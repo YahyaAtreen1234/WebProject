@@ -1,0 +1,279 @@
+'use client';
+
+import { useState, useMemo, useEffect } from 'react';
+import CollectionFilters, { FilterState } from '@/src/components/CollectionFilters';
+import ProductCard from '@/src/components/ProductCard';
+import Cart from '@/src/components/Cart';
+
+export default function ShopPage() {
+  const [allProducts, setAllProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [filters, setFilters] = useState<FilterState>({
+    priceRange: [0, 500],
+    selectedCategories: [],
+    searchTerm: '',
+    sortBy: 'newest',
+  });
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('/api/products');
+        if (response.ok) {
+          const data = await response.json();
+          setAllProducts(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [itemsPerPage, setItemsPerPage] = useState(12);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const cart = Cart();
+
+  // Get unique categories
+  const categories = allProducts.length > 0 ? [...new Set(allProducts.map((p) => p.category))] : [];
+
+  // Filter and sort products
+  const filteredProducts = useMemo(() => {
+    let result = allProducts;
+
+    // Search filter
+    if (filters.searchTerm) {
+      result = result.filter(
+        (p) =>
+          p.title.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+          p.description.toLowerCase().includes(filters.searchTerm.toLowerCase())
+      );
+    }
+
+    // Category filter
+    if (filters.selectedCategories.length > 0) {
+      result = result.filter((p) => filters.selectedCategories.includes(p.category));
+    }
+
+    // Price filter
+    result = result.filter(
+      (p) => p.price >= filters.priceRange[0] && p.price <= filters.priceRange[1]
+    );
+
+    // Sorting
+    switch (filters.sortBy) {
+      case 'price-low':
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case 'price-high':
+        result.sort((a, b) => b.price - a.price);
+        break;
+      case 'name-asc':
+        result.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      case 'name-desc':
+        result.sort((a, b) => b.title.localeCompare(a.title));
+        break;
+      default: // newest
+        result.sort((a, b) => b.featured ? 1 : -1);
+    }
+
+    return result;
+  }, [filters]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  return (
+    <div className="min-h-screen relative">
+      {/* Header */}
+      <section className="container-gutter section-spacing pt-gutter-lg">
+        <div className="mb-8">
+          <h1 className="mb-4 text-4xl md:text-5xl">Our Collection</h1>
+          <p className="text-lg md:text-xl text-midnight-200 leading-relaxed max-w-3xl">
+            Carefully curated gemstones and minerals from around the world. Each piece is unique and selected for its exceptional beauty, rarity, and investment potential.
+          </p>
+        </div>
+
+        {/* Controls Bar */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center mb-8">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`px-4 py-2 rounded-lg font-bold transition-all ${
+                viewMode === 'grid'
+                  ? 'bg-sapphire-600 text-white'
+                  : 'bg-midnight-800/50 border border-sapphire-500/30 text-midnight-200 hover:border-sapphire-400'
+              }`}
+            >
+              ⊞ Grid
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`px-4 py-2 rounded-lg font-bold transition-all ${
+                viewMode === 'list'
+                  ? 'bg-sapphire-600 text-white'
+                  : 'bg-midnight-800/50 border border-sapphire-500/30 text-midnight-200 hover:border-sapphire-400'
+              }`}
+            >
+              ≡ List
+            </button>
+          </div>
+
+          <div className="flex gap-4">
+            <select
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(parseInt(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="px-4 py-2 rounded-lg bg-midnight-800/50 border border-sapphire-500/30 text-white text-sm focus:outline-none focus:border-sapphire-400"
+            >
+              <option value="6">6 per page</option>
+              <option value="12">12 per page</option>
+              <option value="24">24 per page</option>
+            </select>
+
+            <div className="text-sm text-midnight-300 px-4 py-2">
+              Showing {paginatedProducts.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} -{' '}
+              {Math.min(currentPage * itemsPerPage, filteredProducts.length)} of{' '}
+              {filteredProducts.length}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <div className="container-gutter pb-gutter-lg grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Sidebar Filters */}
+        <div className="lg:col-span-1">
+          <div className="card-glass backdrop-blur-md p-6 rounded-2xl sticky top-24">
+            <CollectionFilters onFilterChange={setFilters} categories={categories} />
+          </div>
+        </div>
+
+        {/* Products Grid/List */}
+        <div className="lg:col-span-3">
+          {loading ? (
+            <div className="text-center py-16">
+              <div className="text-6xl mb-4">⏳</div>
+              <h3 className="text-2xl font-bold text-white mb-2">Loading products...</h3>
+            </div>
+          ) : paginatedProducts.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="text-6xl mb-4">🔍</div>
+              <h3 className="text-2xl font-bold text-white mb-2">No products found</h3>
+              <p className="text-midnight-300">Try adjusting your filters or search terms</p>
+            </div>
+          ) : (
+            <>
+              {/* Grid View */}
+              {viewMode === 'grid' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {paginatedProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onAddToCart={cart.addToCart}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* List View */}
+              {viewMode === 'list' && (
+                <div className="space-y-4">
+                  {paginatedProducts.map((product) => (
+                    <div
+                      key={product.id}
+                      className="card-glass backdrop-blur-md p-6 rounded-2xl flex gap-6 items-start"
+                    >
+                      <div className="w-32 h-32 rounded-lg bg-gradient-to-br from-sapphire-900/50 to-amethyst-900/50 flex items-center justify-center text-4xl flex-shrink-0">
+                        💎
+                      </div>
+
+                      <div className="flex-1">
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <h3 className="text-xl font-bold text-white mb-1">{product.title}</h3>
+                            <p className="text-sm text-sapphire-300">{product.category}</p>
+                          </div>
+                          <p className="text-3xl font-bold bg-gradient-to-r from-gold-300 to-rose-300 bg-clip-text text-transparent">
+                            ${product.price}
+                          </p>
+                        </div>
+
+                        <p className="text-midnight-200 mb-4">{product.description}</p>
+
+                        <div className="flex gap-4 items-center">
+                          <span className="text-sm text-midnight-400">
+                            Stock: <span className="text-white font-semibold">{product.stock}</span>
+                          </span>
+                          <button
+                            onClick={() => cart.addToCart(product, 1)}
+                            disabled={product.stock === 0}
+                            className="px-6 py-2 btn-primary text-sm disabled:opacity-50"
+                          >
+                            Add to Cart
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="mt-12 flex justify-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 rounded-lg bg-midnight-800/50 border border-sapphire-500/30 text-white hover:border-sapphire-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    ← Previous
+                  </button>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                        currentPage === page
+                          ? 'bg-sapphire-600 text-white'
+                          : 'bg-midnight-800/50 border border-sapphire-500/30 text-white hover:border-sapphire-400'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2 rounded-lg bg-midnight-800/50 border border-sapphire-500/30 text-white hover:border-sapphire-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next →
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Cart */}
+      <cart.CartUI />
+    </div>
+  );
+}

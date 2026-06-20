@@ -1,0 +1,43 @@
+{
+  "navigation": {
+    "home": "Inicio",
+    "gallery": "Galería",
+    "wishlist": "Deseos",
+    "comparison": "Comparar",
+    "customOrders": "Pedidos Personalizados",
+    "support": "Soporte",
+    "guarantee": "Garantía",
+    "about": "Acerca de",
+    "blog": "Blog",
+    "categories": "Categorías",
+    "contact": "Contacto"
+  },
+  "header": {
+    "welcome": "Bienvenido a StonesLand",
+    "tagline": "Descubre las Mejores Piedras Preciosas y Minerales del Mundo"
+  },
+  "footer": {
+    "copyright": "© 2026 StonesLand. Todos los derechos reservados.",
+    "followUs": "Síguenos",
+    "quickLinks": "Enlaces Rápidos"
+  },
+  "buttons": {
+    "shopNow": "Comprar Ahora",
+    "learnMore": "Aprende Más",
+    "addToCart": "Agregar al Carrito",
+    "addToWishlist": "Agregar a Deseos",
+    "compare": "Comparar",
+    "contact": "Contáctanos",
+    "readMore": "Leer Más"
+  },
+  "common": {
+    "price": "Precio",
+    "category": "Categoría",
+    "rating": "Calificación",
+    "inStock": "En Stock",
+    "outOfStock": "Agotado",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito"
+  }
+}

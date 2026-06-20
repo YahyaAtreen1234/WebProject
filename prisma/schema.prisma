@@ -1,0 +1,679 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     String    @id @default(cuid())
+  name                   String
+  email                  String    @unique
+  password               String
+  role                   String    @default("customer")  // admin, manager, staff, viewer, customer
+  status                 String    @default("active")    // active, inactive, pending
+  emailVerified          Boolean   @default(false)
+  verificationCode       String?
+  verificationCodeExpiry DateTime?
+  profileImage           String?
+  phone                  String?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  orders              Order[]
+  addresses           DeliveryAddress[]
+  wishlist            Wishlist[]
+  paymentMethods      PaymentMethod[]
+  customOrders        CustomOrder[]
+  supportTickets      SupportTicket[]
+  productComparisons  ProductComparison[]
+  reviews             ProductReview[]
+
+  @@index([email])
+  @@index([emailVerified])
+  @@index([role])
+  @@index([status])
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@index([userId])
+}
+
+model Product {
+  id        String     @id @default(cuid())
+  title     String     @unique
+  description String
+  price     Float
+  image     String?              // Main/featured image (for backward compatibility)
+  imagesJson String    @default("[]")  // JSON array of image URLs
+  category  String
+  stock     Int        @default(0)
+  featured  Boolean    @default(false)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  orderItems OrderItem[]
+  reviews    ProductReview[]
+
+  @@index([category])
+  @@index([featured])
+}
+
+model ProductReview {
+  id        String   @id @default(cuid())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+
+  rating    Int      @default(5)
+  title     String
+  comment   String
+  helpful   Int      @default(0)
+
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([productId, userId])
+  @@index([productId])
+  @@index([userId])
+  @@index([rating])
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  cartId    String
+  productId String
+  quantity  Int      @default(1)
+  price     Float
+
+  @@unique([cartId, productId])
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique
+
+  // User link (for registered users)
+  user            User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId          String?
+
+  // Customer info
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  address         String
+  city            String
+  state           String?
+  postalCode      String
+  country         String
+
+  // Pricing
+  totalAmount     Float
+  subtotal        Float
+  tax             Float
+  shipping        Float
+  discount        Float?
+  discountCode    String?
+
+  // Payment & Status
+  paymentMethod   String?
+  stripePaymentId String?     @unique
+  paymentStatus   String      @default("pending")
+  status          String      @default("pending")
+
+  // Relations
+  items           OrderItem[]
+  delivery        Delivery?
+  paymentRecords  PaymentRecord[]
+  returns         Return[]
+  notes           String?
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([customerEmail])
+  @@index([userId])
+  @@index([stripePaymentId])
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+  quantity  Int
+  price     Float
+  title     String
+
+  @@index([orderId])
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  read      Boolean  @default(false)
+  status    String   @default("new")  // new, replied, closed
+  replies   ContactReply[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([read])
+  @@index([email])
+  @@index([status])
+}
+
+model ContactReply {
+  id        String   @id @default(cuid())
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  contactId String
+
+  message   String
+  type      String   @default("admin")  // admin, system
+  createdAt DateTime @default(now())
+
+  @@index([contactId])
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Delivery {
+  id                String            @id @default(cuid())
+  order             Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId           String            @unique
+  trackingNumber    String            @unique
+  carrier           String
+  shippingMethod    String
+  estimatedDays    Int
+  status            String            @default("pending")
+  currentLocation   String?
+  latitude          Float?
+  longitude         Float?
+  shippingCost      Float
+  insuranceCost     Float?
+  totalShippingCost Float
+  weight            Float?
+  dimensions        String?
+  trackingHistory   TrackingEvent[]
+  notifications     DeliveryNotification[]
+  estimatedDelivery DateTime?
+  actualDelivery    DateTime?
+  signature         String?
+  notes             String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([status])
+  @@index([trackingNumber])
+  @@index([carrier])
+}
+
+model TrackingEvent {
+  id        String   @id @default(cuid())
+  delivery  Delivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+  deliveryId String
+  status    String
+  location  String
+  latitude  Float?
+  longitude Float?
+  timestamp DateTime @default(now())
+  description String?
+  createdAt DateTime @default(now())
+
+  @@index([deliveryId])
+  @@index([timestamp])
+}
+
+model DeliveryNotification {
+  id        String   @id @default(cuid())
+  delivery  Delivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+  deliveryId String
+  type      String
+  recipient String
+  subject   String?
+  message   String
+  sent      Boolean  @default(false)
+  sentAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([deliveryId])
+  @@index([sent])
+}
+
+model DeliveryAddress {
+  id           String   @id @default(cuid())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  name         String
+  phone        String
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  state        String?
+  postalCode   String
+  country      String
+  latitude     Float?
+  longitude    Float?
+  isDefault    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+  @@index([isDefault])
+}
+
+model ShippingRate {
+  id           String   @id @default(cuid())
+  carrier      String
+  method       String
+  minWeight    Float    @default(0)
+  maxWeight    Float    @default(1000)
+  baseRate     Float
+  perKgRate    Float
+  daysEstimate Int
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([carrier, method])
+  @@index([active])
+}
+
+model Discount {
+  id               String    @id @default(cuid())
+  code             String    @unique
+  type             String    // "percentage", "fixed", "free_shipping"
+  value            Float     // percentage (e.g., 10) or fixed amount (e.g., 50)
+  description      String?
+  minOrderAmount   Float     @default(0)
+  maxDiscount      Float?    // max discount amount for percentage discounts
+  maxUses          Int?      // null = unlimited
+  timesUsed        Int       @default(0)
+  expiryDate       DateTime?
+  active           Boolean   @default(true)
+  usages           DiscountUsage[]
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([code])
+  @@index([active])
+  @@index([expiryDate])
+}
+
+model DiscountUsage {
+  id         String   @id @default(cuid())
+  discount   Discount @relation(fields: [discountId], references: [id], onDelete: Cascade)
+  discountId String
+  email      String
+  usedAt     DateTime @default(now())
+
+  @@index([discountId])
+  @@index([email])
+  @@index([usedAt])
+}
+
+model PaymentMethod {
+  id              String    @id @default(cuid())
+  user            User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String?
+  type            String    // "credit_card", "paypal", "apple_pay", "google_pay", "bank_transfer"
+  isDefault       Boolean   @default(false)
+
+  // Card details (encrypted in production)
+  last4           String?   // Last 4 digits
+  expiryMonth     Int?
+  expiryYear      Int?
+  cardholderName  String?
+
+  // PayPal
+  paypalEmail     String?
+  paypalId        String?
+
+  // Bank details
+  bankName        String?
+  accountLast4    String?
+  routingNumber   String?
+
+  // Stripe token
+  stripeToken     String?
+
+  active          Boolean   @default(true)
+  paymentRecords  PaymentRecord[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([type])
+  @@index([isDefault])
+}
+
+model PaymentRecord {
+  id                String    @id @default(cuid())
+  order             Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  orderId           String?
+  paymentMethod     PaymentMethod? @relation(fields: [paymentMethodId], references: [id], onDelete: SetNull)
+  paymentMethodId   String?
+
+  type              String    // "credit_card", "paypal", "apple_pay", "google_pay", "bank_transfer"
+  amount            Float
+  currency          String    @default("USD")
+  status            String    @default("pending") // "pending", "processing", "completed", "failed", "refunded"
+
+  transactionId     String?   @unique
+  receiptUrl        String?
+
+  failureReason     String?
+
+  processedAt       DateTime?
+  refundedAt        DateTime?
+  refundAmount      Float?
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([orderId])
+  @@index([paymentMethodId])
+  @@index([type])
+  @@index([status])
+  @@index([transactionId])
+}
+
+model Return {
+  id                String    @id @default(cuid())
+  order             Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  orderId           String?
+  returnNumber      String    @unique
+
+  status            String    @default("requested") // "requested", "approved", "rejected", "shipped", "received", "refunded", "completed"
+  reason            String
+  description       String?
+
+  itemsToReturn     ReturnItem[]
+  refund            Refund?
+
+  requestedAt       DateTime  @default(now())
+  approvedAt        DateTime?
+  shippedAt         DateTime?
+  receivedAt        DateTime?
+  completedAt       DateTime?
+
+  shippingLabel     String?
+  trackingNumber    String?
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([orderId])
+  @@index([status])
+  @@index([returnNumber])
+}
+
+model ReturnItem {
+  id          String    @id @default(cuid())
+  return      Return    @relation(fields: [returnId], references: [id], onDelete: Cascade)
+  returnId    String
+  productId   String
+  productName String
+  quantity    Int
+  reason      String?
+  condition   String    // "new", "like_new", "good", "fair", "poor"
+
+  @@index([returnId])
+}
+
+model Refund {
+  id                String    @id @default(cuid())
+  return            Return    @relation(fields: [returnId], references: [id], onDelete: Cascade)
+  returnId          String    @unique
+
+  status            String    @default("pending") // "pending", "approved", "processing", "completed", "failed"
+  amount            Float
+  reason            String?
+
+  processedAt       DateTime?
+  completedAt       DateTime?
+
+  failureReason     String?
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([returnId])
+  @@index([status])
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  subscribed Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([subscribed])
+}
+
+model EmailCampaign {
+  id          String   @id @default(cuid())
+  title       String
+  subject     String
+  content     String
+  status      String   @default("draft") // "draft", "scheduled", "sending", "sent", "failed"
+  recipientCount Int    @default(0)
+  sentCount   Int      @default(0)
+  openCount   Int      @default(0)
+  clickCount  Int      @default(0)
+
+  scheduledAt DateTime?
+  sentAt      DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+}
+
+model EmailLog {
+  id          String   @id @default(cuid())
+  recipientEmail String
+  subject     String
+  type        String   // "welcome", "order_confirmation", "order_shipped", "campaign", "password_reset"
+  status      String   @default("pending") // "pending", "sent", "failed", "opened", "clicked"
+
+  sentAt      DateTime?
+  openedAt    DateTime?
+  clickedAt   DateTime?
+
+  failureReason String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([recipientEmail])
+  @@index([type])
+  @@index([status])
+}
+
+// PHASE 1: HIGH PRIORITY FEATURES
+
+// Wishlist (already exists above, just ensure it's there)
+// User.wishlist relation already defined
+
+// Product Comparison
+model ProductComparison {
+  id        String    @id @default(cuid())
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String?
+  sessionId String?   // for guest users
+
+  comparisonItems ComparisonItem[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([sessionId])
+}
+
+model ComparisonItem {
+  id          String    @id @default(cuid())
+  comparison  ProductComparison @relation(fields: [comparisonId], references: [id], onDelete: Cascade)
+  comparisonId String
+  productId   String
+  addedAt     DateTime  @default(now())
+
+  @@unique([comparisonId, productId])
+  @@index([comparisonId])
+}
+
+// Custom Orders
+model CustomOrder {
+  id              String    @id @default(cuid())
+  customOrderNumber String  @unique
+  user            User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId          String?
+
+  customerName    String
+  customerEmail   String
+  customerPhone   String?
+
+  description     String    // What they want
+  budget          Float?
+  deadline        String?
+
+  status          String    @default("requested") // "requested", "under_review", "quoted", "accepted", "in_progress", "completed", "rejected"
+  quotedPrice     Float?
+  finalPrice      Float?
+
+  items           CustomOrderItem[]
+
+  adminNotes      String?
+  customerNotes   String?
+
+  requestedAt     DateTime  @default(now())
+  quotedAt        DateTime?
+  completedAt     DateTime?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([customOrderNumber])
+}
+
+model CustomOrderItem {
+  id          String    @id @default(cuid())
+  customOrder CustomOrder @relation(fields: [customOrderId], references: [id], onDelete: Cascade)
+  customOrderId String
+
+  description String
+  quantity    Int?
+  specifications String?
+
+  @@index([customOrderId])
+}
+
+// Support / Help System
+model SupportTicket {
+  id            String    @id @default(cuid())
+  ticketNumber  String    @unique
+  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId        String?
+
+  email         String
+  name          String
+
+  subject       String
+  category      String    // "general", "order", "product", "technical", "refund", "shipping", "other"
+  priority      String    @default("medium") // "low", "medium", "high", "urgent"
+
+  status        String    @default("open") // "open", "in_progress", "waiting_customer", "resolved", "closed"
+
+  messages      SupportMessage[]
+
+  openedAt      DateTime  @default(now())
+  resolvedAt    DateTime?
+  closedAt      DateTime?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([ticketNumber])
+  @@index([category])
+}
+
+model SupportMessage {
+  id          String    @id @default(cuid())
+  ticket      SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  ticketId    String
+
+  senderType  String    // "customer", "admin"
+  senderName  String
+  senderEmail String
+
+  message     String
+  attachmentUrl String?
+
+  isInternal  Boolean   @default(false) // visible only to admin
+
+  createdAt   DateTime  @default(now())
+
+  @@index([ticketId])
+}
+
+// Money-Back Guarantee
+model GuaranteePolicy {
+  id              String    @id @default(cuid())
+  title           String
+  description     String
+  days            Int       // e.g., 15 days
+  terms           String    // detailed terms and conditions
+  conditionsJson  String    // JSON array of conditions
+
+  active          Boolean   @default(true)
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+// Update User model to include relations
+// (Already has wishlist, adding custom orders and support tickets)

@@ -1,0 +1,43 @@
+{
+  "navigation": {
+    "home": "Startseite",
+    "gallery": "Galerie",
+    "wishlist": "Wunschliste",
+    "comparison": "Vergleichen",
+    "customOrders": "Benutzerdefinierte Bestellungen",
+    "support": "Unterstützung",
+    "guarantee": "Garantie",
+    "about": "Über Uns",
+    "blog": "Blog",
+    "categories": "Kategorien",
+    "contact": "Kontakt"
+  },
+  "header": {
+    "welcome": "Willkommen bei StonesLand",
+    "tagline": "Entdecken Sie die Schönsten Edelsteine und Mineralien der Welt"
+  },
+  "footer": {
+    "copyright": "© 2026 StonesLand. Alle Rechte vorbehalten.",
+    "followUs": "Folgen Sie uns",
+    "quickLinks": "Schnelllinks"
+  },
+  "buttons": {
+    "shopNow": "Jetzt Kaufen",
+    "learnMore": "Mehr Erfahren",
+    "addToCart": "In den Warenkorb",
+    "addToWishlist": "Zur Wunschliste Hinzufügen",
+    "compare": "Vergleichen",
+    "contact": "Kontaktieren Sie Uns",
+    "readMore": "Mehr Lesen"
+  },
+  "common": {
+    "price": "Preis",
+    "category": "Kategorie",
+    "rating": "Bewertung",
+    "inStock": "Auf Lager",
+    "outOfStock": "Ausverkauft",
+    "loading": "Wird geladen...",
+    "error": "Fehler",
+    "success": "Erfolg"
+  }
+}

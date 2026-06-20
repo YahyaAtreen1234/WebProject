@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  @apply transition-all duration-300;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-gradient-to-br from-midnight-900 via-midnight-800 to-sapphire-700 text-midnight-100 font-sans min-h-screen;
+    background-attachment: fixed;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold;
+  }
+
+  h1 {
+    @apply text-h1 bg-gradient-to-r from-sapphire-300 via-amethyst-300 to-emerald-300 bg-clip-text text-transparent;
+  }
+
+  h2 {
+    @apply text-h2 bg-gradient-to-r from-gold-300 to-rose-300 bg-clip-text text-transparent;
+  }
+
+  h3 {
+    @apply text-h3 text-white;
+  }
+
+  h4 {
+    @apply text-h4 text-midnight-100;
+  }
+
+  a {
+    @apply hover:text-sapphire-300 transition-all duration-300;
+  }
+}
+
+@layer components {
+  .nav-link {
+    @apply font-semibold relative transition-colors;
+    color: #cbd5e1;
+  }
+
+  .nav-link:hover {
+    color: #60a5fa;
+  }
+
+  .nav-link::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300;
+    background: linear-gradient(to right, #3b82f6, #a855f7);
+  }
+
+  .nav-link:hover::after {
+    @apply w-full;
+  }
+
+  .container-gutter {
+    @apply px-gutter max-w-7xl mx-auto;
+  }
+
+  .section-spacing {
+    @apply py-gutter-lg;
+  }
+
+  .btn-primary {
+    @apply px-8 py-3 rounded-lg font-bold text-white shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300;
+    background: linear-gradient(to right, #1d4ed8, #7e22ce);
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(to right, #2563eb, #9333ea);
+  }
+
+  .btn-secondary {
+    @apply px-8 py-3 rounded-lg font-bold border-2 transition-all duration-300;
+    color: #3b82f6;
+    border-color: #3b82f6;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(59, 130, 246, 0.1);
+  }
+
+  .btn-accent {
+    @apply px-8 py-3 rounded-lg font-bold text-white shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300;
+    background: linear-gradient(to right, #d97706, #be185d);
+  }
+
+  .btn-accent:hover {
+    background: linear-gradient(to right, #f59e0b, #db2777);
+  }
+
+  .card-glass {
+    @apply backdrop-blur-xl border rounded-2xl transition-all duration-300;
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .card-glass:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+
+  .card-gradient {
+    @apply relative overflow-hidden rounded-2xl border p-1;
+    background: linear-gradient(to bottom-right, rgba(37, 99, 235, 0.2), rgba(126, 34, 206, 0.2));
+    border-color: rgba(59, 130, 246, 0.2);
+  }
+
+  .glow-effect {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+  }
+
+  .glow-effect:hover {
+    box-shadow: 0 0 40px rgba(168, 85, 247, 0.7);
+  }
+
+  .text-gradient {
+    background: linear-gradient(to right, #60a5fa, #c084fc, #6ee7b7);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .shimmer-bg {
+    background: linear-gradient(to right, #2563eb, #9333ea, #2563eb);
+    background-size: 200% auto;
+    animation: shimmer 2s infinite;
+  }
+}

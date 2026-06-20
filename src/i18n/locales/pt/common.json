@@ -1,0 +1,43 @@
+{
+  "navigation": {
+    "home": "Início",
+    "gallery": "Galeria",
+    "wishlist": "Meus Desejos",
+    "comparison": "Comparar",
+    "customOrders": "Pedidos Personalizados",
+    "support": "Suporte",
+    "guarantee": "Garantia",
+    "about": "Sobre Nós",
+    "blog": "Blog",
+    "categories": "Categorias",
+    "contact": "Contato"
+  },
+  "header": {
+    "welcome": "Bem-vindo ao StonesLand",
+    "tagline": "Descubra as Mais Belas Gemas e Minerais do Mundo"
+  },
+  "footer": {
+    "copyright": "© 2026 StonesLand. Todos os direitos reservados.",
+    "followUs": "Siga-nos",
+    "quickLinks": "Links Rápidos"
+  },
+  "buttons": {
+    "shopNow": "Compre Agora",
+    "learnMore": "Saiba Mais",
+    "addToCart": "Adicionar ao Carrinho",
+    "addToWishlist": "Adicionar aos Meus Desejos",
+    "compare": "Comparar",
+    "contact": "Entre em Contato",
+    "readMore": "Ler Mais"
+  },
+  "common": {
+    "price": "Preço",
+    "category": "Categoria",
+    "rating": "Classificação",
+    "inStock": "Em Estoque",
+    "outOfStock": "Fora de Estoque",
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso"
+  }
+}

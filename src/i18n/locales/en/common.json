@@ -1,0 +1,43 @@
+﻿{
+    "common":  {
+                   "rating":  "Rating",
+                   "category":  "Category",
+                   "price":  "Price",
+                   "success":  "Success",
+                   "error":  "Error",
+                   "loading":  "Loading...",
+                   "inStock":  "In Stock",
+                   "outOfStock":  "Out of Stock"
+               },
+    "navigation":  {
+                       "gallery":  "Gallery",
+                       "guarantee":  "Guarantee",
+                       "blog":  "Blog",
+                       "home":  "Home",
+                       "support":  "Support",
+                       "customOrders":  "Custom Orders",
+                       "wishlist":  "Wishlist",
+                       "contact":  "Contact",
+                       "about":  "About Us",
+                       "comparison":  "Compare",
+                       "categories":  "Categories"
+                   },
+    "footer":  {
+                   "copyright":  "© 2026 StonesLand. All rights reserved.",
+                   "followUs":  "Follow Us",
+                   "quickLinks":  "Quick Links"
+               },
+    "header":  {
+                   "tagline":  "Discover the World\u0027s Finest Gemstones \u0026 Minerals",
+                   "welcome":  "Welcome to StonesLand"
+               },
+    "buttons":  {
+                    "readMore":  "Read More",
+                    "contact":  "Contact Us",
+                    "compare":  "Compare",
+                    "learnMore":  "Learn More",
+                    "addToWishlist":  "Add to Wishlist",
+                    "shopNow":  "Shop Now",
+                    "addToCart":  "Add to Cart"
+                }
+}

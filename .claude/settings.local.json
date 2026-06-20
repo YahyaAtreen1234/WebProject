@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(node --version)",
+      "PowerShell(npm --version)",
+      "mcp__Claude_Preview__preview_start",
+      "PowerShell($nodePath = & where.exe node 2>$null; if \\($nodePath\\) { \"Node found at: $nodePath\"; node --version } else { \"Node not found in PATH\" })",
+      "Bash(npm run *)",
+      "Bash(npm install *)",
+      "PowerShell($env:DATABASE_URL = 'file:./prisma/dev.db' ; cd 'E:\\\\Claude project' ; npm run prisma:migrate -- --name add_discount_system)",
+      "WebFetch(domain:fineartminerals.com)",
+      "Bash(curl -s http://localhost:3001)",
+      "Bash(set DATABASE_URL=file:./prisma/dev.db)",
+      "Bash(npx prisma *)",
+      "Bash(findstr /n \"||.*'\" src/components/AdminSupportTickets.tsx)",
+      "Bash(findstr /n \"AdminSupportTickets\" src/app/admin/*.tsx)",
+      "Bash(node -e ' *)",
+      "Bash(export DATABASE_URL=\"file:./prisma/dev.db\")",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(curl -X POST http://localhost:3000/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"admin@minerals.local\",\"password\":\"admin123\"}')",
+      "Bash(curl -s http://localhost:3000/api/auth/login -X POST -H \"Content-Type: application/json\" -d '{\"email\":\"admin@minerals.local\",\"password\":\"admin123\"}')"
+    ]
+  }
+}
