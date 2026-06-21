@@ -24,7 +24,7 @@ export default function AdminDiscounts() {
   const [discounts, setDiscounts] = useState<Discount[]>([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [editingId, setEditingId] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     code: '',
     type: 'percentage',
