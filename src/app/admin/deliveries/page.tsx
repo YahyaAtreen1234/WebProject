@@ -1,6 +1,6 @@
 'use client';
 
-import DeliveryAdmin from '@/src/components/DeliveryAdmin';
+import DeliveryAdmin from '@/components/DeliveryAdmin';
 
 export default function AdminDeliveriesPage() {
   return (

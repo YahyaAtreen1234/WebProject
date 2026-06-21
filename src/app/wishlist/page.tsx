@@ -1,4 +1,4 @@
-﻿import Wishlist from '@/src/components/Wishlist';
+﻿import Wishlist from '@/components/Wishlist';
 
 export const metadata = {
   title: 'My Wishlist',

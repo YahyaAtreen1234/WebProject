@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import BlogCard from '@/src/components/blog/BlogCard';
-import { blogPosts } from '@/src/data/blogData';
+import BlogCard from '@/components/blog/BlogCard';
+import { blogPosts } from '@/data/blogData';
 
 interface BlogPostPageProps {
   params: {

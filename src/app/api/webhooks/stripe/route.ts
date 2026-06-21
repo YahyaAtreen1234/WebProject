@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe } from '@/src/lib/stripe';
-import { prisma } from '@/src/lib/db';
-import { sendOrderConfirmation } from '@/src/lib/email';
+import { stripe } from '@/lib/stripe';
+import { prisma } from '@/lib/db';
+import { sendOrderConfirmation } from '@/lib/email';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 

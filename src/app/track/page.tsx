@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import DeliveryTracking from '@/src/components/DeliveryTracking';
+import DeliveryTracking from '@/components/DeliveryTracking';
 
 export default function TrackPage() {
   const [trackingNumber, setTrackingNumber] = useState('');

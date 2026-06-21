@@ -1,6 +1,6 @@
 'use client';
 
-import UserPanel from '@/src/components/UserPanel';
+import UserPanel from '@/components/UserPanel';
 
 export default function UserDashboardPage() {
   return <UserPanel />;

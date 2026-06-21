@@ -1,6 +1,6 @@
 'use client';
 
-import VaultGallery from '@/src/components/VaultGallery';
+import VaultGallery from '@/components/VaultGallery';
 
 export default function GalleryPage() {
   return (

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { useCart } from '@/src/context/CartContext';
+import { useCart } from '@/context/CartContext';
 
 export default function Navigation() {
   const { getItemCount } = useCart();

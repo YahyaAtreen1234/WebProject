@@ -1,6 +1,6 @@
 'use client';
 
-import AdminLogin from '@/src/components/AdminLogin';
+import AdminLogin from '@/components/AdminLogin';
 
 export default function AdminLoginPage() {
   return <AdminLogin />;

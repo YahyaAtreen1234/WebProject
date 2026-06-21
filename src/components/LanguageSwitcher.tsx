@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useLanguage, useChangeLanguage } from '@/src/i18n/useLanguage';
-import { SUPPORTED_LANGUAGES } from '@/src/i18n/config';
+import { useLanguage, useChangeLanguage } from '@/i18n/useLanguage';
+import { SUPPORTED_LANGUAGES } from '@/i18n/config';
 
 export default function LanguageSwitcher() {
   const { currentLanguage } = useLanguage();

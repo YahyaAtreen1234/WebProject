@@ -1,6 +1,6 @@
 'use client';
 
-import AdminProducts from '@/src/components/AdminProducts';
+import AdminProducts from '@/components/AdminProducts';
 
 export default function AdminProductsPage() {
   return (

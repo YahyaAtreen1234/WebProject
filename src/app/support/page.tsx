@@ -1,4 +1,4 @@
-﻿import SupportTickets from '@/src/components/SupportTickets';
+﻿import SupportTickets from '@/components/SupportTickets';
 
 export const metadata = {
   title: 'Help & Support',

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useCurrency, useChangeCurrency } from '@/src/currency/useCurrency';
-import { SUPPORTED_CURRENCIES, getCurrencyCodes, CurrencyCode } from '@/src/currency/config';
+import { useCurrency, useChangeCurrency } from '@/currency/useCurrency';
+import { SUPPORTED_CURRENCIES, getCurrencyCodes, CurrencyCode } from '@/currency/config';
 
 export default function CurrencySwitcher() {
   const { currentCurrency, lastUpdated } = useCurrency();

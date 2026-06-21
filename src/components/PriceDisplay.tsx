@@ -1,7 +1,7 @@
 'use client';
 
-import { useFormatPrice, useCurrencyInfo } from '@/src/currency/useCurrency';
-import { CurrencyCode } from '@/src/currency/config';
+import { useFormatPrice, useCurrencyInfo } from '@/currency/useCurrency';
+import { CurrencyCode } from '@/currency/config';
 
 interface PriceDisplayProps {
   amount: number;

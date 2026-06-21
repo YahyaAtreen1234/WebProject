@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/src/lib/db';
-import { isValidEmail } from '@/src/lib/auth';
+import { prisma } from '@/lib/db';
+import { isValidEmail } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {

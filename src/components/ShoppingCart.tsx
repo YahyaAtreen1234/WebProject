@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useCart } from '@/src/context/CartContext';
-import { cartUtils } from '@/src/lib/cart';
+import { useCart } from '@/context/CartContext';
+import { cartUtils } from '@/lib/cart';
 
 export default function ShoppingCart() {
   const { cart, removeItem, updateQuantity } = useCart();

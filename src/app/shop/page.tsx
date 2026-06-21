@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import CollectionFilters, { FilterState } from '@/src/components/CollectionFilters';
-import ProductCard from '@/src/components/ProductCard';
-import Cart from '@/src/components/Cart';
+import CollectionFilters, { FilterState } from '@/components/CollectionFilters';
+import ProductCard from '@/components/ProductCard';
+import Cart from '@/components/Cart';
 
 export default function ShopPage() {
   const [allProducts, setAllProducts] = useState<any[]>([]);

@@ -1,6 +1,6 @@
-import { prisma } from '@/src/lib/db';
-import { generateUniqueTrackingNumber } from '@/src/lib/tracking';
-import { verifyToken } from '@/src/lib/auth';
+import { prisma } from '@/lib/db';
+import { generateUniqueTrackingNumber } from '@/lib/tracking';
+import { verifyToken } from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(

@@ -1,6 +1,6 @@
 'use client';
 
-import AdminDiscounts from '@/src/components/AdminDiscounts';
+import AdminDiscounts from '@/components/AdminDiscounts';
 
 export default function AdminDiscountsPage() {
   return (

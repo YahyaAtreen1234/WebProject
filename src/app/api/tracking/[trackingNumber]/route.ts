@@ -1,5 +1,5 @@
-import { prisma } from '@/src/lib/db';
-import { verifyToken } from '@/src/lib/auth';
+import { prisma } from '@/lib/db';
+import { verifyToken } from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
 
 const VALID_STATUSES = ['pending', 'picked', 'in_transit', 'out_for_delivery', 'delivered', 'failed'];

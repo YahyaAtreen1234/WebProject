@@ -5,6 +5,9 @@
 
 import { PERMISSIONS, ROLES, Role, Permission } from './permissions';
 
+// Re-export ROLES for use in other files
+export { ROLES };
+
 /**
  * Role to permissions mapping
  * Defines what each role can do

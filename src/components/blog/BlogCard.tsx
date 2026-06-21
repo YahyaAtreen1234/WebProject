@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { BlogPost } from '@/src/data/blogData';
+import { BlogPost } from '@/data/blogData';
 
 interface BlogCardProps {
   post: BlogPost;

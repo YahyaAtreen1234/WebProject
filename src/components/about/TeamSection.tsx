@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { teamMembers } from '@/src/data/aboutData';
+import { teamMembers } from '@/data/aboutData';
 
 export default function TeamSection() {
   const [visibleCards, setVisibleCards] = useState<number[]>([]);

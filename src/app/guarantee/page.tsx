@@ -1,4 +1,4 @@
-﻿import GuaranteeInfo from '@/src/components/GuaranteeInfo';
+﻿import GuaranteeInfo from '@/components/GuaranteeInfo';
 
 export const metadata = {
   title: 'Money-Back Guarantee',

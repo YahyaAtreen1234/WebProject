@@ -1,4 +1,4 @@
-﻿import CustomOrders from '@/src/components/CustomOrders';
+﻿import CustomOrders from '@/components/CustomOrders';
 
 export const metadata = {
   title: 'Custom Orders',

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import HeroSection from '@/src/components/about/HeroSection';
-import TrustBadgesSection from '@/src/components/about/TrustBadgesSection';
-import CTASection from '@/src/components/about/CTASection';
+import HeroSection from '@/components/about/HeroSection';
+import TrustBadgesSection from '@/components/about/TrustBadgesSection';
+import CTASection from '@/components/about/CTASection';
 
 export const metadata: Metadata = {
   title: 'About StonesLand | Authentic Gemstones & Minerals Since 2015',

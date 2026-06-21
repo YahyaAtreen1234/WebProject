@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useTranslation } from '@/src/i18n';
+import { useTranslation } from '@/i18n';
 import { useEffect, useState } from 'react';
 
 export default function HeroSection() {

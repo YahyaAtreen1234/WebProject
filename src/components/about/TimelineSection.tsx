@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { timeline } from '@/src/data/aboutData';
+import { timeline } from '@/data/aboutData';
 
 interface TimelineItem {
   year: number;

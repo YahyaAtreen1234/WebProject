@@ -2,8 +2,8 @@
 
 import { useState, useMemo } from 'react';
 import type { Metadata } from 'next';
-import BlogCard from '@/src/components/blog/BlogCard';
-import { blogPosts, categories } from '@/src/data/blogData';
+import BlogCard from '@/components/blog/BlogCard';
+import { blogPosts, categories } from '@/data/blogData';
 
 const POSTS_PER_PAGE = 6;
 

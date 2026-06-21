@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import ProductCarousel from '@/src/components/ProductCarousel';
+import ProductCarousel from '@/components/ProductCarousel';
 
 export default function Home() {
   return (

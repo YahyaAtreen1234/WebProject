@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { companyInfo, values } from '@/src/data/aboutData';
+import { companyInfo, values } from '@/data/aboutData';
 
 export default function MissionValuesSection() {
   const [visibleCards, setVisibleCards] = useState<number[]>([]);

@@ -1,4 +1,4 @@
-﻿import ProductComparison from '@/src/components/ProductComparison';
+﻿import ProductComparison from '@/components/ProductComparison';
 
 export const metadata = {
   title: 'Compare Products',

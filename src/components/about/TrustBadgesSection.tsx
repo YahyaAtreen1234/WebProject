@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { trustBadges, certifications } from '@/src/data/aboutData';
+import { trustBadges, certifications } from '@/data/aboutData';
 
 export default function TrustBadgesSection() {
   const [visibleBadges, setVisibleBadges] = useState<number[]>([]);

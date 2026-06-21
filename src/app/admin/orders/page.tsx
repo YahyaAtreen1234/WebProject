@@ -1,6 +1,6 @@
 'use client';
 
-import AdminOrders from '@/src/components/AdminOrders';
+import AdminOrders from '@/components/AdminOrders';
 
 export default function AdminOrdersPage() {
   return (

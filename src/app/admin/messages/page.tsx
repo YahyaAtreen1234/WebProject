@@ -1,6 +1,6 @@
 'use client';
 
-import AdminMessages from '@/src/components/AdminMessages';
+import AdminMessages from '@/components/AdminMessages';
 
 export default function AdminMessagesPage() {
   return <AdminMessages />;

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createCheckoutSession } from '@/src/lib/stripe';
-import { prisma } from '@/src/lib/db';
+import { createCheckoutSession } from '@/lib/stripe';
+import { prisma } from '@/lib/db';
 
 export async function POST(request: NextRequest) {
   try {

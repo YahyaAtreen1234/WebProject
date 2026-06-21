@@ -1,5 +1,5 @@
-import { prisma } from '@/src/lib/db';
-import { isValidTrackingNumber } from '@/src/lib/tracking';
+import { prisma } from '@/lib/db';
+import { isValidTrackingNumber } from '@/lib/tracking';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {

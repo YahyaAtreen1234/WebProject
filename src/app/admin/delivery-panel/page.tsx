@@ -1,6 +1,6 @@
 'use client';
 
-import AdvancedDeliveryPanel from '@/src/components/AdvancedDeliveryPanel';
+import AdvancedDeliveryPanel from '@/components/AdvancedDeliveryPanel';
 
 export default function AdvancedDeliveryPanelPage() {
   return (

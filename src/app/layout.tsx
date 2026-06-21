@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
-import Navigation from '@/src/components/Navigation';
-import Footer from '@/src/components/Footer';
-import { CartProvider } from '@/src/context/CartContext';
-import { LanguageProvider } from '@/src/i18n';
-import { CurrencyProvider } from '@/src/currency';
+import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
+import { CartProvider } from '@/context/CartContext';
+import { LanguageProvider } from '@/i18n';
+import { CurrencyProvider } from '@/currency';
 import './globals.css';
 
 export const metadata: Metadata = {

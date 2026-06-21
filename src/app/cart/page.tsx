@@ -1,6 +1,6 @@
 'use client';
 
-import ShoppingCart from '@/src/components/ShoppingCart';
+import ShoppingCart from '@/components/ShoppingCart';
 
 export default function CartPage() {
   return <ShoppingCart />;

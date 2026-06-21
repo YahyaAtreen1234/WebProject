@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import ProtectedRoute from '@/src/components/ProtectedRoute';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 const adminMenuItems = [
   { label: 'Dashboard', href: '/admin/dashboard', icon: '📊' },

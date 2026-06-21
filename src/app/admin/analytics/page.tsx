@@ -1,6 +1,6 @@
 'use client';
 
-import AdminAnalytics from '@/src/components/AdminAnalytics';
+import AdminAnalytics from '@/components/AdminAnalytics';
 
 export default function AdminAnalyticsPage() {
   return (
