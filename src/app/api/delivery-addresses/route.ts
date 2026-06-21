@@ -4,17 +4,17 @@ import { prisma } from '@/lib/db';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const email = searchParams.get('email');
+    const userId = searchParams.get('userId');
 
-    if (!email) {
+    if (!userId) {
       return NextResponse.json(
-        { error: 'Email required' },
+        { error: 'User ID required' },
         { status: 400 }
       );
     }
 
     const addresses = await prisma.deliveryAddress.findMany({
-      where: { email },
+      where: { userId },
       orderBy: [{ isDefault: 'desc' }, { createdAt: 'desc' }],
     });
 
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const {
-      email,
+      userId,
       name,
       phone,
       addressLine1,
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
       isDefault,
     } = body;
 
-    if (!email || !name || !addressLine1 || !city || !postalCode || !country) {
+    if (!userId || !name || !addressLine1 || !city || !postalCode || !country) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -56,14 +56,14 @@ export async function POST(request: NextRequest) {
     // If this is default, unset others
     if (isDefault) {
       await prisma.deliveryAddress.updateMany({
-        where: { email, isDefault: true },
+        where: { userId, isDefault: true },
         data: { isDefault: false },
       });
     }
 
     const address = await prisma.deliveryAddress.create({
       data: {
-        email,
+        userId,
         name,
         phone,
         addressLine1,

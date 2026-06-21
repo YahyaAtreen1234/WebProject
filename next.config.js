@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
   eslint: {
     // Disable ESLint during production builds to allow deployment
     ignoreDuringBuilds: true,
