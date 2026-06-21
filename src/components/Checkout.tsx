@@ -2,8 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { loadStripe } from '@stripe/js';
 import { useCart } from '@/context/CartContext';
 import { cartUtils } from '@/lib/cart';
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 export default function Checkout() {
   const { cart, clearCart } = useCart();
