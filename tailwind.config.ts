@@ -9,21 +9,21 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // StonesLand Gemstone-Inspired Palette
+        // StonesLand Gemstone-Inspired Palette - Yellow & Black Theme
         midnight: {
           50: '#f0f2f5',
           100: '#d9dfe8',
-          600: '#2a3547',
-          700: '#1f2937',
-          800: '#111827',
-          900: '#0a0e17',
+          600: '#1a1a1a',
+          700: '#0f0f0f',
+          800: '#000000',
+          900: '#000000',
         },
         sapphire: {
-          300: '#60a5fa',
-          400: '#3b82f6',
-          500: '#2563eb',
-          600: '#1d4ed8',
-          700: '#1e40af',
+          300: '#fef08a',
+          400: '#facc15',
+          500: '#eab308',
+          600: '#ca8a04',
+          700: '#a16207',
         },
         emerald: {
           300: '#6ee7b7',
