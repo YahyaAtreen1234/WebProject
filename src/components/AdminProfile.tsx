@@ -86,7 +86,7 @@ export default function AdminProfile() {
       }
 
       // Update localStorage (in production, would be API call)
-      const updated = { ...adminInfo, ...formData };
+      const updated = { ...adminInfo, ...formData, id: adminInfo!.id };
       localStorage.setItem('adminInfo', JSON.stringify(updated));
       setAdminInfo(updated);
       setSuccess('Profile updated successfully!');
@@ -99,8 +99,8 @@ export default function AdminProfile() {
   };
 
   const handleChangePassword = async () => {
-    setError(');
-    setSuccess(');
+    setError('');
+    setSuccess('');
 
     if (!passwordForm.currentPassword) {
       setError('Current password is required');
