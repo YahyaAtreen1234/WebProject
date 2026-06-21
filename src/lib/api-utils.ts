@@ -46,7 +46,7 @@ export function validateInput<T>(
   } catch (error) {
     if (error instanceof z.ZodError) {
       const details: Record<string, any> = {};
-      error.errors.forEach((err) => {
+      error.issues.forEach((err) => {
         const path = err.path.join('.');
         details[path || 'root'] = err.message;
       });
