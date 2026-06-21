@@ -39,8 +39,8 @@ export default function AdminProfile() {
         const parsed = JSON.parse(info);
         setAdminInfo(parsed);
         setFormData({
-          name: parsed.name || ',
-          email: parsed.email || ',
+          name: parsed.name || '',
+          email: parsed.email || '',
         });
       } catch (e) {
         console.error('Error parsing admin info:', e);
@@ -75,8 +75,8 @@ export default function AdminProfile() {
   };
 
   const handleSaveProfile = async () => {
-    setError(');
-    setSuccess(');
+    setError('');
+    setSuccess('');
     setLoading(true);
 
     try {
