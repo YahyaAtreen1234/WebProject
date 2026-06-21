@@ -39,7 +39,7 @@ export default function Wishlist() {
       if (response.ok) {
         const data = await response.json();
         setWishlist(data);
-        fetchProductsData(data.map((item) => item.productId));
+        fetchProductsData(data.map((item: any) => item.productId));
       }
     } catch (error) {
       console.error('Failed to fetch wishlist:', error);
