@@ -52,9 +52,9 @@ export async function checkAuth(request: NextRequest): Promise<AuthResult> {
 
     return {
       success: true,
-      userId: payload.userId || payload.id,
-      role: payload.role || ROLES.CUSTOMER,
-      isAdmin: payload.isAdmin || false,
+      userId: (payload as any).userId || (payload as any).id,
+      role: (payload as any).role || ROLES.CUSTOMER,
+      isAdmin: (payload as any).isAdmin || false,
       payload,
     };
   } catch (error) {
