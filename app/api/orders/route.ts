@@ -83,9 +83,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let totalAmount = 0;
+    let subtotal = 0;
     const orderItems = items.map((item: Record<string, unknown>) => {
-      totalAmount += (item.price as number) * (item.quantity as number);
+      subtotal += (item.price as number) * (item.quantity as number);
       return {
         productId: item.productId,
         quantity: item.quantity,
@@ -94,8 +94,14 @@ export async function POST(request: NextRequest) {
       };
     });
 
+    const tax = subtotal * 0.1; // 10% tax
+    const shipping = 10; // Fixed shipping cost
+    const totalAmount = subtotal + tax + shipping;
+    const orderNumber = `ORD-${Date.now()}`;
+
     const order = await prisma.order.create({
       data: {
+        orderNumber,
         customerName,
         customerEmail,
         customerPhone: customerPhone || '',
@@ -103,6 +109,9 @@ export async function POST(request: NextRequest) {
         city,
         postalCode,
         country,
+        subtotal,
+        tax,
+        shipping,
         totalAmount,
         items: {
           create: orderItems,
