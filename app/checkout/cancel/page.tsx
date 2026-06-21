@@ -1,9 +1,8 @@
-'use client';
-
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-export default function CheckoutCancelPage() {
+function CheckoutCancelContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('order_id');
 
@@ -57,5 +56,13 @@ export default function CheckoutCancelPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutCancelPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-midnight-950" />}>
+      <CheckoutCancelContent />
+    </Suspense>
   );
 }
