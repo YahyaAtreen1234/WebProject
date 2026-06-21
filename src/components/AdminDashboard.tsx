@@ -9,6 +9,7 @@ import AdminAnalytics from './AdminAnalytics';
 import AdminDiscounts from './AdminDiscounts';
 import AdminCustomOrders from './AdminCustomOrders';
 import AdminSupportTickets from './AdminSupportTickets';
+import AdminSettings from './AdminSettings';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -30,6 +31,7 @@ export default function AdminDashboard() {
     { id: 'support', label: '💬 Support Tickets', icon: '💬' },
     { id: 'analytics', label: '📈 Analytics', icon: '📈' },
     { id: 'discounts', label: '🏷️ Discounts', icon: '🏷️' },
+    { id: 'settings', label: '⚙️ Settings', icon: '⚙️' },
   ];
 
   return (
@@ -161,6 +163,7 @@ export default function AdminDashboard() {
         {activeTab === 'support' && <AdminSupportTickets />}
         {activeTab === 'analytics' && <AdminAnalytics />}
         {activeTab === 'discounts' && <AdminDiscounts />}
+        {activeTab === 'settings' && <AdminSettings />}
       </div>
     </div>
   );

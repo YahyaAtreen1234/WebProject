@@ -675,5 +675,36 @@ model GuaranteePolicy {
   updatedAt       DateTime  @updatedAt
 }
 
+model SiteSettings {
+  id              String    @id @default("main")
+  siteName        String    @default("StonesLand")
+  siteTagline     String    @default("Premium Gems & Minerals")
+  logo            String?   // URL or base64 of logo image
+  favicon         String?   // URL or base64 of favicon
+  primaryColor    String    @default("#facc15")   // Yellow
+  backgroundColor String    @default("#000000")  // Black
+
+  // Contact info
+  email           String?
+  phone           String?
+  address         String?
+
+  // Social media
+  instagramUrl    String?
+  twitterUrl      String?
+  facebookUrl     String?
+  linkedinUrl     String?
+
+  // SEO
+  seoTitle        String?
+  seoDescription  String?
+  seoKeywords     String?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([id])
+}
+
 // Update User model to include relations
 // (Already has wishlist, adding custom orders and support tickets)

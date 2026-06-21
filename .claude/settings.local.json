@@ -18,7 +18,10 @@
       "Bash(export DATABASE_URL=\"file:./prisma/dev.db\")",
       "Bash(pkill -f \"next dev\")",
       "Bash(curl -X POST http://localhost:3000/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"admin@minerals.local\",\"password\":\"admin123\"}')",
-      "Bash(curl -s http://localhost:3000/api/auth/login -X POST -H \"Content-Type: application/json\" -d '{\"email\":\"admin@minerals.local\",\"password\":\"admin123\"}')"
+      "Bash(curl -s http://localhost:3000/api/auth/login -X POST -H \"Content-Type: application/json\" -d '{\"email\":\"admin@minerals.local\",\"password\":\"admin123\"}')",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   }
 }
