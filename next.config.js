@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    appDir: true,
+  },
   webpack: (config, { isServer }) => {
     // Disable CSS optimization to fix PostCSS build error
     if (!isServer) {
