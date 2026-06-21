@@ -138,5 +138,5 @@ export function isAdminOrManager(role: Role): boolean {
  * @returns true if user is staff or above, false otherwise
  */
 export function isStaffOrAbove(role: Role): boolean {
-  return [ROLES.ADMIN, ROLES.MANAGER, ROLES.STAFF].includes(role);
+  return [ROLES.ADMIN, ROLES.MANAGER, ROLES.STAFF].includes(role as any);
 }
