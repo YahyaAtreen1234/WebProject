@@ -117,7 +117,7 @@ export default function AdminCustomOrders() {
                   key={order.id}
                   onClick={() => {
                     setSelectedOrder(order);
-                    setFormData({ status: order.status, quotedPrice: order.quotedPrice?.toString() || ', adminNotes: ' });
+                    setFormData({ status: order.status, quotedPrice: order.quotedPrice?.toString() || '', adminNotes: '' });
                   }}
                   className={`card-glass p-4 border cursor-pointer transition-all ${
                     selectedOrder?.id === order.id
