@@ -24,7 +24,7 @@ export default function AdminProfile() {
     newPassword: '',
     confirmPassword: '',
   });
-  const [lastLoginTime, setLastLoginTime] = useState<string>(');
+  const [lastLoginTime, setLastLoginTime] = useState<string>('');
   const [loginAttempts, setLoginAttempts] = useState(0);
 
   useEffect(() => {
