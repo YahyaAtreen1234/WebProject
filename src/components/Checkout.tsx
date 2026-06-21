@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { loadStripe } from '@stripe/js';
+import { loadStripe } from '@stripe/stripe-js';
 import { useCart } from '@/context/CartContext';
 import { cartUtils } from '@/lib/cart';
 
