@@ -229,7 +229,7 @@ export async function getUserFromToken(token: string) {
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: payload.userId },
+      where: { id: (payload as any).userId },
       select: {
         id: true,
         email: true,
@@ -259,7 +259,7 @@ export async function getAdminFromToken(token: string) {
     }
 
     const admin = await prisma.admin.findUnique({
-      where: { id: payload.adminId },
+      where: { id: (payload as any).adminId },
       select: {
         id: true,
         email: true,
