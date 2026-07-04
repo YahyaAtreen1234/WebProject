@@ -36,6 +36,8 @@ export default function AdminProducts() {
     image: '',
     featured: false,
   });
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const categories = ['Minerals', 'Crystals', 'Gemstones', 'Fossils', 'Jewelry'];
 
@@ -81,6 +83,8 @@ export default function AdminProducts() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
 
     try {
       const method = editingId ? 'PATCH' : 'POST';
@@ -106,10 +110,15 @@ export default function AdminProducts() {
       });
 
       if (response.ok) {
+        setSuccess(`Product ${editingId ? 'updated' : 'created'} successfully!`);
         fetchProducts();
         resetForm();
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Failed to save product');
       }
     } catch (error) {
+      setError('An error occurred: ' + (error instanceof Error ? error.message : 'Unknown error'));
       console.error('Error saving product:', error);
     }
   };
@@ -176,6 +185,16 @@ export default function AdminProducts() {
           <h3 className="text-lg font-bold text-white mb-4">
             {editingId ? 'Edit Product' : 'Create New Product'}
           </h3>
+          {error && (
+            <div className="mb-4 p-4 bg-rose-500/20 border border-rose-500 rounded text-rose-400">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="mb-4 p-4 bg-emerald-500/20 border border-emerald-500 rounded text-emerald-400">
+              {success}
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="text"
