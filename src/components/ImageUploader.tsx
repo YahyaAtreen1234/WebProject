@@ -21,17 +21,25 @@ export default function ImageUploader({ onImageSelect, currentImage }: ImageUplo
     setUploading(true);
 
     try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        throw new Error('Not authenticated. Please login as admin.');
+      }
+
       const formData = new FormData();
       formData.append('file', file);
 
       const response = await fetch('/api/admin/upload', {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
         body: formData,
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Upload failed');
+        const data = await response.json().catch(() => ({ error: 'Upload failed' }));
+        throw new Error(data.error || `Upload failed (${response.status})`);
       }
 
       const data = await response.json();
