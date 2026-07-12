@@ -22,7 +22,10 @@ export default function ShopPage() {
         const response = await fetch('/api/products');
         if (response.ok) {
           const data = await response.json();
-          setAllProducts(data);
+          console.log('Products fetched:', data);
+          setAllProducts(Array.isArray(data) ? data : []);
+        } else {
+          console.error('Failed to fetch products, status:', response.status);
         }
       } catch (error) {
         console.error('Failed to fetch products:', error);
@@ -85,7 +88,7 @@ export default function ShopPage() {
     }
 
     return result;
-  }, [filters]);
+  }, [allProducts, filters]);
 
   // Pagination
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
