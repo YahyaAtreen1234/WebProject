@@ -24,7 +24,8 @@
       "Bash(git push *)",
       "Bash(npx vercel@54.14.5 inspect dpl_DJqpcmNrpzcDdnkhnVpZUyuBu2zL --logs)",
       "Bash(cp -r src/app .)",
-      "Bash(git rm *)"
+      "Bash(git rm *)",
+      "Bash(npx tsc *)"
     ]
   }
 }

@@ -13,16 +13,6 @@ export default function UnifiedLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [capsLock, setCapsLock] = useState(false);
 
-  const adminAccounts = [
-    { email: 'admin@stonesland.com', password: 'AdminPassword123!' },
-    { email: 'manager@stonesland.com', password: 'ManagerPassword123!' },
-  ];
-
-  const userAccounts = [
-    { email: 'john@example.com', password: 'UserPassword123!' },
-    { email: 'jane@example.com', password: 'UserPassword123!' },
-  ];
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     setCapsLock(e.getModifierState('CapsLock'));
   };
@@ -33,43 +23,39 @@ export default function UnifiedLogin() {
     setLoading(true);
 
     try {
-      // Check admin accounts
-      const adminAccount = adminAccounts.find(
-        (acc) => acc.email.toLowerCase() === email.toLowerCase() && acc.password === password
-      );
+      // Call backend API for authentication
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-      if (adminAccount) {
+      if (!response.ok) {
+        const data = await response.json();
+        setError(data.error || '❌ Invalid email or password');
+        return;
+      }
+
+      const data = await response.json();
+
+      if (data.isAdmin) {
         // Admin login
-        const token = btoa(`${email}:${password}:admin`);
-        localStorage.setItem('adminToken', token);
+        localStorage.setItem('adminToken', data.token);
         localStorage.setItem('adminInfo', JSON.stringify({
-          name: email === 'admin@stonesland.com' ? 'Admin User' : 'Manager User',
-          email: email,
-          role: email === 'admin@stonesland.com' ? 'admin' : 'manager',
+          name: data.name,
+          email: data.email,
+          role: data.role,
         }));
         router.push('/admin/dashboard');
-        return;
-      }
-
-      // Check user accounts
-      const userAccount = userAccounts.find(
-        (acc) => acc.email.toLowerCase() === email.toLowerCase() && acc.password === password
-      );
-
-      if (userAccount) {
+      } else {
         // User login
-        const token = btoa(`${email}:${password}:user`);
-        localStorage.setItem('userToken', token);
+        localStorage.setItem('userToken', data.token);
         localStorage.setItem('userInfo', JSON.stringify({
-          name: email === 'john@example.com' ? 'John Doe' : 'Jane Smith',
-          email: email,
+          name: data.name,
+          email: data.email,
         }));
         router.push('/user/dashboard');
-        return;
       }
-
-      // No account found
-      setError('❌ Invalid email or password');
     } catch (err) {
       setError('Login failed. Please try again.');
       console.error(err);
