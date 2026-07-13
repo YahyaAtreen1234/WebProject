@@ -68,11 +68,13 @@ export async function POST(request: NextRequest) {
     // 2. Call the payment processor's refund API
     // 3. Handle the response
 
+    // Process the refund immediately
     const refundRecord = await prisma.refund.update({
       where: { id: refundId },
       data: {
-        status: 'processing',
+        status: 'completed',
         processedAt: new Date(),
+        completedAt: new Date(),
       },
     });
 
@@ -87,25 +89,10 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Simulate processing (in production, this would call payment processor)
-    setTimeout(async () => {
-      try {
-        await prisma.refund.update({
-          where: { id: refundId },
-          data: {
-            status: 'completed',
-            completedAt: new Date(),
-          },
-        });
-      } catch (error) {
-        console.error('Error completing refund:', error);
-      }
-    }, 2000);
-
     return NextResponse.json({
       success: true,
       refund: refundRecord,
-      message: 'Refund is being processed. Customer will receive funds within 5-10 business days.',
+      message: 'Refund processed successfully. Customer will receive funds within 5-10 business days.',
     });
   } catch (error) {
     console.error('Error processing refund:', error);

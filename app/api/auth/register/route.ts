@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { sendVerificationEmail } from '@/lib/email';
 import bcryptjs from 'bcryptjs';
 
 function generateVerificationCode() {
@@ -57,9 +58,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // TODO: Send verification email
-    // For now, log to console
-    console.log(`Verification code for ${email}: ${verificationCode}`);
+    // Send verification email
+    await sendVerificationEmail(email, verificationCode);
 
     return NextResponse.json(
       { message: 'Registration successful. Check your email for verification code.' },
