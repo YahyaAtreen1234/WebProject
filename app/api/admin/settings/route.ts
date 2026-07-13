@@ -1,23 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import jwt from 'jsonwebtoken';
 
-export async function GET() {
+interface JWTPayload {
+  isAdmin?: boolean;
+}
+
+async function verifyAdmin(request: NextRequest) {
   try {
-    let settings = await prisma.siteSettings.findUnique({
+    const auth = request.headers.get('authorization');
+    if (!auth || !auth.startsWith('Bearer ')) {
+      return null;
+    }
+
+    const token = auth.substring(7);
+    const payload = jwt.verify(token, process.env.JWT_SECRET || 'secret-key') as JWTPayload;
+    return payload.isAdmin ? payload : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const admin = await verifyAdmin(request);
+    if (!admin) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const settings = await prisma.siteSettings.findUnique({
       where: { id: 'main' },
     });
 
     if (!settings) {
-      settings = await prisma.siteSettings.create({
-        data: { id: 'main' },
+      // Return default settings if none exist
+      return NextResponse.json({
+        id: 'main',
+        siteName: 'StonesLand',
+        siteTagline: 'Premium Gems & Minerals',
+        logo: null,
+        email: null,
+        phone: null,
+        address: null,
       });
     }
 
     return NextResponse.json(settings);
   } catch (error) {
-    console.error('Get settings error:', error);
+    console.error('Error fetching settings:', error);
     return NextResponse.json(
-      { error: 'Failed to get settings' },
+      { error: 'Failed to fetch settings' },
       { status: 500 }
     );
   }
@@ -25,26 +57,37 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
+    const admin = await verifyAdmin(request);
+    if (!admin) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
 
-    let settings = await prisma.siteSettings.findUnique({
+    const settings = await prisma.siteSettings.upsert({
       where: { id: 'main' },
+      create: {
+        id: 'main',
+        siteName: body.siteName || 'StonesLand',
+        siteTagline: body.siteTagline || 'Premium Gems & Minerals',
+        logo: body.logo,
+        email: body.email,
+        phone: body.phone,
+        address: body.address,
+      },
+      update: {
+        siteName: body.siteName,
+        siteTagline: body.siteTagline,
+        logo: body.logo,
+        email: body.email,
+        phone: body.phone,
+        address: body.address,
+      },
     });
-
-    if (!settings) {
-      settings = await prisma.siteSettings.create({
-        data: { id: 'main', ...body },
-      });
-    } else {
-      settings = await prisma.siteSettings.update({
-        where: { id: 'main' },
-        data: body,
-      });
-    }
 
     return NextResponse.json(settings);
   } catch (error) {
-    console.error('Update settings error:', error);
+    console.error('Error updating settings:', error);
     return NextResponse.json(
       { error: 'Failed to update settings' },
       { status: 500 }

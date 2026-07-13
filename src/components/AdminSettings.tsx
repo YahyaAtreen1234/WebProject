@@ -25,7 +25,13 @@ export default function AdminSettings() {
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch('/api/admin/settings');
+      const token = localStorage.getItem('adminToken');
+      const response = await fetch('/api/admin/settings', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch settings');
+      }
       const data = await response.json();
       setSettings(data);
       setFormData(data);
@@ -62,24 +68,33 @@ export default function AdminSettings() {
     setMessage('');
 
     try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        setMessage('Not authenticated. Please login again.');
+        return;
+      }
+
       const response = await fetch('/api/admin/settings', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update settings');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to update settings');
       }
 
       const updated = await response.json();
       setSettings(updated);
       setMessage('Settings updated successfully!');
       setTimeout(() => setMessage(''), 3000);
-      window.location.reload();
     } catch (error) {
       console.error('Error updating settings:', error);
-      setMessage('Failed to update settings');
+      setMessage(error instanceof Error ? error.message : 'Failed to update settings');
     } finally {
       setLoading(false);
     }
