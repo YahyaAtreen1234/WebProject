@@ -24,12 +24,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find admin by email
-    const admin = await prisma.admin.findUnique({
+    // Find user by email (admin or regular user)
+    const user = await prisma.user.findUnique({
       where: { email },
     });
 
-    if (!admin) {
+    if (!user) {
       // Don't reveal if email exists (security best practice)
       return NextResponse.json(
         { error: 'Invalid email or password' },
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify password
-    const passwordValid = await verifyPassword(password, admin.password);
+    const passwordValid = await verifyPassword(password, user.password);
 
     if (!passwordValid) {
       return NextResponse.json(
@@ -48,17 +48,24 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate JWT token
-    const token = signToken({ adminId: admin.id, email: admin.email, isAdmin: true });
+    const isAdmin = user.role === 'admin';
+    const token = signToken({
+      userId: user.id,
+      email: user.email,
+      isAdmin,
+      role: user.role
+    });
 
     // Return success with token
     return NextResponse.json(
       {
         success: true,
         token,
-        admin: {
-          id: admin.id,
-          email: admin.email,
-          name: admin.name,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
         },
       },
       { status: 200 }
