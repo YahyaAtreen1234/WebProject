@@ -3,10 +3,22 @@
 import { useState, useMemo, useEffect } from 'react';
 import CollectionFilters, { FilterState } from '@/components/CollectionFilters';
 import ProductCard from '@/components/ProductCard';
-import Cart from '@/components/Cart';
+import CartUI from '@/components/Cart';
+import { useCart } from '@/hooks/useCart';
+
+interface Product {
+  id: string;
+  title: string;
+  price: number;
+  description: string;
+  category: string;
+  stock: number;
+  image?: string;
+  featured?: boolean;
+}
 
 export default function ShopPage() {
-  const [allProducts, setAllProducts] = useState<any[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [filters, setFilters] = useState<FilterState>({
@@ -41,7 +53,7 @@ export default function ShopPage() {
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const cart = Cart();
+  const cart = useCart();
 
   // Get unique categories
   const categories = allProducts.length > 0 ? [...new Set(allProducts.map((p) => p.category))] : [];
