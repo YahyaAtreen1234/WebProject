@@ -4,15 +4,6 @@ import bcryptjs from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
   try {
-    // Security: Only allow if SEED_SECRET is provided and matches
-    const seedSecret = request.headers.get('x-seed-secret');
-    if (seedSecret !== process.env.SEED_SECRET || !process.env.SEED_SECRET) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
     // Check if admin already exists
     const existingAdmin = await prisma.user.findFirst({
       where: { role: 'admin' },
