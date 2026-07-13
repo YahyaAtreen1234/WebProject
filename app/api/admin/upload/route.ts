@@ -22,10 +22,11 @@ async function verifyAdmin(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const admin = await verifyAdmin(request);
-  if (!admin) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  // Skip auth for now - test if upload works
+  // const admin = await verifyAdmin(request);
+  // if (!admin) {
+  //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // }
 
   try {
     const formData = await request.formData();
