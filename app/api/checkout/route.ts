@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
             productId: item.id || 'unknown',
             quantity: item.quantity,
             price: item.price,
-            title: item.name,
+            title: item.title,
           },
         })
       )
