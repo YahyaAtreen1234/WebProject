@@ -52,8 +52,15 @@ export async function POST(request: NextRequest) {
     });
 
     // Create order items
+    interface OrderItemInput {
+      id: string;
+      price: number;
+      quantity: number;
+      title: string;
+    }
+
     await Promise.all(
-      items.map((item: any) =>
+      items.map((item: OrderItemInput) =>
         prisma.orderItem.create({
           data: {
             orderId: order.id,

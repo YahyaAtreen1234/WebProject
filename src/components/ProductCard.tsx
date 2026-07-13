@@ -2,17 +2,19 @@
 
 import { useState } from 'react';
 
+interface Product {
+  id: string;
+  title: string;
+  price: number;
+  description: string;
+  category: string;
+  stock: number;
+  image?: string;
+}
+
 interface ProductCardProps {
-  product: {
-    id: string;
-    title: string;
-    price: number;
-    description: string;
-    category: string;
-    stock: number;
-    image?: string;
-  };
-  onAddToCart: (product: any, quantity: number) => void;
+  product: Product;
+  onAddToCart: (product: Product, quantity: number) => void;
 }
 
 export default function ProductCard({ product, onAddToCart }: ProductCardProps) {

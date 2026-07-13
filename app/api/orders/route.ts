@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(request.nextUrl.searchParams.get('page') || '1');
     const limit = parseInt(request.nextUrl.searchParams.get('limit') || '20');
 
-    const where: any = {};
+    const where: Record<string, unknown> = {};
     if (status) where.status = status;
 
     // For confirmed orders, exclude those that already have delivery records
