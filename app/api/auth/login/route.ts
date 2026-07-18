@@ -56,17 +56,24 @@ export async function POST(request: NextRequest) {
       role: user.role
     });
 
-    // Return success with token
+    const userPayload = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    };
+
+    // Return success with token and a normalized payload for all clients.
     return NextResponse.json(
       {
         success: true,
         token,
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        },
+        user: userPayload,
+        admin: isAdmin ? userPayload : null,
+        isAdmin,
+        name: userPayload.name,
+        email: userPayload.email,
+        role: userPayload.role,
       },
       { status: 200 }
     );

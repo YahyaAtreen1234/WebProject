@@ -41,8 +41,15 @@ export default function CustomerAuth() {
       }
 
       const data = await response.json();
+      console.log('Customer login response payload:', data);
+
+      const account = data.user ?? data.admin;
+      if (!data.token || !account?.id || !account?.email) {
+        throw new Error(data.error || 'Login response was incomplete');
+      }
+
       localStorage.setItem('userToken', data.token);
-      localStorage.setItem('userInfo', JSON.stringify(data.user));
+      localStorage.setItem('userInfo', JSON.stringify(account));
 
       router.push('/');
     } catch (err) {

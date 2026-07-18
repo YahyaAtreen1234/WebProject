@@ -29,11 +29,18 @@ export default function AdminLogin() {
       }
 
       const data = await response.json();
+      console.log('Admin login response payload:', data);
+
+      const account = data.admin ?? data.user;
+      if (!data.token || !account?.id || !account?.email) {
+        throw new Error(data.error || 'Login response was incomplete');
+      }
+
       localStorage.setItem('adminToken', data.token);
       localStorage.setItem('adminInfo', JSON.stringify({
-        id: data.admin.id,
-        email: data.admin.email,
-        name: data.admin.name,
+        id: account.id,
+        email: account.email,
+        name: account.name || account.email,
       }));
 
       router.push('/admin/dashboard');

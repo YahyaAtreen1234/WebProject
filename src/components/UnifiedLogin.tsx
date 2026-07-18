@@ -37,22 +37,31 @@ export default function UnifiedLogin() {
       }
 
       const data = await response.json();
+      console.log('Unified login response payload:', data);
 
-      if (data.isAdmin) {
+      const account = data.admin ?? data.user;
+      if (!data.token || !account?.id || !account?.email) {
+        throw new Error(data.error || 'Login response was incomplete');
+      }
+
+      if (data.isAdmin || account.role === 'admin') {
         // Admin login
         localStorage.setItem('adminToken', data.token);
         localStorage.setItem('adminInfo', JSON.stringify({
-          name: data.name,
-          email: data.email,
-          role: data.role,
+          id: account.id,
+          name: account.name || account.email,
+          email: account.email,
+          role: account.role,
         }));
         router.push('/admin/dashboard');
       } else {
         // User login
         localStorage.setItem('userToken', data.token);
         localStorage.setItem('userInfo', JSON.stringify({
-          name: data.name,
-          email: data.email,
+          id: account.id,
+          name: account.name || account.email,
+          email: account.email,
+          role: account.role,
         }));
         router.push('/user/dashboard');
       }
