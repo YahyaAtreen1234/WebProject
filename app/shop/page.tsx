@@ -288,7 +288,7 @@ export default function ShopPage() {
       </div>
 
       {/* Cart */}
-      <cart.CartUI />
+      <CartUI cart={cart} />
     </div>
   );
 }
