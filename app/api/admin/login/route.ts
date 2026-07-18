@@ -64,7 +64,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     return NextResponse.json(
-      { error: 'Login failed' },
+      {
+        error: 'Login failed',
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }
