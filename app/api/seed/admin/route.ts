@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create admin user
+    // Create admin user and a legacy admin record so both login paths work.
     const hashedPassword = await bcryptjs.hash('AdminPassword123!', 10);
     const admin = await prisma.user.create({
       data: {
@@ -26,6 +26,16 @@ export async function POST(request: NextRequest) {
         role: 'admin',
         status: 'active',
         emailVerified: true,
+      },
+    });
+
+    await prisma.admin.upsert({
+      where: { email: admin.email },
+      update: { password: hashedPassword, name: admin.name },
+      create: {
+        email: admin.email,
+        password: hashedPassword,
+        name: admin.name,
       },
     });
 

@@ -15,8 +15,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find admin
-    const admin = await prisma.admin.findUnique({
+    // Find the admin account from the main user table first, while keeping
+    // compatibility with the legacy Admin table.
+    const userAdmin = await prisma.user.findFirst({
+      where: { email, role: 'admin' },
+    });
+
+    const admin = userAdmin ?? await prisma.admin.findUnique({
       where: { email },
     });
 
