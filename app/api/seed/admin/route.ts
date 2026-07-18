@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     const admin = await prisma.user.create({
       data: {
         name: 'Admin User',
-        email: 'admin@stonesland.com',
+        email: 'admin@minerals.local',
         password: hashedPassword,
         role: 'admin',
         status: 'active',
