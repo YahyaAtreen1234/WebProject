@@ -23,11 +23,6 @@ async function verifyAdmin(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const admin = await verifyAdmin(request);
-    if (!admin) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const settings = await prisma.siteSettings.findUnique({
       where: { id: 'main' },
     });
@@ -49,8 +44,15 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error fetching settings:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch settings' },
-      { status: 500 }
+      {
+        id: 'main',
+        siteName: 'StonesLand',
+        siteTagline: 'Premium Gems & Minerals',
+        logo: null,
+        email: null,
+        phone: null,
+        address: null,
+      }
     );
   }
 }
