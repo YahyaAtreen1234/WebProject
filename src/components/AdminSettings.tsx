@@ -12,10 +12,20 @@ interface Settings {
   address: string | null;
 }
 
+const defaultSettings: Settings = {
+  id: 'main',
+  siteName: 'StonesLand',
+  siteTagline: 'Premium Gems & Minerals',
+  logo: null,
+  email: null,
+  phone: null,
+  address: null,
+};
+
 export default function AdminSettings() {
-  const [settings, setSettings] = useState<Settings | null>(null);
-  const [formData, setFormData] = useState<Partial<Settings>>({});
-  const [loading, setLoading] = useState(false);
+  const [settings, setSettings] = useState<Settings>(defaultSettings);
+  const [formData, setFormData] = useState<Partial<Settings>>(defaultSettings);
+  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
@@ -26,13 +36,18 @@ export default function AdminSettings() {
   const fetchSettings = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch('/api/admin/settings', {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch settings');
+      if (!token) {
+        setSettings(defaultSettings);
+        setFormData(defaultSettings);
+        setLoading(false);
+        return;
       }
-      const data = await response.json();
+
+      const response = await fetch('/api/admin/settings', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = response.ok ? await response.json() : defaultSettings;
       setSettings(data);
       setFormData(data);
       if (data.logo) {
@@ -40,7 +55,10 @@ export default function AdminSettings() {
       }
     } catch (error) {
       console.error('Error fetching settings:', error);
-      setMessage('Failed to load settings');
+      setSettings(defaultSettings);
+      setFormData(defaultSettings);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -99,10 +117,6 @@ export default function AdminSettings() {
       setLoading(false);
     }
   };
-
-  if (!settings) {
-    return <div className="text-white">Loading...</div>;
-  }
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-midnight-800 rounded-lg border border-sapphire-500/20">
