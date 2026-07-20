@@ -15,40 +15,55 @@ export default function Navigation() {
   // First effect: Mark that we're on the client side (hydration complete)
   useEffect(() => {
     setIsClient(true);
+    console.log('[Navigation] Client hydration complete');
   }, []);
 
   // Second effect: Read admin info from localStorage only after hydration
   useEffect(() => {
     if (!isClient) return;
 
-    try {
-      const label = getAdminDisplayLabel();
-      console.log('[Navigation] Reading admin display label:', label);
-      if (label && label !== 'My Account') {
-        setAdminDisplayLabel(label);
-        console.log('[Navigation] Updated admin display label to:', label);
-      }
-    } catch (error) {
-      console.error('[Navigation] Error reading admin display label:', error);
-    }
-  }, [isClient]);
-
-  // Listen for storage changes (cross-tab sync or manual updates)
-  useEffect(() => {
-    const handleStorageChange = () => {
+    const updateAdminLabel = () => {
       try {
         const label = getAdminDisplayLabel();
+        console.log('[Navigation] Reading admin display label:', label);
         if (label && label !== 'My Account') {
           setAdminDisplayLabel(label);
+          console.log('[Navigation] Updated admin display label to:', label);
         }
       } catch (error) {
-        console.error('[Navigation] Error handling storage change:', error);
+        console.error('[Navigation] Error reading admin display label:', error);
       }
     };
 
+    // Read immediately on mount
+    updateAdminLabel();
+
+    // Listen for storage changes (for same-tab updates)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'adminInfo' || e.key === null) {
+        console.log('[Navigation] Storage changed, updating label');
+        updateAdminLabel();
+      }
+    };
+
+    // Listen for custom admin auth changed event (faster than polling)
+    const handleAdminAuthChanged = (e: Event) => {
+      console.log('[Navigation] adminAuthChanged event fired, updating label');
+      updateAdminLabel();
+    };
+
+    // Fallback: poll localStorage every 500ms to catch same-tab changes
+    const pollInterval = setInterval(updateAdminLabel, 500);
+
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+    window.addEventListener('adminAuthChanged', handleAdminAuthChanged);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('adminAuthChanged', handleAdminAuthChanged);
+      clearInterval(pollInterval);
+    };
+  }, [isClient]);
 
   const navItems = [
     { label: 'Shop', href: '/shop' },

@@ -40,6 +40,15 @@ export function setStoredAdminAuth(token: string, account: StoredAdminInfo) {
       name: adminData.name,
       role: adminData.role,
     });
+
+    // Dispatch custom event to notify other components (same-tab updates)
+    try {
+      const event = new CustomEvent('adminAuthChanged', { detail: adminData });
+      window.dispatchEvent(event);
+      console.log('[clientAuth] Dispatched adminAuthChanged event');
+    } catch (error) {
+      console.error('[clientAuth] Failed to dispatch event:', error);
+    }
   } catch (error) {
     console.error('[clientAuth] Failed to store admin auth:', error);
   }
