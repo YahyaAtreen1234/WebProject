@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
 
+// Allow larger payloads for logo uploads (5MB)
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '5mb',
+    },
+  },
+};
+
 function verifyAdmin(request: NextRequest) {
   try {
     const auth = request.headers.get('authorization');
