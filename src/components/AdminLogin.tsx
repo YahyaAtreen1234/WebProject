@@ -18,6 +18,8 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
+      console.log('[AdminLogin] Starting login process...');
+      
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -30,13 +32,25 @@ export default function AdminLogin() {
       }
 
       const data = await response.json();
+      console.log('[AdminLogin] Login API response:', {
+        hasToken: !!data.token,
+        hasAdmin: !!data.admin,
+        hasUser: !!data.user,
+        adminEmail: data.admin?.email || data.user?.email,
+      });
+
       const account = data.admin ?? data.user;
 
       if (!data.token || !account?.email) {
+        console.error('[AdminLogin] Invalid login response - missing token or email');
         throw new Error(data.error || 'Login response was incomplete');
       }
 
-      console.log('Login response received:', { email: account.email, name: account.name });
+      console.log('[AdminLogin] Storing auth data:', {
+        email: account.email,
+        name: account.name,
+        role: account.role,
+      });
 
       setStoredAdminAuth(data.token, {
         id: account.id,
@@ -45,9 +59,21 @@ export default function AdminLogin() {
         role: account.role || 'admin',
       });
 
+      console.log('[AdminLogin] Auth stored successfully, redirecting to dashboard...');
+
+      // Verify data was actually stored before redirecting
+      const storedInfo = localStorage.getItem('adminInfo');
+      const storedToken = localStorage.getItem('adminToken');
+      console.log('[AdminLogin] Verification - Data in localStorage:', {
+        hasToken: !!storedToken,
+        storedInfo: storedInfo ? JSON.parse(storedInfo) : null,
+      });
+
       router.push('/admin/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+      const errorMsg = err instanceof Error ? err.message : 'Login failed';
+      console.error('[AdminLogin] Login error:', errorMsg);
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }

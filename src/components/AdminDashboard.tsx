@@ -19,12 +19,17 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const info = getStoredAdminInfo();
+    console.log('[AdminDashboard] Loading admin info:', info);
+    
     if (info?.email) {
       setAdminName(info.email);
+      console.log('[AdminDashboard] Set admin name to email:', info.email);
     } else if (info?.name) {
       setAdminName(info.name);
+      console.log('[AdminDashboard] Set admin name to name:', info.name);
+    } else {
+      console.warn('[AdminDashboard] No admin info found!');
     }
-    console.log('Admin dashboard loaded:', info);
   }, []);
 
   const handleLogout = () => {

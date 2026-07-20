@@ -9,13 +9,45 @@ export default function Navigation() {
   const { getItemCount } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const [adminDisplayLabel, setAdminDisplayLabel] = useState('My Account');
+  const [isClient, setIsClient] = useState(false);
   const cartCount = getItemCount();
 
+  // First effect: Mark that we're on the client side (hydration complete)
   useEffect(() => {
-    const label = getAdminDisplayLabel();
-    if (label && label !== 'My Account') {
-      setAdminDisplayLabel(label);
+    setIsClient(true);
+  }, []);
+
+  // Second effect: Read admin info from localStorage only after hydration
+  useEffect(() => {
+    if (!isClient) return;
+
+    try {
+      const label = getAdminDisplayLabel();
+      console.log('[Navigation] Reading admin display label:', label);
+      if (label && label !== 'My Account') {
+        setAdminDisplayLabel(label);
+        console.log('[Navigation] Updated admin display label to:', label);
+      }
+    } catch (error) {
+      console.error('[Navigation] Error reading admin display label:', error);
     }
+  }, [isClient]);
+
+  // Listen for storage changes (cross-tab sync or manual updates)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const label = getAdminDisplayLabel();
+        if (label && label !== 'My Account') {
+          setAdminDisplayLabel(label);
+        }
+      } catch (error) {
+        console.error('[Navigation] Error handling storage change:', error);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   const navItems = [
@@ -28,14 +60,19 @@ export default function Navigation() {
 
   const handleMyAccount = () => {
     // Check if user or admin is logged in
-    const userToken = localStorage.getItem('userToken');
-    const adminToken = localStorage.getItem('adminToken');
+    try {
+      const userToken = localStorage.getItem('userToken');
+      const adminToken = localStorage.getItem('adminToken');
 
-    if (adminToken) {
-      window.location.href = '/admin/dashboard';
-    } else if (userToken) {
-      window.location.href = '/user/dashboard';
-    } else {
+      if (adminToken) {
+        window.location.href = '/admin/dashboard';
+      } else if (userToken) {
+        window.location.href = '/user/dashboard';
+      } else {
+        window.location.href = '/login';
+      }
+    } catch (error) {
+      console.error('[Navigation] Error checking auth tokens:', error);
       window.location.href = '/login';
     }
   };

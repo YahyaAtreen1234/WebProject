@@ -16,23 +16,33 @@ export function getStoredAdminToken(): string | null {
 
 export function setStoredAdminAuth(token: string, account: StoredAdminInfo) {
   if (typeof window === 'undefined') {
+    console.log('[clientAuth] Skipping setStoredAdminAuth - server-side context');
     return;
   }
 
-  if (token) {
-    localStorage.setItem('adminToken', token);
+  try {
+    if (token) {
+      localStorage.setItem('adminToken', token);
+    }
+
+    const adminData = {
+      id: account.id || '',
+      email: account.email || '',
+      name: account.name || account.email || 'Admin',
+      role: account.role || 'admin',
+    };
+
+    localStorage.setItem('adminInfo', JSON.stringify(adminData));
+    localStorage.setItem('lastLoginSuccess', Date.now().toString());
+    
+    console.log('[clientAuth] Admin auth stored successfully:', {
+      email: adminData.email,
+      name: adminData.name,
+      role: adminData.role,
+    });
+  } catch (error) {
+    console.error('[clientAuth] Failed to store admin auth:', error);
   }
-
-  const adminData = {
-    id: account.id || '',
-    email: account.email || '',
-    name: account.name || account.email || 'Admin',
-    role: account.role || 'admin',
-  };
-
-  localStorage.setItem('adminInfo', JSON.stringify(adminData));
-  localStorage.setItem('lastLoginSuccess', Date.now().toString());
-  console.log('Admin auth stored:', { email: adminData.email, name: adminData.name });
 }
 
 export function getStoredAdminInfo(): StoredAdminInfo | null {
@@ -40,14 +50,16 @@ export function getStoredAdminInfo(): StoredAdminInfo | null {
     return null;
   }
 
-  const info = localStorage.getItem('adminInfo');
-  if (!info) {
-    return null;
-  }
-
   try {
-    return JSON.parse(info) as StoredAdminInfo;
-  } catch {
+    const info = localStorage.getItem('adminInfo');
+    if (!info) {
+      return null;
+    }
+
+    const parsed = JSON.parse(info) as StoredAdminInfo;
+    return parsed;
+  } catch (error) {
+    console.error('[clientAuth] Failed to retrieve admin info:', error);
     return null;
   }
 }
@@ -64,7 +76,16 @@ export function clearStoredAdminAuth() {
 }
 
 export function getAdminDisplayLabel(): string {
-  const info = getStoredAdminInfo();
-  if (!info) return 'My Account';
-  return info.email || info.name || 'My Account';
+  try {
+    const info = getStoredAdminInfo();
+    if (!info) {
+      return 'My Account';
+    }
+    const label = info.email || info.name || 'My Account';
+    console.log('[clientAuth] Admin display label:', label);
+    return label;
+  } catch (error) {
+    console.error('[clientAuth] Error getting display label:', error);
+    return 'My Account';
+  }
 }
