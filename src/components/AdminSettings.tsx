@@ -77,11 +77,12 @@ export default function AdminSettings() {
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const maxWidth = 200;
-          const maxHeight = 200;
+          const maxWidth = 150;
+          const maxHeight = 150;
           let width = img.width;
           let height = img.height;
 
+          // Maintain aspect ratio while resizing
           if (width > height) {
             if (width > maxWidth) {
               height *= maxWidth / width;
@@ -97,12 +98,19 @@ export default function AdminSettings() {
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext('2d');
-          ctx?.drawImage(img, 0, 0, width, height);
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+          }
 
-          // Compress to JPEG with quality 0.8
-          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+          // Compress to JPEG with low quality to minimize payload
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          console.log('[AdminSettings] Compressed logo size:', compressedBase64.length, 'bytes');
           setFormData(prev => ({ ...prev, logo: compressedBase64 }));
           setLogoPreview(compressedBase64);
+        };
+        img.onerror = () => {
+          console.error('[AdminSettings] Failed to load image');
+          setMessage('Failed to load image. Please try another file.');
         };
         img.src = reader.result as string;
       };
