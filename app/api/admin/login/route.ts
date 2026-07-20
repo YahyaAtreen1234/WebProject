@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { signToken } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,15 +43,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate JWT token
-    const token = jwt.sign(
-      {
-        adminId: admin.id,
-        email: admin.email,
-        isAdmin: true,
-      },
-      process.env.JWT_SECRET || 'secret-key',
-      { expiresIn: '7d' }
-    );
+    const token = signToken({
+      adminId: admin.id,
+      email: admin.email,
+      isAdmin: true,
+      role: 'admin',
+    });
 
     return NextResponse.json({
       success: true,

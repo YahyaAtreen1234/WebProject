@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { getStoredAdminToken } from '@/lib/clientAuth';
 
 interface ImageUploaderProps {
   onImageSelect: (imageUrl: string) => void;
@@ -21,7 +22,7 @@ export default function ImageUploader({ onImageSelect, currentImage }: ImageUplo
     setUploading(true);
 
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = getStoredAdminToken();
       if (!token) {
         throw new Error('Not authenticated. Please login as admin.');
       }
@@ -94,7 +95,7 @@ export default function ImageUploader({ onImageSelect, currentImage }: ImageUplo
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif"
+          accept="image/*"
           onChange={handleFileSelect}
           className="hidden"
         />
@@ -107,7 +108,7 @@ export default function ImageUploader({ onImageSelect, currentImage }: ImageUplo
       )}
 
       <p className="text-xs text-midnight-400">
-        Supported: JPEG, PNG, WebP, GIF (Max 5MB)
+        Supported: all image formats and sizes are allowed.
       </p>
     </div>
   );

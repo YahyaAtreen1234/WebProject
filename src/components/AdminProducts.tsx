@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ImageUploader from './ImageUploader';
+import { getStoredAdminToken } from '@/lib/clientAuth';
 
 interface Product {
   id: string;
@@ -42,7 +43,7 @@ export default function AdminProducts() {
   const categories = ['Minerals', 'Crystals', 'Gemstones', 'Fossils', 'Jewelry'];
 
   useEffect(() => {
-    const savedToken = localStorage.getItem('adminToken');
+    const savedToken = getStoredAdminToken();
     if (!savedToken) {
       router.push('/admin/login');
       return;
@@ -59,6 +60,13 @@ export default function AdminProducts() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
+      const savedToken = getStoredAdminToken() || token;
+      if (!savedToken) {
+        setError('Missing admin token. Please log in again.');
+        router.push('/admin/login');
+        return;
+      }
+
       const params = new URLSearchParams({
         limit: limit.toString(),
         offset: offset.toString(),
@@ -66,16 +74,20 @@ export default function AdminProducts() {
       if (search) params.append('search', search);
 
       const response = await fetch(`/api/admin/products?${params}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${savedToken}` },
       });
 
       if (response.ok) {
         const data = await response.json();
         setProducts(data.products);
         setTotal(data.total);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Failed to load products');
       }
     } catch (error) {
       console.error('Error fetching products:', error);
+      setError('Error fetching products.');
     } finally {
       setLoading(false);
     }
@@ -87,16 +99,24 @@ export default function AdminProducts() {
     setSuccess('');
 
     try {
+      const savedToken = getStoredAdminToken() || token;
+      if (!savedToken) {
+        setError('Missing admin token. Please log in again.');
+        router.push('/admin/login');
+        return;
+      }
+
       const method = editingId ? 'PATCH' : 'POST';
       const url = editingId
         ? `/api/admin/products/${editingId}`
         : '/api/admin/products';
 
+      console.log('AdminProducts submit token:', savedToken?.slice(0, 20));
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${savedToken}`,
         },
         body: JSON.stringify({
           title: formData.title,
@@ -127,16 +147,27 @@ export default function AdminProducts() {
     if (!confirm('Are you sure you want to delete this product?')) return;
 
     try {
+      const savedToken = getStoredAdminToken() || token;
+      if (!savedToken) {
+        setError('Missing admin token. Please log in again.');
+        router.push('/admin/login');
+        return;
+      }
+
       const response = await fetch(`/api/admin/products/${productId}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${savedToken}` },
       });
 
       if (response.ok) {
         fetchProducts();
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Failed to delete product');
       }
     } catch (error) {
       console.error('Error deleting product:', error);
+      setError('Error deleting product.');
     }
   };
 

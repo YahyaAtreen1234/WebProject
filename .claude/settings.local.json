@@ -25,7 +25,27 @@
       "Bash(npx vercel@54.14.5 inspect dpl_DJqpcmNrpzcDdnkhnVpZUyuBu2zL --logs)",
       "Bash(cp -r src/app .)",
       "Bash(git rm *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(Start-Sleep -Seconds 5)",
+      "Bash(curl -L -X POST http://localhost:3000/api/seed/admin)",
+      "Bash(git commit -m 'Fix login: use User table instead of non-existent Admin table *)",
+      "Bash(git commit -m 'Fix Cart hook usage and product type in shop page *)",
+      "Bash(git commit -m 'Fix CartUI component - remove unnecessary cart prop *)",
+      "Bash(curl -X POST http://localhost:3000/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"admin@minerals.local\",\"password\":\"AdminPassword123!\"}')",
+      "Bash(curl -X POST http://localhost:3000/api/seed/admin)",
+      "Bash(git commit -m 'Fix seed endpoint: use correct admin email *)",
+      "Bash(git commit -m 'Add debug endpoint to check database connection *)",
+      "Bash(git commit -m 'Change database provider from SQLite to PostgreSQL *)",
+      "Bash(git commit -m 'Revert to PostgreSQL provider *)",
+      "Bash(git commit -m 'Add Prisma migration to build script *)",
+      "Bash(git commit -m 'Remove invalid --skip-generate flag from prisma migrate deploy *)",
+      "Bash(rm prisma/migration_lock.toml)",
+      "Bash(git commit -m 'Remove migration_lock.toml for database provider switch *)",
+      "Bash(git commit -m 'Add migration_lock.toml for PostgreSQL *)",
+      "Bash(git commit -m 'Fix AdminSettings infinite loading issue *)",
+      "Bash(git commit -m 'Allow unauthenticated GET for settings *)",
+      "Bash(git commit -m 'Fix admin info storage - always save email and name after login *)",
+      "Bash(git commit -m 'Fix React hydration error in Navigation component *)"
     ]
   }
 }

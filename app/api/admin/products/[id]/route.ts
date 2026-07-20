@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import jwt from 'jsonwebtoken';
+import { verifyToken } from '@/lib/auth';
 
-async function verifyAdmin(request: NextRequest) {
+function verifyAdmin(request: NextRequest) {
   try {
     const auth = request.headers.get('authorization');
     if (!auth || !auth.startsWith('Bearer ')) {
@@ -10,9 +10,9 @@ async function verifyAdmin(request: NextRequest) {
     }
 
     const token = auth.substring(7);
-    const payload = jwt.verify(token, process.env.JWT_SECRET || 'secret-key') as any;
+    const payload = verifyToken(token) as Record<string, unknown> | null;
 
-    if (!payload.isAdmin) {
+    if (!payload?.isAdmin) {
       return null;
     }
 
@@ -82,6 +82,7 @@ export async function PATCH(
         ...(category && { category }),
         ...(stock !== undefined && { stock: parseInt(stock.toString()) }),
         ...(image && { image }),
+        ...(image && { images: { push: image } }),
         ...(featured !== undefined && { featured }),
       },
     });

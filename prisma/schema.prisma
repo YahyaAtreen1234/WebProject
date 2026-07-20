@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -57,7 +57,7 @@ model Product {
   description String
   price     Float
   image     String?              // Main/featured image (for backward compatibility)
-  imagesJson String    @default("[]")  // JSON array of image URLs
+  images    String     @default("[]") // JSON array of image URLs
   category  String
   stock     Int        @default(0)
   featured  Boolean    @default(false)

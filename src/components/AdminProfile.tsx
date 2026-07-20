@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getStoredAdminInfo } from '@/lib/clientAuth';
 
 interface AdminInfo {
   id: string;
@@ -33,18 +34,13 @@ export default function AdminProfile() {
   }, []);
 
   const loadAdminInfo = () => {
-    const info = localStorage.getItem('adminInfo');
+    const info = getStoredAdminInfo();
     if (info) {
-      try {
-        const parsed = JSON.parse(info);
-        setAdminInfo(parsed);
-        setFormData({
-          name: parsed.name || '',
-          email: parsed.email || '',
-        });
-      } catch (e) {
-        console.error('Error parsing admin info:', e);
-      }
+      setAdminInfo(info as AdminInfo);
+      setFormData({
+        name: info.name || '',
+        email: info.email || '',
+      });
     }
   };
 

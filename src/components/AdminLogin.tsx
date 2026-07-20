@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { setStoredAdminAuth } from '@/lib/clientAuth';
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -29,19 +30,18 @@ export default function AdminLogin() {
       }
 
       const data = await response.json();
-      console.log('Admin login response payload:', data);
-
       const account = data.admin ?? data.user;
-      if (!data.token || !account?.id || !account?.email) {
+
+      if (!data.token || !account?.email) {
         throw new Error(data.error || 'Login response was incomplete');
       }
 
-      localStorage.setItem('adminToken', data.token);
-      localStorage.setItem('adminInfo', JSON.stringify({
+      setStoredAdminAuth(data.token, {
         id: account.id,
         email: account.email,
         name: account.name || account.email,
-      }));
+        role: account.role || 'admin',
+      });
 
       router.push('/admin/dashboard');
     } catch (err) {

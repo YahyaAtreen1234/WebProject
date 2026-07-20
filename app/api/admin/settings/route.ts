@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import jwt from 'jsonwebtoken';
+import { verifyToken } from '@/lib/auth';
 
-interface JWTPayload {
-  isAdmin?: boolean;
-}
-
-async function verifyAdmin(request: NextRequest) {
+function verifyAdmin(request: NextRequest) {
   try {
     const auth = request.headers.get('authorization');
     if (!auth || !auth.startsWith('Bearer ')) {
@@ -14,8 +10,8 @@ async function verifyAdmin(request: NextRequest) {
     }
 
     const token = auth.substring(7);
-    const payload = jwt.verify(token, process.env.JWT_SECRET || 'secret-key') as JWTPayload;
-    return payload.isAdmin ? payload : null;
+    const payload = verifyToken(token) as Record<string, unknown> | null;
+    return payload?.isAdmin ? payload : null;
   } catch {
     return null;
   }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { getStoredAdminToken } from '@/lib/clientAuth';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -21,7 +22,7 @@ export default function ProtectedRoute({ children, type = 'admin' }: ProtectedRo
 
       // Check admin authentication
       if (isAdmin) {
-        const adminToken = localStorage.getItem('adminToken');
+        const adminToken = getStoredAdminToken();
         if (!adminToken) {
           router.push('/admin/login');
           return;

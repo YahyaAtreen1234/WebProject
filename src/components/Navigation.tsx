@@ -1,13 +1,19 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
+import { getAdminDisplayLabel, getStoredAdminInfo } from '@/lib/clientAuth';
 
 export default function Navigation() {
   const { getItemCount } = useCart();
   const [isOpen, setIsOpen] = useState(false);
+  const [adminDisplayLabel, setAdminDisplayLabel] = useState('My Account');
   const cartCount = getItemCount();
+
+  useEffect(() => {
+    setAdminDisplayLabel(getAdminDisplayLabel());
+  }, []);
 
   const navItems = [
     { label: 'Shop', href: '/shop' },
@@ -72,7 +78,7 @@ export default function Navigation() {
               )}
             </Link>
             <button onClick={handleMyAccount} className="btn-primary text-sm">
-              My Account
+              {adminDisplayLabel}
             </button>
           </div>
 
@@ -114,7 +120,7 @@ export default function Navigation() {
               </Link>
             ))}
             <button onClick={handleMyAccount} className="w-full btn-primary text-sm">
-              My Account
+              {adminDisplayLabel}
             </button>
           </div>
         )}

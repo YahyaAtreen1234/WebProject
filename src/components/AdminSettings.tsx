@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getStoredAdminToken } from '@/lib/clientAuth';
 
 interface Settings {
   id: string;
@@ -35,7 +36,7 @@ export default function AdminSettings() {
 
   const fetchSettings = async () => {
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = getStoredAdminToken();
       if (!token) {
         setSettings(defaultSettings);
         setFormData(defaultSettings);
@@ -86,7 +87,7 @@ export default function AdminSettings() {
     setMessage('');
 
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = getStoredAdminToken();
       if (!token) {
         setMessage('Not authenticated. Please login again.');
         return;

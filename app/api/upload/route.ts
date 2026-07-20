@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
-import { validateImageFile, generateUniqueFilename } from '@/lib/upload';
+import { generateUniqueFilename } from '@/lib/upload';
 import { withUserAuth, errorResponse, successResponse } from '@/lib/middlewares';
 
 /**
@@ -19,9 +19,6 @@ export async function POST(request: NextRequest) {
     if (!file) {
       return errorResponse('No file provided', 400);
     }
-
-    // Validate file
-    validateImageFile(file);
 
     // Generate unique filename
     const filename = generateUniqueFilename(file.name);
@@ -45,15 +42,6 @@ export async function POST(request: NextRequest) {
     );
   } catch (error: any) {
     console.error('Upload error:', error);
-
-    // Handle specific error types
-    if (error.message.includes('File size')) {
-      return errorResponse(error.message, 400);
-    }
-
-    if (error.message.includes('type') || error.message.includes('extension')) {
-      return errorResponse(error.message, 400);
-    }
 
     if (error.message?.includes('BLOB_READ_WRITE_TOKEN')) {
       return errorResponse(

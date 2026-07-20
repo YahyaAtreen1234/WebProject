@@ -2,45 +2,21 @@
  * File upload utilities for product images
  */
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-const MAX_IMAGES_PER_PRODUCT = 5;
-
 /**
- * Validate image file
- * @param file - File to validate
- * @throws Error if file is invalid
+ * Image upload utilities now accept all image formats and sizes.
  */
 export function validateImageFile(file: File): void {
   if (!file) {
     throw new Error('No file provided');
   }
-
-  if (file.size > MAX_FILE_SIZE) {
-    throw new Error(`File size must be less than ${MAX_FILE_SIZE / 1024 / 1024}MB`);
-  }
-
-  if (!ALLOWED_TYPES.includes(file.type)) {
-    throw new Error('Only JPEG, PNG, and WebP images are allowed');
-  }
-
-  // Additional validation: check file extension
-  const filename = file.name.toLowerCase();
-  const validExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
-  const hasValidExtension = validExtensions.some((ext) => filename.endsWith(ext));
-
-  if (!hasValidExtension) {
-    throw new Error('Invalid file extension');
-  }
 }
 
 /**
- * Check if image array is at max capacity
- * @param currentImages - Array of current image URLs
- * @returns true if at max capacity, false otherwise
+ * Check if image array is at max capacity.
+ * This project no longer enforces a maximum image count.
  */
 export function isImageArrayFull(currentImages: string[]): boolean {
-  return currentImages.length >= MAX_IMAGES_PER_PRODUCT;
+  return false;
 }
 
 /**
@@ -116,7 +92,5 @@ export function createFormData(file: File): FormData {
 }
 
 export const UPLOAD_CONFIG = {
-  MAX_FILE_SIZE,
-  ALLOWED_TYPES,
-  MAX_IMAGES_PER_PRODUCT,
+  // Upload restrictions are intentionally removed.
 };
