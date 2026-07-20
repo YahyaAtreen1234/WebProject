@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import { getAdminDisplayLabel, getStoredAdminInfo } from '@/lib/clientAuth';
@@ -98,15 +99,13 @@ export default function Navigation() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sapphire-400 via-amethyst-400 to-emerald-400 shadow-lg shadow-sapphire-500/50 group-hover:shadow-amethyst-500/50 transform group-hover:scale-110 flex items-center justify-center">
-              <span className="text-white font-bold text-lg">💎</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-h4 font-display bg-gradient-to-r from-sapphire-300 to-amethyst-300 bg-clip-text text-transparent font-bold">
-                StonesLand
-              </span>
-              <span className="text-xs text-gold-300 font-semibold">Premium Gems & Minerals</span>
-            </div>
+            <Image
+              src="/logo.png"
+              alt="StonesLand Logo"
+              width={80}
+              height={80}
+              className="h-16 w-auto object-contain group-hover:scale-110 transform transition-transform"
+            />
           </Link>
 
           {/* Desktop Navigation */}

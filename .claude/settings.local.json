@@ -47,7 +47,9 @@
       "Bash(git commit -m 'Fix admin info storage - always save email and name after login *)",
       "Bash(git commit -m 'Fix React hydration error in Navigation component *)",
       "Bash(git commit -m 'Fix production database: use PostgreSQL for Vercel *)",
-      "Bash(git commit -m 'Fix logo upload: increase payload size and add image compression *)"
+      "Bash(git commit -m 'Fix logo upload: increase payload size and add image compression *)",
+      "Bash(git commit -m 'Resolve failed migration in production database *)",
+      "Bash(git commit -m 'Add StonesLand logo to Navigation *)"
     ]
   }
 }
