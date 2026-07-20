@@ -45,7 +45,8 @@
       "Bash(git commit -m 'Fix AdminSettings infinite loading issue *)",
       "Bash(git commit -m 'Allow unauthenticated GET for settings *)",
       "Bash(git commit -m 'Fix admin info storage - always save email and name after login *)",
-      "Bash(git commit -m 'Fix React hydration error in Navigation component *)"
+      "Bash(git commit -m 'Fix React hydration error in Navigation component *)",
+      "Bash(git commit -m 'Fix production database: use PostgreSQL for Vercel *)"
     ]
   }
 }

@@ -36,6 +36,8 @@ export default function AdminLogin() {
         throw new Error(data.error || 'Login response was incomplete');
       }
 
+      console.log('Login response received:', { email: account.email, name: account.name });
+
       setStoredAdminAuth(data.token, {
         id: account.id,
         email: account.email,

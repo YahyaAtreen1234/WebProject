@@ -12,7 +12,10 @@ export default function Navigation() {
   const cartCount = getItemCount();
 
   useEffect(() => {
-    setAdminDisplayLabel(getAdminDisplayLabel());
+    const label = getAdminDisplayLabel();
+    if (label && label !== 'My Account') {
+      setAdminDisplayLabel(label);
+    }
   }, []);
 
   const navItems = [

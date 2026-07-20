@@ -23,13 +23,16 @@ export function setStoredAdminAuth(token: string, account: StoredAdminInfo) {
     localStorage.setItem('adminToken', token);
   }
 
-  localStorage.setItem('adminInfo', JSON.stringify({
+  const adminData = {
     id: account.id || '',
     email: account.email || '',
     name: account.name || account.email || 'Admin',
     role: account.role || 'admin',
-  }));
+  };
+
+  localStorage.setItem('adminInfo', JSON.stringify(adminData));
   localStorage.setItem('lastLoginSuccess', Date.now().toString());
+  console.log('Admin auth stored:', { email: adminData.email, name: adminData.name });
 }
 
 export function getStoredAdminInfo(): StoredAdminInfo | null {
@@ -62,5 +65,6 @@ export function clearStoredAdminAuth() {
 
 export function getAdminDisplayLabel(): string {
   const info = getStoredAdminInfo();
-  return info?.email || info?.name || 'My Account';
+  if (!info) return 'My Account';
+  return info.email || info.name || 'My Account';
 }
