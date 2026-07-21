@@ -22,7 +22,7 @@ export default function ShopPage() {
   const [loading, setLoading] = useState(true);
 
   const [filters, setFilters] = useState<FilterState>({
-    priceRange: [0, 500],
+    priceRange: [0, 10000],
     selectedCategories: [],
     searchTerm: '',
     sortBy: 'newest',
@@ -47,6 +47,14 @@ export default function ShopPage() {
           // Set products first
           setAllProducts(data);
           console.log('[ShopPage] Products state updated with', data.length, 'products');
+
+          // Calculate max price from products dynamically
+          if (data.length > 0) {
+            const maxPrice = Math.max(...data.map((p: Product) => p.price || 0));
+            const bufferPrice = Math.ceil(maxPrice * 1.1); // Add 10% buffer
+            console.log('[ShopPage] Max product price:', maxPrice, 'Setting filter max to:', bufferPrice);
+            setFilters(prev => ({ ...prev, priceRange: [0, bufferPrice] }));
+          }
 
           // Read URL search parameter AFTER products are fetched
           const searchParams = new URLSearchParams(window.location.search);
