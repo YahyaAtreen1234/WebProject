@@ -44,6 +44,9 @@ export default function ShopPage() {
             console.log('Applying search filter:', searchParam);
             setFilters(prev => ({ ...prev, searchTerm: decodeURIComponent(searchParam) }));
           }
+
+          // Clear loading state after products successfully loaded
+          setLoading(false);
         } else {
           console.error('Failed to fetch products, status:', response.status);
           setLoading(false);
