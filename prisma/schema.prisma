@@ -677,17 +677,17 @@ model GuaranteePolicy {
 
 model SiteSettings {
   id                String    @id @default("main")
-  websiteName       String    @default("StonesLand")
-  websiteTagline    String    @default("Premium Gems & Minerals")
-  websiteLogo       String?   @db.Text
+  siteName          String    @default("StonesLand")
+  siteTagline       String    @default("Premium Gems & Minerals")
+  logo              String?   @db.Text
   favicon           String?   @db.Text
   primaryColor      String    @default("#facc15")
   backgroundColor   String    @default("#000000")
 
   // Contact info
-  contactEmail      String?
-  contactPhone      String?
-  contactAddress    String?   @db.Text
+  email             String?
+  phone             String?
+  address           String?   @db.Text
 
   // Social media
   instagramUrl      String?
