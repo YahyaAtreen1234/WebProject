@@ -31,28 +31,42 @@ export default function ShopPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        setLoading(true);
         const response = await fetch('/api/products');
         if (response.ok) {
           const data = await response.json();
-          console.log('Products fetched:', data);
-          setAllProducts(Array.isArray(data) ? data : []);
+          console.log('[ShopPage] Products fetched:', data, 'Count:', data.length);
 
-          // After products load, apply URL search parameter
+          if (!Array.isArray(data)) {
+            console.error('[ShopPage] API returned non-array:', data);
+            setAllProducts([]);
+            setLoading(false);
+            return;
+          }
+
+          // Set products first
+          setAllProducts(data);
+          console.log('[ShopPage] Products state updated with', data.length, 'products');
+
+          // Read URL search parameter AFTER products are fetched
           const searchParams = new URLSearchParams(window.location.search);
           const searchParam = searchParams.get('search');
           if (searchParam) {
-            console.log('Applying search filter:', searchParam);
-            setFilters(prev => ({ ...prev, searchTerm: decodeURIComponent(searchParam) }));
+            const decodedSearch = decodeURIComponent(searchParam);
+            console.log('[ShopPage] Applying search filter from URL:', decodedSearch);
+            setFilters(prev => ({ ...prev, searchTerm: decodedSearch }));
           }
 
-          // Clear loading state after products successfully loaded
+          // Clear loading state last
           setLoading(false);
         } else {
-          console.error('Failed to fetch products, status:', response.status);
+          console.error('[ShopPage] Failed to fetch products, status:', response.status);
+          setAllProducts([]);
           setLoading(false);
         }
       } catch (error) {
-        console.error('Failed to fetch products:', error);
+        console.error('[ShopPage] Error fetching products:', error);
+        setAllProducts([]);
         setLoading(false);
       }
     };
