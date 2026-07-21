@@ -39,8 +39,8 @@ export async function GET(request: NextRequest) {
       settings = await prisma.siteSettings.create({
         data: {
           id: 'main',
-          websiteName: 'StonesLand',
-          websiteTagline: 'Premium Gems & Minerals',
+          siteName: 'StonesLand',
+          siteTagline: 'Premium Gems & Minerals',
         },
       });
       console.log('[SettingsAPI] GET: Default settings created');
