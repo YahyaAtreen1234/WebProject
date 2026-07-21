@@ -70,24 +70,23 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json();
     console.log('[SettingsAPI] PUT: Request body received:', {
-      websiteName: body.websiteName,
-      websiteTagline: body.websiteTagline,
-      contactEmail: body.contactEmail,
-      contactPhone: body.contactPhone,
+      siteName: body.siteName || body.websiteName,
+      siteTagline: body.siteTagline || body.websiteTagline,
+      email: body.email || body.contactEmail,
+      phone: body.phone || body.contactPhone,
     });
 
     const {
-      websiteName,
-      websiteTagline,
-      websiteLogo,
-      contactEmail,
-      contactPhone,
-      contactAddress,
-      socialLinks,
+      siteName,
+      siteTagline,
+      logo,
+      email,
+      phone,
+      address,
     } = body;
 
     // Validation
-    if (!websiteName || !websiteTagline) {
+    if (!siteName || !siteTagline) {
       console.log('[SettingsAPI] PUT: Validation failed - missing required fields');
       return NextResponse.json(
         { error: 'Website name and tagline are required' },
@@ -104,12 +103,12 @@ export async function PUT(request: NextRequest) {
       settings = await prisma.siteSettings.create({
         data: {
           id: 'main',
-          websiteName,
-          websiteTagline,
-          websiteLogo,
-          contactEmail,
-          contactPhone,
-          contactAddress,
+          siteName,
+          siteTagline,
+          logo,
+          email,
+          phone,
+          address,
         },
       });
       console.log('[SettingsAPI] PUT: Settings created successfully');
@@ -118,12 +117,12 @@ export async function PUT(request: NextRequest) {
       settings = await prisma.siteSettings.update({
         where: { id: 'main' },
         data: {
-          websiteName,
-          websiteTagline,
-          websiteLogo,
-          contactEmail,
-          contactPhone,
-          contactAddress,
+          siteName,
+          siteTagline,
+          logo,
+          email,
+          phone,
+          address,
         },
       });
       console.log('[SettingsAPI] PUT: Settings updated successfully');

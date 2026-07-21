@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 
 interface Settings {
   id: string;
-  websiteName: string;
-  websiteTagline: string;
-  websiteLogo?: string;
-  contactEmail?: string;
-  contactPhone?: string;
-  contactAddress?: string;
+  siteName: string;
+  siteTagline: string;
+  logo?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
 }
 
 export default function SettingsPage() {
@@ -20,12 +20,12 @@ export default function SettingsPage() {
   const [success, setSuccess] = useState('');
 
   const [formData, setFormData] = useState({
-    websiteName: '',
-    websiteTagline: '',
-    websiteLogo: '',
-    contactEmail: '',
-    contactPhone: '',
-    contactAddress: '',
+    siteName: '',
+    siteTagline: '',
+    logo: '',
+    email: '',
+    phone: '',
+    address: '',
   });
 
   useEffect(() => {
@@ -58,12 +58,12 @@ export default function SettingsPage() {
       console.log('[SettingsPage] Settings loaded:', data);
       setSettings(data);
       setFormData({
-        websiteName: data.websiteName || '',
-        websiteTagline: data.websiteTagline || '',
-        websiteLogo: data.websiteLogo || '',
-        contactEmail: data.contactEmail || '',
-        contactPhone: data.contactPhone || '',
-        contactAddress: data.contactAddress || '',
+        siteName: data.siteName || '',
+        siteTagline: data.siteTagline || '',
+        logo: data.logo || '',
+        email: data.email || '',
+        phone: data.phone || '',
+        address: data.address || '',
       });
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Error loading settings';
@@ -79,7 +79,7 @@ export default function SettingsPage() {
     setError('');
     setSuccess('');
 
-    if (!formData.websiteName || !formData.websiteTagline) {
+    if (!formData.siteName || !formData.siteTagline) {
       setError('Website name and tagline are required');
       return;
     }
@@ -164,8 +164,8 @@ export default function SettingsPage() {
                   </label>
                   <input
                     type="text"
-                    value={formData.websiteName}
-                    onChange={(e) => setFormData({ ...formData, websiteName: e.target.value })}
+                    value={formData.siteName}
+                    onChange={(e) => setFormData({ ...formData, siteName: e.target.value })}
                     className="w-full px-4 py-3 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-400 focus:outline-none focus:border-sapphire-500 transition-colors"
                     placeholder="StonesLand"
                     required
@@ -178,8 +178,8 @@ export default function SettingsPage() {
                   </label>
                   <input
                     type="text"
-                    value={formData.websiteTagline}
-                    onChange={(e) => setFormData({ ...formData, websiteTagline: e.target.value })}
+                    value={formData.siteTagline}
+                    onChange={(e) => setFormData({ ...formData, siteTagline: e.target.value })}
                     className="w-full px-4 py-3 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-400 focus:outline-none focus:border-sapphire-500 transition-colors"
                     placeholder="Premium Gems & Minerals"
                     required
@@ -192,8 +192,8 @@ export default function SettingsPage() {
                   </label>
                   <input
                     type="text"
-                    value={formData.websiteLogo}
-                    onChange={(e) => setFormData({ ...formData, websiteLogo: e.target.value })}
+                    value={formData.logo}
+                    onChange={(e) => setFormData({ ...formData, logo: e.target.value })}
                     className="w-full px-4 py-3 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-400 focus:outline-none focus:border-sapphire-500 transition-colors"
                     placeholder="https://example.com/logo.png"
                   />
@@ -212,8 +212,8 @@ export default function SettingsPage() {
                   </label>
                   <input
                     type="email"
-                    value={formData.contactEmail}
-                    onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full px-4 py-3 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-400 focus:outline-none focus:border-sapphire-500 transition-colors"
                     placeholder="contact@stonesland.com"
                   />
@@ -225,8 +225,8 @@ export default function SettingsPage() {
                   </label>
                   <input
                     type="tel"
-                    value={formData.contactPhone}
-                    onChange={(e) => setFormData({ ...formData, contactPhone: e.target.value })}
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="w-full px-4 py-3 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-400 focus:outline-none focus:border-sapphire-500 transition-colors"
                     placeholder="+1 (555) 123-4567"
                   />
@@ -237,8 +237,8 @@ export default function SettingsPage() {
                     Business Address
                   </label>
                   <textarea
-                    value={formData.contactAddress}
-                    onChange={(e) => setFormData({ ...formData, contactAddress: e.target.value })}
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     className="w-full px-4 py-3 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-400 focus:outline-none focus:border-sapphire-500 transition-colors"
                     placeholder="123 Gem Street, Mineral City, MC 12345"
                     rows={3}
