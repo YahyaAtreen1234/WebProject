@@ -29,6 +29,15 @@ export default function ShopPage() {
   });
 
   useEffect(() => {
+    // Read search parameter from URL
+    const searchParams = new URLSearchParams(window.location.search);
+    const searchParam = searchParams.get('search');
+    if (searchParam) {
+      setFilters(prev => ({ ...prev, searchTerm: searchParam }));
+    }
+  }, []);
+
+  useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch('/api/products');
