@@ -29,15 +29,6 @@ export default function ShopPage() {
   });
 
   useEffect(() => {
-    // Read search parameter from URL
-    const searchParams = new URLSearchParams(window.location.search);
-    const searchParam = searchParams.get('search');
-    if (searchParam) {
-      setFilters(prev => ({ ...prev, searchTerm: searchParam }));
-    }
-  }, []);
-
-  useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch('/api/products');
@@ -45,12 +36,20 @@ export default function ShopPage() {
           const data = await response.json();
           console.log('Products fetched:', data);
           setAllProducts(Array.isArray(data) ? data : []);
+
+          // After products load, apply URL search parameter
+          const searchParams = new URLSearchParams(window.location.search);
+          const searchParam = searchParams.get('search');
+          if (searchParam) {
+            console.log('Applying search filter:', searchParam);
+            setFilters(prev => ({ ...prev, searchTerm: decodeURIComponent(searchParam) }));
+          }
         } else {
           console.error('Failed to fetch products, status:', response.status);
+          setLoading(false);
         }
       } catch (error) {
         console.error('Failed to fetch products:', error);
-      } finally {
         setLoading(false);
       }
     };
