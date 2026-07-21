@@ -58,7 +58,8 @@
       "Bash(git commit -m 'Fix infinite loading state in Shop page *)",
       "Bash(git commit -m 'Improve Shop page product loading with better error handling and logging *)",
       "Bash(git commit -m 'Make price range filter dynamic based on product prices *)",
-      "PowerShell(New-Item -ItemType Directory -Path \"E:\\\\Claude project\\\\app\\\\admin\\\\deliveries\\\\create\" -Force)"
+      "PowerShell(New-Item -ItemType Directory -Path \"E:\\\\Claude project\\\\app\\\\admin\\\\deliveries\\\\create\" -Force)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }

@@ -49,6 +49,7 @@ export async function POST(
     // Check delivery exists
     const delivery = await prisma.delivery.findUnique({
       where: { id: params.id },
+      include: { order: true },
     });
     if (!delivery) {
       return NextResponse.json(
