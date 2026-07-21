@@ -49,7 +49,16 @@
       "Bash(git commit -m 'Fix production database: use PostgreSQL for Vercel *)",
       "Bash(git commit -m 'Fix logo upload: increase payload size and add image compression *)",
       "Bash(git commit -m 'Resolve failed migration in production database *)",
-      "Bash(git commit -m 'Add StonesLand logo to Navigation *)"
+      "Bash(git commit -m 'Add StonesLand logo to Navigation *)",
+      "Bash(git commit -m 'Fix deprecated Next.js config syntax in settings route *)",
+      "Bash(git commit -m 'Improve logo compression for smaller payload size *)",
+      "Bash(grep -E \"\\\\.\\(tsx|ts\\)$\")",
+      "Bash(git commit -m 'Fix shop product search parameter from URL *)",
+      "Bash(git commit -m 'Fix product search parameter timing issue in Shop page *)",
+      "Bash(git commit -m 'Fix infinite loading state in Shop page *)",
+      "Bash(git commit -m 'Improve Shop page product loading with better error handling and logging *)",
+      "Bash(git commit -m 'Make price range filter dynamic based on product prices *)",
+      "PowerShell(New-Item -ItemType Directory -Path \"E:\\\\Claude project\\\\app\\\\admin\\\\deliveries\\\\create\" -Force)"
     ]
   }
 }
