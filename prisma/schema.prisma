@@ -676,32 +676,32 @@ model GuaranteePolicy {
 }
 
 model SiteSettings {
-  id              String    @id @default("main")
-  siteName        String    @default("StonesLand")
-  siteTagline     String    @default("Premium Gems & Minerals")
-  logo            String?   // URL or base64 of logo image
-  favicon         String?   // URL or base64 of favicon
-  primaryColor    String    @default("#facc15")   // Yellow
-  backgroundColor String    @default("#000000")  // Black
+  id                String    @id @default("main")
+  websiteName       String    @default("StonesLand")
+  websiteTagline    String    @default("Premium Gems & Minerals")
+  websiteLogo       String?   @db.Text
+  favicon           String?   @db.Text
+  primaryColor      String    @default("#facc15")
+  backgroundColor   String    @default("#000000")
 
   // Contact info
-  email           String?
-  phone           String?
-  address         String?
+  contactEmail      String?
+  contactPhone      String?
+  contactAddress    String?   @db.Text
 
   // Social media
-  instagramUrl    String?
-  twitterUrl      String?
-  facebookUrl     String?
-  linkedinUrl     String?
+  instagramUrl      String?
+  twitterUrl        String?
+  facebookUrl       String?
+  linkedinUrl       String?
 
   // SEO
-  seoTitle        String?
-  seoDescription  String?
-  seoKeywords     String?
+  seoTitle          String?
+  seoDescription    String?
+  seoKeywords       String?
 
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   @@unique([id])
 }

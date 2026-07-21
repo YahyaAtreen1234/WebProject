@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
 
@@ -6,88 +6,137 @@ function verifyAdmin(request: NextRequest) {
   try {
     const auth = request.headers.get('authorization');
     if (!auth || !auth.startsWith('Bearer ')) {
+      console.log('[SettingsAPI] No authorization header');
       return null;
     }
-
     const token = auth.substring(7);
     const payload = verifyToken(token) as Record<string, unknown> | null;
-    return payload?.isAdmin ? payload : null;
-  } catch {
+    if (!payload?.isAdmin) {
+      console.log('[SettingsAPI] User is not admin:', payload);
+      return null;
+    }
+    return payload;
+  } catch (error) {
+    console.error('[SettingsAPI] Token verification error:', error);
     return null;
   }
 }
 
 export async function GET(request: NextRequest) {
   try {
-    const settings = await prisma.siteSettings.findUnique({
-      where: { id: 'main' },
-    });
+    console.log('[SettingsAPI] GET request received');
+    const admin = verifyAdmin(request);
+    if (!admin) {
+      console.log('[SettingsAPI] GET: Admin verification failed');
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    let settings = await prisma.siteSettings.findFirst();
+    console.log('[SettingsAPI] GET: Found settings:', settings?.id);
 
     if (!settings) {
-      // Return default settings if none exist
-      return NextResponse.json({
-        id: 'main',
-        siteName: 'StonesLand',
-        siteTagline: 'Premium Gems & Minerals',
-        logo: null,
-        email: null,
-        phone: null,
-        address: null,
+      console.log('[SettingsAPI] GET: Creating default settings');
+      settings = await prisma.siteSettings.create({
+        data: {
+          id: 'main',
+          websiteName: 'StonesLand',
+          websiteTagline: 'Premium Gems & Minerals',
+        },
       });
+      console.log('[SettingsAPI] GET: Default settings created');
     }
 
     return NextResponse.json(settings);
   } catch (error) {
-    console.error('Error fetching settings:', error);
+    console.error('[SettingsAPI] GET error:', error);
     return NextResponse.json(
       {
-        id: 'main',
-        siteName: 'StonesLand',
-        siteTagline: 'Premium Gems & Minerals',
-        logo: null,
-        email: null,
-        phone: null,
-        address: null,
-      }
+        error: 'Failed to fetch settings',
+        details: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 }
     );
   }
 }
 
 export async function PUT(request: NextRequest) {
   try {
-    const admin = await verifyAdmin(request);
+    console.log('[SettingsAPI] PUT request received');
+    const admin = verifyAdmin(request);
     if (!admin) {
+      console.log('[SettingsAPI] PUT: Admin verification failed');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
-
-    const settings = await prisma.siteSettings.upsert({
-      where: { id: 'main' },
-      create: {
-        id: 'main',
-        siteName: body.siteName || 'StonesLand',
-        siteTagline: body.siteTagline || 'Premium Gems & Minerals',
-        logo: body.logo,
-        email: body.email,
-        phone: body.phone,
-        address: body.address,
-      },
-      update: {
-        siteName: body.siteName,
-        siteTagline: body.siteTagline,
-        logo: body.logo,
-        email: body.email,
-        phone: body.phone,
-        address: body.address,
-      },
+    console.log('[SettingsAPI] PUT: Request body received:', {
+      websiteName: body.websiteName,
+      websiteTagline: body.websiteTagline,
+      contactEmail: body.contactEmail,
+      contactPhone: body.contactPhone,
     });
+
+    const {
+      websiteName,
+      websiteTagline,
+      websiteLogo,
+      contactEmail,
+      contactPhone,
+      contactAddress,
+      socialLinks,
+    } = body;
+
+    // Validation
+    if (!websiteName || !websiteTagline) {
+      console.log('[SettingsAPI] PUT: Validation failed - missing required fields');
+      return NextResponse.json(
+        { error: 'Website name and tagline are required' },
+        { status: 400 }
+      );
+    }
+
+    // Get existing settings or create new one
+    let settings = await prisma.siteSettings.findFirst();
+    console.log('[SettingsAPI] PUT: Found existing settings:', settings?.id);
+
+    if (!settings) {
+      console.log('[SettingsAPI] PUT: Creating new settings');
+      settings = await prisma.siteSettings.create({
+        data: {
+          id: 'main',
+          websiteName,
+          websiteTagline,
+          websiteLogo,
+          contactEmail,
+          contactPhone,
+          contactAddress,
+        },
+      });
+      console.log('[SettingsAPI] PUT: Settings created successfully');
+    } else {
+      console.log('[SettingsAPI] PUT: Updating existing settings');
+      settings = await prisma.siteSettings.update({
+        where: { id: 'main' },
+        data: {
+          websiteName,
+          websiteTagline,
+          websiteLogo,
+          contactEmail,
+          contactPhone,
+          contactAddress,
+        },
+      });
+      console.log('[SettingsAPI] PUT: Settings updated successfully');
+    }
 
     return NextResponse.json(settings);
   } catch (error) {
-    console.error('Error updating settings:', error);
+    console.error('[SettingsAPI] PUT error:', error);
     return NextResponse.json(
-      { error: 'Failed to update settings' },
+      {
+        error: 'Failed to update settings',
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }
