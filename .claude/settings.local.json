@@ -75,7 +75,8 @@
       "Bash(git commit -m 'Add scroll-hide header animation - header disappears when scrolling down *)",
       "Bash(git commit -m 'Add missing HELP & SUPPORT pages - fix 404 errors *)",
       "Bash(git commit -m 'Update search bar text color to black for better visibility *)",
-      "Bash(git commit -m 'Add Auctions page - fix 404 error *)"
+      "Bash(git commit -m 'Add Auctions page - fix 404 error *)",
+      "Bash(git commit -m 'Improve Auctions page - add colored gem displays and fetch products *)"
     ]
   }
 }

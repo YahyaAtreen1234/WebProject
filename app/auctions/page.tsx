@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface AuctionItem {
   id: string;
@@ -9,22 +9,83 @@ interface AuctionItem {
   currentBid: number;
   bids: number;
   timeLeft: string;
-  image: string;
   category: string;
+  gemColor: string;
+  gemEmoji: string;
 }
+
+const categoryColors: Record<string, { bg: string; emoji: string; gradient: string }> = {
+  Tanzanite: { bg: 'from-blue-900 to-blue-700', emoji: '💙', gradient: 'from-blue-900 to-blue-600' },
+  Emerald: { bg: 'from-green-900 to-green-700', emoji: '💚', gradient: 'from-green-900 to-green-600' },
+  Ruby: { bg: 'from-red-900 to-red-700', emoji: '❤️', gradient: 'from-red-900 to-red-600' },
+  Sapphire: { bg: 'from-indigo-900 to-indigo-700', emoji: '💙', gradient: 'from-indigo-900 to-indigo-600' },
+  Tourmaline: { bg: 'from-yellow-900 to-yellow-700', emoji: '💛', gradient: 'from-yellow-900 to-yellow-600' },
+  Amethyst: { bg: 'from-purple-900 to-purple-700', emoji: '💜', gradient: 'from-purple-900 to-purple-600' },
+};
 
 export default function AuctionsPage() {
   const [sortBy, setSortBy] = useState('ending-soon');
+  const [products, setProducts] = useState<AuctionItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const auctionItems: AuctionItem[] = [
+  useEffect(() => {
+    fetchAuctionItems();
+  }, []);
+
+  const fetchAuctionItems = async () => {
+    try {
+      const response = await fetch('/api/products');
+      if (response.ok) {
+        const data = await response.json();
+        const auctionItems = data.slice(0, 6).map((product: any, index: number) => {
+          const categories = Object.keys(categoryColors);
+          const category = product.category || categories[index % categories.length];
+          const colors = categoryColors[category] || categoryColors.Tanzanite;
+
+          return {
+            id: product.id,
+            title: product.title,
+            currentBid: product.price + Math.floor(Math.random() * 1000),
+            bids: Math.floor(Math.random() * 35) + 8,
+            timeLeft: getRandomTimeLeft(),
+            category: category,
+            gemColor: colors.bg,
+            gemEmoji: colors.emoji,
+          };
+        });
+        setProducts(auctionItems);
+      }
+    } catch (error) {
+      console.error('Error fetching auction items:', error);
+      // Use default items if API fails
+      setProducts(getDefaultAuctionItems());
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getRandomTimeLeft = () => {
+    const options = [
+      '2 hours 30 minutes',
+      '5 hours 45 minutes',
+      '1 day 3 hours',
+      '1 day 8 hours',
+      '2 days 4 hours',
+      '3 days',
+    ];
+    return options[Math.floor(Math.random() * options.length)];
+  };
+
+  const getDefaultAuctionItems = (): AuctionItem[] => [
     {
       id: '1',
       title: 'Rare Tanzanite Crystal - Tanzania',
       currentBid: 2500,
       bids: 15,
       timeLeft: '2 hours 30 minutes',
-      image: '💎',
       category: 'Tanzanite',
+      gemColor: categoryColors.Tanzanite.bg,
+      gemEmoji: categoryColors.Tanzanite.emoji,
     },
     {
       id: '2',
@@ -32,8 +93,9 @@ export default function AuctionsPage() {
       currentBid: 3200,
       bids: 22,
       timeLeft: '5 hours 45 minutes',
-      image: '💎',
       category: 'Emerald',
+      gemColor: categoryColors.Emerald.bg,
+      gemEmoji: categoryColors.Emerald.emoji,
     },
     {
       id: '3',
@@ -41,8 +103,9 @@ export default function AuctionsPage() {
       currentBid: 4100,
       bids: 31,
       timeLeft: '1 day 3 hours',
-      image: '💎',
       category: 'Ruby',
+      gemColor: categoryColors.Ruby.bg,
+      gemEmoji: categoryColors.Ruby.emoji,
     },
     {
       id: '4',
@@ -50,8 +113,9 @@ export default function AuctionsPage() {
       currentBid: 3500,
       bids: 18,
       timeLeft: '1 day 8 hours',
-      image: '💎',
       category: 'Sapphire',
+      gemColor: categoryColors.Sapphire.bg,
+      gemEmoji: categoryColors.Sapphire.emoji,
     },
     {
       id: '5',
@@ -59,8 +123,9 @@ export default function AuctionsPage() {
       currentBid: 1800,
       bids: 12,
       timeLeft: '2 days 4 hours',
-      image: '💎',
       category: 'Tourmaline',
+      gemColor: categoryColors.Tourmaline.bg,
+      gemEmoji: categoryColors.Tourmaline.emoji,
     },
     {
       id: '6',
@@ -68,10 +133,13 @@ export default function AuctionsPage() {
       currentBid: 950,
       bids: 8,
       timeLeft: '3 days',
-      image: '💎',
       category: 'Amethyst',
+      gemColor: categoryColors.Amethyst.bg,
+      gemEmoji: categoryColors.Amethyst.emoji,
     },
   ];
+
+  const auctionItems = products.length > 0 ? products : getDefaultAuctionItems();
 
   return (
     <div className="min-h-screen bg-white">
@@ -114,9 +182,9 @@ export default function AuctionsPage() {
                 key={item.id}
                 className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-lg transition-all cursor-pointer"
               >
-                {/* Image */}
-                <div className="bg-gradient-to-b from-gray-800 to-black h-48 flex items-center justify-center">
-                  <span className="text-7xl">{item.image}</span>
+                {/* Image - Colored Gradient by Gemstone */}
+                <div className={`bg-gradient-to-b ${item.gemColor} h-48 flex items-center justify-center`}>
+                  <span className="text-7xl animate-bounce">{item.gemEmoji}</span>
                 </div>
 
                 {/* Content */}
