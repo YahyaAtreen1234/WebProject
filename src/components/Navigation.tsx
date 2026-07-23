@@ -192,15 +192,15 @@ export default function Navigation() {
             <button className="flex items-center gap-1 py-3 text-white hover:text-gray-300">
               ☰ BROWSE CATEGORIES
             </button>
-            <div className="absolute left-0 mt-0 w-48 bg-white border border-gray-200 shadow-lg hidden group-hover:block z-50">
-              <Link href="/gallery?search=Amethyst" className="block px-4 py-2 hover:bg-gray-100">Amethyst</Link>
-              <Link href="/gallery?search=Rose+Quartz" className="block px-4 py-2 hover:bg-gray-100">Rose Quartz</Link>
-              <Link href="/gallery?search=Citrine" className="block px-4 py-2 hover:bg-gray-100">Citrine</Link>
-              <Link href="/gallery?search=Clear+Quartz" className="block px-4 py-2 hover:bg-gray-100">Clear Quartz</Link>
-              <Link href="/gallery?search=Tourmaline" className="block px-4 py-2 hover:bg-gray-100">Tourmaline</Link>
-              <Link href="/gallery?search=Garnet" className="block px-4 py-2 hover:bg-gray-100">Garnet</Link>
-              <Link href="/gallery?search=Jade" className="block px-4 py-2 hover:bg-gray-100">Jade</Link>
-              <Link href="/gallery" className="block px-4 py-2 hover:bg-gray-100 font-bold border-t">View All</Link>
+            <div className="absolute left-0 mt-0 w-48 bg-black border border-gray-800 shadow-lg hidden group-hover:block z-50">
+              <Link href="/gallery?search=Amethyst" className="block px-4 py-2 text-white hover:bg-gray-800">Amethyst</Link>
+              <Link href="/gallery?search=Rose+Quartz" className="block px-4 py-2 text-white hover:bg-gray-800">Rose Quartz</Link>
+              <Link href="/gallery?search=Citrine" className="block px-4 py-2 text-white hover:bg-gray-800">Citrine</Link>
+              <Link href="/gallery?search=Clear+Quartz" className="block px-4 py-2 text-white hover:bg-gray-800">Clear Quartz</Link>
+              <Link href="/gallery?search=Tourmaline" className="block px-4 py-2 text-white hover:bg-gray-800">Tourmaline</Link>
+              <Link href="/gallery?search=Garnet" className="block px-4 py-2 text-white hover:bg-gray-800">Garnet</Link>
+              <Link href="/gallery?search=Jade" className="block px-4 py-2 text-white hover:bg-gray-800">Jade</Link>
+              <Link href="/gallery" className="block px-4 py-2 text-white hover:bg-gray-800 font-bold border-t border-gray-700">View All</Link>
             </div>
           </div>
 
@@ -210,11 +210,11 @@ export default function Navigation() {
             <button className="flex items-center gap-1 py-3 text-white hover:text-gray-300">
               SHOP ▼
             </button>
-            <div className="absolute left-0 mt-0 w-48 bg-white border border-gray-200 shadow-lg hidden group-hover:block z-50">
-              <Link href="/shop" className="block px-4 py-2 hover:bg-gray-100">All Products</Link>
-              <Link href="/shop?sort=newest" className="block px-4 py-2 hover:bg-gray-100">New Arrivals</Link>
-              <Link href="/shop?sort=price-low" className="block px-4 py-2 hover:bg-gray-100">On Sale</Link>
-              <Link href="/shop?sort=featured" className="block px-4 py-2 hover:bg-gray-100">Best Sellers</Link>
+            <div className="absolute left-0 mt-0 w-48 bg-black border border-gray-800 shadow-lg hidden group-hover:block z-50">
+              <Link href="/shop" className="block px-4 py-2 text-white hover:bg-gray-800">All Products</Link>
+              <Link href="/shop?sort=newest" className="block px-4 py-2 text-white hover:bg-gray-800">New Arrivals</Link>
+              <Link href="/shop?sort=price-low" className="block px-4 py-2 text-white hover:bg-gray-800">On Sale</Link>
+              <Link href="/shop?sort=featured" className="block px-4 py-2 text-white hover:bg-gray-800">Best Sellers</Link>
             </div>
           </div>
 
@@ -225,12 +225,12 @@ export default function Navigation() {
             <button className="flex items-center gap-1 py-3 text-white hover:text-gray-300">
               HELP & SUPPORT ▼
             </button>
-            <div className="absolute left-0 mt-0 w-48 bg-white border border-gray-200 shadow-lg hidden group-hover:block z-50">
-              <Link href="/faq" className="block px-4 py-2 hover:bg-gray-100">FAQ</Link>
-              <Link href="/shipping" className="block px-4 py-2 hover:bg-gray-100">Shipping Info</Link>
-              <Link href="/returns" className="block px-4 py-2 hover:bg-gray-100">Returns Policy</Link>
-              <Link href="/contact" className="block px-4 py-2 hover:bg-gray-100">Contact Us</Link>
-              <Link href="/tracking" className="block px-4 py-2 hover:bg-gray-100">Track Order</Link>
+            <div className="absolute left-0 mt-0 w-48 bg-black border border-gray-800 shadow-lg hidden group-hover:block z-50">
+              <Link href="/faq" className="block px-4 py-2 text-white hover:bg-gray-800">FAQ</Link>
+              <Link href="/shipping" className="block px-4 py-2 text-white hover:bg-gray-800">Shipping Info</Link>
+              <Link href="/returns" className="block px-4 py-2 text-white hover:bg-gray-800">Returns Policy</Link>
+              <Link href="/contact" className="block px-4 py-2 text-white hover:bg-gray-800">Contact Us</Link>
+              <Link href="/tracking" className="block px-4 py-2 text-white hover:bg-gray-800">Track Order</Link>
             </div>
           </div>
         </div>

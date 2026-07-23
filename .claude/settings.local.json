@@ -69,7 +69,8 @@
       "Bash(xargs grep -l \"Price Range\\\\|BROWSE CATEGORIES\")",
       "Bash(git commit -m 'Remove sidebar filters from shop page *)",
       "Bash(git commit -m 'Fix JSX syntax error in shop page - add missing closing div *)",
-      "Bash(git commit -m 'Change secondary navigation bar to black background with white text *)"
+      "Bash(git commit -m 'Change secondary navigation bar to black background with white text *)",
+      "Bash(git commit -m 'Update dropdown menus to black background with white text *)"
     ]
   }
 }
