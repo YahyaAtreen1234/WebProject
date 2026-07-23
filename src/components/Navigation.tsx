@@ -186,10 +186,10 @@ export default function Navigation() {
       </div>
 
       {/* Secondary Navigation */}
-      <div className="bg-white border-t border-gray-200 px-4 sm:px-6 py-2 hidden sm:block">
+      <div className="bg-black text-white border-t border-gray-800 px-4 sm:px-6 py-2 hidden sm:block">
         <div className="max-w-7xl mx-auto flex items-center gap-6 text-sm font-semibold">
           <div className="relative group">
-            <button className="flex items-center gap-1 py-3 hover:text-gray-600">
+            <button className="flex items-center gap-1 py-3 text-white hover:text-gray-300">
               ☰ BROWSE CATEGORIES
             </button>
             <div className="absolute left-0 mt-0 w-48 bg-white border border-gray-200 shadow-lg hidden group-hover:block z-50">
@@ -204,10 +204,10 @@ export default function Navigation() {
             </div>
           </div>
 
-          <Link href="/" className="py-3 hover:text-gray-600">HOME</Link>
+          <Link href="/" className="py-3 text-white hover:text-gray-300">HOME</Link>
 
           <div className="relative group">
-            <button className="flex items-center gap-1 py-3 hover:text-gray-600">
+            <button className="flex items-center gap-1 py-3 text-white hover:text-gray-300">
               SHOP ▼
             </button>
             <div className="absolute left-0 mt-0 w-48 bg-white border border-gray-200 shadow-lg hidden group-hover:block z-50">
@@ -218,11 +218,11 @@ export default function Navigation() {
             </div>
           </div>
 
-          <Link href="/gallery" className="py-3 hover:text-gray-600">GEMSTONES</Link>
-          <Link href="/auctions" className="py-3 hover:text-gray-600">AUCTIONS</Link>
+          <Link href="/gallery" className="py-3 text-white hover:text-gray-300">GEMSTONES</Link>
+          <Link href="/auctions" className="py-3 text-white hover:text-gray-300">AUCTIONS</Link>
 
           <div className="relative group">
-            <button className="flex items-center gap-1 py-3 hover:text-gray-600">
+            <button className="flex items-center gap-1 py-3 text-white hover:text-gray-300">
               HELP & SUPPORT ▼
             </button>
             <div className="absolute left-0 mt-0 w-48 bg-white border border-gray-200 shadow-lg hidden group-hover:block z-50">
