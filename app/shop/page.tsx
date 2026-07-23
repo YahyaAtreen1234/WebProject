@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import CollectionFilters, { FilterState } from '@/components/CollectionFilters';
 import ProductCard from '@/components/ProductCard';
 import CartUI from '@/components/Cart';
 import { useCart } from '@/hooks/useCart';
@@ -15,6 +14,13 @@ interface Product {
   stock: number;
   image?: string;
   featured?: boolean;
+}
+
+interface FilterState {
+  priceRange: [number, number];
+  selectedCategories: string[];
+  searchTerm: string;
+  sortBy: string;
 }
 
 export default function ShopPage() {
@@ -202,16 +208,7 @@ export default function ShopPage() {
       </section>
 
       {/* Main Content */}
-      <div className="container-gutter pb-gutter-lg grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Sidebar Filters */}
-        <div className="lg:col-span-1">
-          <div className="card-glass backdrop-blur-md p-6 rounded-2xl sticky top-24">
-            <CollectionFilters onFilterChange={setFilters} categories={categories} />
-          </div>
-        </div>
-
-        {/* Products Grid/List */}
-        <div className="lg:col-span-3">
+      <div className="container-gutter pb-gutter-lg">
           {loading ? (
             <div className="text-center py-16">
               <div className="text-6xl mb-4">⏳</div>
@@ -317,8 +314,6 @@ export default function ShopPage() {
               )}
             </>
           )}
-        </div>
-      </div>
 
       {/* Cart */}
       <CartUI />

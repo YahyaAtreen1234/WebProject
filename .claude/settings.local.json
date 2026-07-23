@@ -65,7 +65,9 @@
       "Bash(git commit -m 'Redesign Navigation - Match Fine Art Minerals website style *)",
       "Bash(git commit -m 'Fix Navigation syntax error - remove orphaned code *)",
       "Bash(git commit -m 'Implement Complete Website Redesign - Match Fine Art Minerals *)",
-      "Bash(git commit -m 'Remove sidebar search/filter panel from gallery page *)"
+      "Bash(git commit -m 'Remove sidebar search/filter panel from gallery page *)",
+      "Bash(xargs grep -l \"Price Range\\\\|BROWSE CATEGORIES\")",
+      "Bash(git commit -m 'Remove sidebar filters from shop page *)"
     ]
   }
 }
