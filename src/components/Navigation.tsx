@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useCart } from '@/context/CartContext';
 
 export default function Navigation() {
-  const { getItemCount } = useCart();
+  const { cart, getItemCount } = useCart();
   const [cartCount, setCartCount] = useState(0);
   const [isClient, setIsClient] = useState(false);
   const [language, setLanguage] = useState('ENGLISH');
@@ -21,7 +21,7 @@ export default function Navigation() {
   useEffect(() => {
     setIsClient(true);
     setCartCount(getItemCount());
-  }, [getItemCount]);
+  }, [cart, getItemCount]);
 
   useEffect(() => {
     const handleScroll = () => {
