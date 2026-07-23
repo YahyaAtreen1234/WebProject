@@ -28,6 +28,7 @@ model User {
   orders              Order[]
   addresses           DeliveryAddress[]
   wishlist            Wishlist[]
+  compare             Compare[]
   paymentMethods      PaymentMethod[]
   customOrders        CustomOrder[]
   supportTickets      SupportTicket[]
@@ -41,6 +42,17 @@ model User {
 }
 
 model Wishlist {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@index([userId])
+}
+
+model Compare {
   id        String   @id @default(cuid())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
