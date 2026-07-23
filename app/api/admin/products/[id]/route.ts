@@ -82,7 +82,6 @@ export async function PATCH(
         ...(category && { category }),
         ...(stock !== undefined && { stock: parseInt(stock.toString()) }),
         ...(image && { image }),
-        ...(image && { images: { push: image } }),
         ...(featured !== undefined && { featured }),
       },
     });
