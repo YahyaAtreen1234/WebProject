@@ -10,6 +10,10 @@ interface Settings {
   email?: string;
   phone?: string;
   address?: string;
+  instagramUrl?: string;
+  facebookUrl?: string;
+  twitterUrl?: string;
+  linkedinUrl?: string;
 }
 
 export default function SettingsPage() {
@@ -26,6 +30,10 @@ export default function SettingsPage() {
     email: '',
     phone: '',
     address: '',
+    instagramUrl: '',
+    facebookUrl: '',
+    twitterUrl: '',
+    linkedinUrl: '',
   });
 
   useEffect(() => {
@@ -64,6 +72,10 @@ export default function SettingsPage() {
         email: data.email || '',
         phone: data.phone || '',
         address: data.address || '',
+        instagramUrl: data.instagramUrl || '',
+        facebookUrl: data.facebookUrl || '',
+        twitterUrl: data.twitterUrl || '',
+        linkedinUrl: data.linkedinUrl || '',
       });
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Error loading settings';
@@ -242,6 +254,65 @@ export default function SettingsPage() {
                     className="w-full px-4 py-3 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-400 focus:outline-none focus:border-sapphire-500 transition-colors"
                     placeholder="123 Gem Street, Mineral City, MC 12345"
                     rows={3}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Social Media Section */}
+            <div className="border-b border-sapphire-500/20 pb-6">
+              <h2 className="text-xl font-bold text-white mb-4">Social Media</h2>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-white mb-2">
+                    Instagram URL
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.instagramUrl}
+                    onChange={(e) => setFormData({ ...formData, instagramUrl: e.target.value })}
+                    className="w-full px-4 py-3 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-400 focus:outline-none focus:border-sapphire-500 transition-colors"
+                    placeholder="https://instagram.com/yourusername"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-white mb-2">
+                    Facebook URL
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.facebookUrl}
+                    onChange={(e) => setFormData({ ...formData, facebookUrl: e.target.value })}
+                    className="w-full px-4 py-3 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-400 focus:outline-none focus:border-sapphire-500 transition-colors"
+                    placeholder="https://facebook.com/yourpage"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-white mb-2">
+                    Twitter URL
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.twitterUrl}
+                    onChange={(e) => setFormData({ ...formData, twitterUrl: e.target.value })}
+                    className="w-full px-4 py-3 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-400 focus:outline-none focus:border-sapphire-500 transition-colors"
+                    placeholder="https://twitter.com/yourhandle"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-white mb-2">
+                    LinkedIn URL
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.linkedinUrl}
+                    onChange={(e) => setFormData({ ...formData, linkedinUrl: e.target.value })}
+                    className="w-full px-4 py-3 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-400 focus:outline-none focus:border-sapphire-500 transition-colors"
+                    placeholder="https://linkedin.com/company/yourcompany"
                   />
                 </div>
               </div>
