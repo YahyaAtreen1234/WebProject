@@ -50,25 +50,9 @@ export default function Navigation() {
 
   return (
     <header className="sticky top-0 z-50 bg-white">
-      {/* Newsletter Banner */}
-      <div className="bg-red-900 text-white py-3 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-4">
-          <p className="text-sm sm:text-base font-semibold">Subscribe to our newsletter and get 10% off</p>
-          <form onSubmit={handleNewsletterSubmit} className="flex gap-2 w-full sm:w-auto">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={newsletter}
-              onChange={(e) => setNewsletter(e.target.value)}
-              className="flex-1 sm:flex-none px-3 py-1.5 text-sm text-black rounded"
-              required
-            />
-            <button type="submit" className="bg-black text-white px-4 py-1.5 text-sm font-semibold rounded hover:bg-gray-800">
-              Sign Up
-            </button>
-          </form>
-          {newsLetterSuccess && <span className="text-xs text-green-300">{newsLetterSuccess}</span>}
-        </div>
+      {/* Money Back Guarantee Banner */}
+      <div className="bg-red-900 text-white py-2 px-4 sm:px-6 text-center text-sm font-semibold">
+        Shop with confidence with our 15 day money back guarantee
       </div>
 
       {/* Top Navigation */}
