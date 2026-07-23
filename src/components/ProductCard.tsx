@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import WishlistButton from './WishlistButton';
 import Compare from './Compare';
-import { useCart } from '@/hooks/useCart';
+import { useCart } from '@/context/CartContext';
 
 interface Product {
   id: string;
