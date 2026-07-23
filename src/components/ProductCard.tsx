@@ -28,11 +28,8 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
   const handleAddToCart = () => {
     addItem({
       id: product.id,
-      title: product.title,
+      name: product.title,
       price: product.price,
-      category: product.category,
-      stock: product.stock,
-      description: product.description,
       image: product.image || '',
     }, quantity);
     setQuantity(1);

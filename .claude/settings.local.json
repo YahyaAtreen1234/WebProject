@@ -85,7 +85,8 @@
       "Bash(git commit -m 'Fix ProductCard to use proper Wishlist, Compare, and Cart functionality *)",
       "Bash(git commit -m 'Fix useCart import in ProductCard - use CartContext instead of localStorage hook *)",
       "Bash(git commit -m 'Fix Navigation cart count to update when items are added *)",
-      "Bash(git commit -m 'Fix TypeScript error - handle optional image field *)"
+      "Bash(git commit -m 'Fix TypeScript error - handle optional image field *)",
+      "Bash(git commit -m 'Fix CartItem field names to match interface *)"
     ]
   }
 }
