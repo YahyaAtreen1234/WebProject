@@ -15,11 +15,37 @@ export default function Navigation() {
   const [searchTerm, setSearchTerm] = useState('');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
     setIsClient(true);
     setCartCount(getItemCount());
   }, [getItemCount]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Show header if at top
+      if (currentScrollY < 50) {
+        setIsHeaderVisible(true);
+      }
+      // Hide header when scrolling down
+      else if (currentScrollY > lastScrollY) {
+        setIsHeaderVisible(false);
+      }
+      // Show header when scrolling up
+      else if (currentScrollY < lastScrollY) {
+        setIsHeaderVisible(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +75,10 @@ export default function Navigation() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white">
+    <header
+      className="sticky top-0 z-50 bg-white transition-transform duration-300 ease-in-out"
+      style={{ transform: isHeaderVisible ? 'translateY(0)' : 'translateY(-100%)' }}
+    >
       {/* Money Back Guarantee Banner */}
       <div className="bg-red-900 text-white py-2 px-4 sm:px-6 text-center text-sm font-semibold">
         Shop with confidence with our 15 day money back guarantee
