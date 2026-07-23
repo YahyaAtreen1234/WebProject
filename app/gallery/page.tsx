@@ -181,153 +181,15 @@ export default function GalleryPage() {
   const end = Math.min(page * ITEMS_PER_PAGE, filteredProducts.length);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-midnight-950 via-midnight-900 to-midnight-950">
+    <div className="min-h-screen bg-white">
       {/* Header Section */}
-      <div className="container-gutter py-gutter-lg">
-        <div className="mb-12">
-          <h1 className="text-5xl font-bold text-gold-500 mb-4">Our Collection</h1>
-          <p className="text-lg text-midnight-300 max-w-2xl">
-            Carefully curated gemstones and minerals from around the world. Each piece is unique and selected for its
-            exceptional beauty, rarity, and investment potential.
-          </p>
-        </div>
-
-        {/* View Toggle */}
-        <div className="flex gap-4 mb-12">
-          <button
-            onClick={() => setFilters((prev) => ({ ...prev, viewMode: 'grid' }))}
-            className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-              filters.viewMode === 'grid'
-                ? 'bg-gold-600 text-white'
-                : 'bg-midnight-800 border border-sapphire-500/30 text-white hover:border-sapphire-400'
-            }`}
-          >
-            🔳 Grid
-          </button>
-          <button
-            onClick={() => setFilters((prev) => ({ ...prev, viewMode: 'list' }))}
-            className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-              filters.viewMode === 'list'
-                ? 'bg-gold-600 text-white'
-                : 'bg-midnight-800 border border-sapphire-500/30 text-white hover:border-sapphire-400'
-            }`}
-          >
-            ≡ List
-          </button>
-        </div>
-      </div>
-
-      {/* Search & Filter Panel - Centered */}
-      <div className="container-gutter max-w-4xl mx-auto mb-12">
-        {/* Search Section */}
-        <div className="mb-12">
-          <h2 className="text-3xl font-bold text-white mb-6">Search</h2>
-          <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl">🔍</span>
-            <input
-              type="text"
-              placeholder="Search minerals, gems, stones..."
-              value={filters.searchTerm}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full pl-14 pr-4 py-4 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-400 focus:outline-none focus:border-sapphire-500 transition-colors"
-            />
-          </div>
-        </div>
-
-        {/* Sort Section */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-4">Sort By</h2>
-          <select
-            value={filters.sortBy}
-            onChange={(e) => setFilters((prev) => ({ ...prev, sortBy: e.target.value }))}
-            className="w-full px-4 py-3 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white focus:outline-none focus:border-sapphire-500"
-          >
-            {SORT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Category Filter */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-4">Filter by Category</h2>
-          <div className="space-y-3">
-            {visibleCategories.map((cat) => (
-              <label key={cat} className="flex items-center cursor-pointer group">
-                <input
-                  type="checkbox"
-                  checked={filters.selectedCategories.includes(cat)}
-                  onChange={() => handleCategoryToggle(cat)}
-                  className="w-5 h-5 accent-sapphire-500 cursor-pointer"
-                />
-                <span className="ml-3 text-white group-hover:text-sapphire-400 transition-colors">{cat}</span>
-              </label>
-            ))}
-            {FILTER_CATEGORIES.length > 6 && (
-              <button
-                onClick={() => setExpandedCategories(!expandedCategories)}
-                className="text-sapphire-400 hover:text-sapphire-300 font-semibold mt-4"
-              >
-                {expandedCategories ? '← Show less' : 'View more...'}
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Price Range Filter */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-4">Price Range</h2>
-          <div className="space-y-4">
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <label className="text-xs text-midnight-400 mb-2 block">Min</label>
-                <input
-                  type="number"
-                  min="0"
-                  value={filters.priceRange.min}
-                  onChange={(e) => handlePriceChange('min', Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full px-3 py-2 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white"
-                />
-              </div>
-              <div className="flex-1">
-                <label className="text-xs text-midnight-400 mb-2 block">Max</label>
-                <input
-                  type="number"
-                  max="10000"
-                  value={filters.priceRange.max}
-                  onChange={(e) => handlePriceChange('max', Math.min(10000, parseInt(e.target.value) || 10000))}
-                  className="w-full px-3 py-2 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white"
-                />
-              </div>
-            </div>
-            <div className="flex items-center justify-between text-sm text-midnight-300">
-              <span>${filters.priceRange.min.toLocaleString()}</span>
-              <span>${filters.priceRange.max.toLocaleString()}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-4 mb-12">
-          <button
-            onClick={() => applyFilters()}
-            className="flex-1 px-6 py-3 bg-gradient-to-r from-gold-600 to-gold-700 text-white rounded-lg font-semibold hover:from-gold-700 hover:to-gold-800 transition-all"
-          >
-            Apply Filters
-          </button>
-          <button
-            onClick={handleResetFilters}
-            className="flex-1 px-6 py-3 bg-midnight-800 border border-sapphire-500/30 text-white rounded-lg font-semibold hover:border-sapphire-400 transition-all"
-          >
-            Reset All
-          </button>
-        </div>
+      <div className="container-gutter py-12 px-4 sm:px-6">
+        <h1 className="text-4xl font-bold text-black mb-4">Gallery</h1>
+        <p className="text-gray-600">Browse our collection of gemstones and minerals</p>
       </div>
 
       {/* Results Section */}
-      <div className="container-gutter">
+      <div className="container-gutter px-4 sm:px-6">
         {error && (
           <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-lg mb-8">
             <p className="text-rose-400">{error}</p>
@@ -350,29 +212,13 @@ export default function GalleryPage() {
           </div>
         ) : (
           <>
-            {/* Products Grid/List */}
-            <div
-              className={
-                filters.viewMode === 'grid'
-                  ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12'
-                  : 'space-y-4 mb-12'
-              }
-            >
+            {/* Products Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
               {paginatedProducts.map((product) => (
                 <Link key={product.id} href={`/shop/${product.id}`}>
-                  <div
-                    className={`group cursor-pointer ${
-                      filters.viewMode === 'list'
-                        ? 'flex gap-4 p-4 bg-midnight-800/50 rounded-lg hover:bg-midnight-800 transition-all'
-                        : 'flex flex-col h-full bg-midnight-800/50 rounded-lg overflow-hidden hover:shadow-xl transition-all hover:scale-105'
-                    }`}
-                  >
+                  <div className="group cursor-pointer flex flex-col h-full bg-white rounded-lg overflow-hidden hover:shadow-lg transition-all hover:scale-105 border border-gray-200">
                     {/* Image */}
-                    <div
-                      className={`relative bg-gradient-to-br from-midnight-700 to-midnight-900 ${
-                        filters.viewMode === 'list' ? 'w-24 h-24 flex-shrink-0' : 'w-full h-48'
-                      }`}
-                    >
+                    <div className="relative bg-gray-100 w-full h-48">
                       {product.image ? (
                         <img
                           src={product.image}
@@ -385,16 +231,14 @@ export default function GalleryPage() {
                     </div>
 
                     {/* Content */}
-                    <div className={`${filters.viewMode === 'grid' ? 'flex-1 p-4' : 'flex-1 flex flex-col justify-between'}`}>
-                      <div>
-                        <p className="text-xs text-sapphire-400 mb-1">{product.category}</p>
-                        <h3 className="text-white font-semibold group-hover:text-gold-400 transition-colors">
-                          {product.title}
-                        </h3>
-                      </div>
-                      <div className="flex justify-between items-center mt-2">
-                        <span className="text-gold-500 font-bold">${product.price.toFixed(2)}</span>
-                        <span className="text-xs text-midnight-400">
+                    <div className="flex-1 p-4">
+                      <p className="text-xs text-gray-500 mb-1">{product.category}</p>
+                      <h3 className="text-black font-semibold group-hover:text-gray-700 transition-colors">
+                        {product.title}
+                      </h3>
+                      <div className="flex justify-between items-center mt-3">
+                        <span className="text-lg font-bold text-black">${product.price.toFixed(2)}</span>
+                        <span className="text-xs text-gray-500">
                           {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
                         </span>
                       </div>
