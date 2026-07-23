@@ -10,6 +10,7 @@ interface Product {
   category: string;
   description: string;
   stock: number;
+  image?: string;
 }
 
 export default function Home() {
@@ -101,8 +102,12 @@ export default function Home() {
                 {allProducts.map((product) => (
                   <Link key={product.id} href={`/shop`}>
                     <div className="bg-black rounded-2xl p-6 text-white text-center cursor-pointer hover:opacity-90 transition h-full">
-                      <div className="bg-gradient-to-b from-gray-700 to-black h-40 rounded-lg flex items-center justify-center mb-4">
-                        <span className="text-5xl">💎</span>
+                      <div className="bg-gradient-to-b from-gray-700 to-black h-40 rounded-lg flex items-center justify-center mb-4 overflow-hidden">
+                        {product.image ? (
+                          <img src={product.image} alt={product.title} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-5xl">💎</span>
+                        )}
                       </div>
                       <p className="font-bold mb-2 line-clamp-2 text-sm">{product.title}</p>
                       <p className="text-gray-400 mb-2 text-sm">{product.category}</p>
