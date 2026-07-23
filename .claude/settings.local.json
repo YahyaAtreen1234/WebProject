@@ -72,7 +72,9 @@
       "Bash(git commit -m 'Change secondary navigation bar to black background with white text *)",
       "Bash(git commit -m 'Update dropdown menus to black background with white text *)",
       "Bash(git commit -m 'Update homepage to fetch and display all products from database *)",
-      "Bash(git commit -m 'Add scroll-hide header animation - header disappears when scrolling down *)"
+      "Bash(git commit -m 'Add scroll-hide header animation - header disappears when scrolling down *)",
+      "Bash(git commit -m 'Add missing HELP & SUPPORT pages - fix 404 errors *)",
+      "Bash(git commit -m 'Update search bar text color to black for better visibility *)"
     ]
   }
 }

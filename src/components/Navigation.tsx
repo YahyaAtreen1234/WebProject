@@ -140,7 +140,7 @@ export default function Navigation() {
                   placeholder="Search for products"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-sm focus:outline-none focus:border-blue-500"
+                  className="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-sm text-black placeholder-gray-500 focus:outline-none focus:border-blue-500"
                 />
                 <button
                   type="submit"
@@ -189,7 +189,7 @@ export default function Navigation() {
               placeholder="Search for products"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1 px-3 py-2 bg-white border border-gray-300 text-sm focus:outline-none focus:border-blue-500"
+              className="flex-1 px-3 py-2 bg-white border border-gray-300 text-sm text-black placeholder-gray-500 focus:outline-none focus:border-blue-500"
             />
             <button type="submit" className="bg-black text-white px-3 py-2 hover:bg-gray-800">
               🔍
