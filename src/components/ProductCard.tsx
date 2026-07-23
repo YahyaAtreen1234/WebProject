@@ -33,7 +33,7 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
       category: product.category,
       stock: product.stock,
       description: product.description,
-      image: product.image,
+      image: product.image || '',
     }, quantity);
     setQuantity(1);
     if (onAddToCart) {
