@@ -67,7 +67,8 @@
       "Bash(git commit -m 'Implement Complete Website Redesign - Match Fine Art Minerals *)",
       "Bash(git commit -m 'Remove sidebar search/filter panel from gallery page *)",
       "Bash(xargs grep -l \"Price Range\\\\|BROWSE CATEGORIES\")",
-      "Bash(git commit -m 'Remove sidebar filters from shop page *)"
+      "Bash(git commit -m 'Remove sidebar filters from shop page *)",
+      "Bash(git commit -m 'Fix JSX syntax error in shop page - add missing closing div *)"
     ]
   }
 }

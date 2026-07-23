@@ -314,6 +314,7 @@ export default function ShopPage() {
               )}
             </>
           )}
+      </div>
 
       {/* Cart */}
       <CartUI />
