@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import WishlistButton from './WishlistButton';
+import Compare from './Compare';
+import { useCart } from '@/hooks/useCart';
 
 interface Product {
   id: string;
@@ -14,17 +17,28 @@ interface Product {
 
 interface ProductCardProps {
   product: Product;
-  onAddToCart: (product: Product, quantity: number) => void;
+  onAddToCart?: (product: Product, quantity: number) => void;
 }
 
 export default function ProductCard({ product, onAddToCart }: ProductCardProps) {
   const [quantity, setQuantity] = useState(1);
   const [showModal, setShowModal] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { addItem } = useCart();
 
   const handleAddToCart = () => {
-    onAddToCart(product, quantity);
+    addItem({
+      id: product.id,
+      title: product.title,
+      price: product.price,
+      category: product.category,
+      stock: product.stock,
+      description: product.description,
+      image: product.image,
+    }, quantity);
     setQuantity(1);
+    if (onAddToCart) {
+      onAddToCart(product, quantity);
+    }
   };
 
   const isRuby = product.id === '5';
@@ -65,12 +79,8 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
               >
                 View Details
               </button>
-              <button
-                onClick={() => setIsFavorite(!isFavorite)}
-                className="px-4 py-3 rounded-lg font-bold text-2xl hover:scale-110 transition-transform"
-              >
-                {isFavorite ? '❤️' : '🤍'}
-              </button>
+              <WishlistButton productId={product.id} />
+              <Compare productId={product.id} />
             </div>
 
             {/* Category Badge */}
