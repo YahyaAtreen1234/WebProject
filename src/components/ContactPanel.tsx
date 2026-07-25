@@ -39,6 +39,8 @@ export default function ContactPanel() {
     message: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<ContactMessage[]>([
     {
       id: '1',
@@ -151,32 +153,64 @@ export default function ContactPanel() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Add new message to list
-    const newMessage: ContactMessage = {
-      id: String(messages.length + 1),
-      name: formData.name,
-      email: formData.email,
-      subject: formData.subject,
-      message: formData.message,
-      date: new Date().toISOString().split('T')[0],
-      status: 'new',
-      type: (formData.type as any) || 'general',
-    };
-    setMessages([newMessage, ...messages]);
-    setSubmitted(true);
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      subject: '',
-      type: 'general',
-      message: '',
-    });
+    setError('');
+    setLoading(true);
 
-    // Reset success message after 5 seconds
-    setTimeout(() => setSubmitted(false), 5000);
+    try {
+      // Call the API endpoint to save the message
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          subject: formData.subject,
+          message: formData.message,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send message');
+      }
+
+      // Add new message to local list
+      const newMessage: ContactMessage = {
+        id: data.id || String(messages.length + 1),
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+        date: new Date().toISOString().split('T')[0],
+        status: 'new',
+        type: (formData.type as any) || 'general',
+      };
+      setMessages([newMessage, ...messages]);
+      setSubmitted(true);
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        subject: '',
+        type: 'general',
+        message: '',
+      });
+
+      // Reset success message after 5 seconds
+      setTimeout(() => setSubmitted(false), 5000);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to send message';
+      setError(errorMsg);
+      console.error('Contact form error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -277,6 +311,14 @@ export default function ContactPanel() {
               </div>
             )}
 
+            {error && (
+              <div className="mb-6 p-4 bg-rose-500/20 border border-rose-500/30 rounded-lg">
+                <p className="text-rose-400 font-semibold">
+                  ❌ {error}
+                </p>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Name & Email Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -366,9 +408,10 @@ export default function ContactPanel() {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full px-6 py-3 bg-gradient-to-r from-sapphire-600 to-sapphire-700 text-white rounded-lg hover:from-sapphire-700 hover:to-sapphire-800 transition-all font-semibold flex items-center justify-center gap-2"
+                disabled={loading}
+                className="w-full px-6 py-3 bg-gradient-to-r from-sapphire-600 to-sapphire-700 text-white rounded-lg hover:from-sapphire-700 hover:to-sapphire-800 transition-all font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span>📤</span> Send Message
+                <span>{loading ? '⏳' : '📤'}</span> {loading ? 'Sending...' : 'Send Message'}
               </button>
             </form>
 

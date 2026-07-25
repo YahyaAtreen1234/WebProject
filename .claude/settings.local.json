@@ -87,7 +87,9 @@
       "Bash(git commit -m 'Fix Navigation cart count to update when items are added *)",
       "Bash(git commit -m 'Fix TypeScript error - handle optional image field *)",
       "Bash(git commit -m 'Fix CartItem field names to match interface *)",
-      "Bash(git commit -m 'Add social media fields to admin settings *)"
+      "Bash(git commit -m 'Add social media fields to admin settings *)",
+      "Bash(grep -E \"/\\(app|src\\)$\")",
+      "Bash(git commit -m 'Fix contact form to save messages to database via API *)"
     ]
   }
 }
