@@ -1,7 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { verifyToken } from '@/lib/auth';
+
+function verifyAdmin(request: NextRequest) {
+  try {
+    const auth = request.headers.get('authorization');
+    if (!auth || !auth.startsWith('Bearer ')) {
+      return null;
+    }
+
+    const token = auth.substring(7);
+    const payload = verifyToken(token) as Record<string, unknown> | null;
+
+    if (!payload?.isAdmin) {
+      return null;
+    }
+
+    return payload;
+  } catch {
+    return null;
+  }
+}
 
 export async function GET(request: NextRequest) {
+  const admin = verifyAdmin(request);
+  if (!admin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const status = searchParams.get('status') || 'all';
