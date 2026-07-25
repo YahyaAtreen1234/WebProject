@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -691,15 +691,15 @@ model SiteSettings {
   id                String    @id @default("main")
   siteName          String    @default("StonesLand")
   siteTagline       String    @default("Premium Gems & Minerals")
-  logo              String?   @db.Text
-  favicon           String?   @db.Text
+  logo              String?
+  favicon           String?
   primaryColor      String    @default("#facc15")
   backgroundColor   String    @default("#000000")
 
   // Contact info
   email             String?
   phone             String?
-  address           String?   @db.Text
+  address           String?
 
   // Social media
   instagramUrl      String?
