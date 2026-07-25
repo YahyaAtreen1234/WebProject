@@ -54,16 +54,26 @@ export default function AdminMessages() {
       const params = new URLSearchParams();
       if (filter !== 'all') params.append('status', filter);
 
+      console.log('[AdminMessages] Fetching with params:', filter, 'Token:', token ? token.substring(0, 20) + '...' : 'NO TOKEN');
+      console.log('[AdminMessages] API URL:', `/api/admin/messages?${params}`);
+
       const response = await fetch(`/api/admin/messages?${params}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      console.log('[AdminMessages] API Response status:', response.status);
+
       if (response.ok) {
         const data = await response.json();
+        console.log('[AdminMessages] API Response data:', data);
+        console.log('[AdminMessages] Messages array:', data.data ? `${data.data.length} messages` : 'No data.data');
         setMessages(data.data || []);
+      } else {
+        const errorData = await response.json();
+        console.error('[AdminMessages] API Error response:', response.status, errorData);
       }
     } catch (error) {
-      console.error('Failed to fetch messages:', error);
+      console.error('[AdminMessages] Failed to fetch messages:', error);
     } finally {
       setLoading(false);
     }

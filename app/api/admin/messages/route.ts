@@ -24,7 +24,10 @@ function verifyAdmin(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   const admin = verifyAdmin(request);
+  console.log('[AdminMessages] Admin auth check:', admin ? 'AUTHENTICATED' : 'FAILED');
+
   if (!admin) {
+    console.log('[AdminMessages] Unauthorized access attempt');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -37,6 +40,9 @@ export async function GET(request: NextRequest) {
 
     const where = status && status !== 'all' ? { status } : {};
 
+    console.log('[AdminMessages] Query params - status:', status, 'page:', page);
+    console.log('[AdminMessages] Database query - where:', JSON.stringify(where));
+
     const [messages, total] = await Promise.all([
       prisma.contact.findMany({
         where,
@@ -47,6 +53,9 @@ export async function GET(request: NextRequest) {
       }),
       prisma.contact.count({ where }),
     ]);
+
+    console.log('[AdminMessages] Database response - found', messages.length, 'messages, total:', total);
+    console.log('[AdminMessages] First message sample:', messages[0] ? { id: messages[0].id, subject: messages[0].subject, status: messages[0].status } : 'none');
 
     return NextResponse.json({
       success: true,
@@ -59,9 +68,9 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Get messages error:', error);
+    console.error('[AdminMessages] Get messages error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch messages' },
+      { success: false, error: 'Failed to fetch messages', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
