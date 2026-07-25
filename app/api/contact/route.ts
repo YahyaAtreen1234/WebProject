@@ -37,6 +37,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log('[Contact API] Creating contact with data:', { name, email, subject });
+
     const contact = await prisma.contact.create({
       data: {
         name,
@@ -44,8 +46,12 @@ export async function POST(request: NextRequest) {
         phone: phone || null,
         subject,
         message,
+        status: 'new',
+        read: false,
       },
     });
+
+    console.log('[Contact API] Contact created successfully:', { id: contact.id, status: contact.status, read: contact.read });
 
     return NextResponse.json(
       { message: 'Contact message received', id: contact.id },

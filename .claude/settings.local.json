@@ -91,7 +91,8 @@
       "Bash(grep -E \"/\\(app|src\\)$\")",
       "Bash(git commit -m 'Fix contact form to save messages to database via API *)",
       "Bash(git commit -m 'Fix admin messages API - add authentication verification *)",
-      "Bash(git commit -m 'Add comprehensive debugging to admin messages system *)"
+      "Bash(git commit -m 'Add comprehensive debugging to admin messages system *)",
+      "Bash(git commit -m 'Add diagnostic debug endpoint and fix contact creation to explicitly set status and read fields *)"
     ]
   }
 }
