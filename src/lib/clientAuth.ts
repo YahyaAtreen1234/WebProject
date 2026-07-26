@@ -1,3 +1,56 @@
+/**
+ * "Remember me" support.
+ *
+ * Tokens always live in localStorage because every consumer in the app reads
+ * them from there. To make an unticked "Remember me" actually expire, the login
+ * is flagged ephemeral and a marker is dropped in sessionStorage — which the
+ * browser discards when it closes but keeps across refreshes and navigation.
+ * On the next launch the marker is gone, so the flagged token is pruned.
+ *
+ * Logins that never set the flag (the older login pages) stay persistent.
+ */
+const EPHEMERAL_KEY = 'authEphemeral';
+const SESSION_MARKER = 'authSessionActive';
+
+export function setAuthPersistence(remember: boolean) {
+  if (typeof window === 'undefined') return;
+
+  try {
+    if (remember) {
+      localStorage.removeItem(EPHEMERAL_KEY);
+    } else {
+      localStorage.setItem(EPHEMERAL_KEY, '1');
+    }
+    sessionStorage.setItem(SESSION_MARKER, '1');
+  } catch (error) {
+    console.error('[clientAuth] Failed to record auth persistence:', error);
+  }
+}
+
+/**
+ * Drops an ephemeral login left over from a previous browser session, then
+ * marks the current session. Safe to call on every page load.
+ */
+export function pruneEphemeralAuth() {
+  if (typeof window === 'undefined') return;
+
+  try {
+    const isEphemeral = localStorage.getItem(EPHEMERAL_KEY) === '1';
+    const sameSession = sessionStorage.getItem(SESSION_MARKER) === '1';
+
+    if (isEphemeral && !sameSession) {
+      ['userToken', 'userInfo', 'adminToken', 'adminInfo'].forEach((key) =>
+        localStorage.removeItem(key)
+      );
+      localStorage.removeItem(EPHEMERAL_KEY);
+    }
+
+    sessionStorage.setItem(SESSION_MARKER, '1');
+  } catch (error) {
+    console.error('[clientAuth] Failed to prune ephemeral auth:', error);
+  }
+}
+
 export interface StoredAdminInfo {
   id?: string;
   email?: string;

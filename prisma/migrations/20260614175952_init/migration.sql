@@ -1,2 +1,0 @@
--- This migration was rolled back and recreated with db push
--- Database schema is now synced via Prisma db push

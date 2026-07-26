@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { verifyPassword, signToken } from '@/lib/auth';
+import { verifyRecaptcha } from '@/lib/recaptcha';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password } = body;
+    const { email, password, captchaToken } = body;
+
+    // Bot check (no-op unless RECAPTCHA_SECRET_KEY is configured)
+    if (!(await verifyRecaptcha(captchaToken))) {
+      return NextResponse.json(
+        { error: 'Captcha verification failed. Please try again.' },
+        { status: 400 }
+      );
+    }
 
     // Validation
     if (!email || !password) {

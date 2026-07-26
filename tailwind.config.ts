@@ -5,6 +5,9 @@ const config: Config = {
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    // The App Router lives at ./app, not ./src/app — without this, classes used
+    // only in page files (e.g. lg:grid-cols-6) never make it into the CSS.
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
     extend: {

@@ -71,6 +71,15 @@ export default function ShopPage() {
             setFilters(prev => ({ ...prev, searchTerm: decodedSearch }));
           }
 
+          // Honour ?sort= from the navigation links (Best Sellers, New Arrivals,
+          // On Sale) and from the homepage "View all featured" button.
+          const sortParam = searchParams.get('sort');
+          const allowedSorts = ['newest', 'featured', 'price-low', 'price-high', 'name-asc', 'name-desc'];
+          if (sortParam && allowedSorts.includes(sortParam)) {
+            console.log('[ShopPage] Applying sort from URL:', sortParam);
+            setFilters(prev => ({ ...prev, sortBy: sortParam }));
+          }
+
           // Clear loading state last
           setLoading(false);
         } else {
@@ -99,7 +108,9 @@ export default function ShopPage() {
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
-    let result = allProducts;
+    // Copy before sorting — sort() mutates, and with no filters applied `result`
+    // would otherwise be the allProducts state array itself.
+    let result = [...allProducts];
 
     // Search filter
     if (filters.searchTerm) {
@@ -134,8 +145,13 @@ export default function ShopPage() {
       case 'name-desc':
         result.sort((a, b) => b.title.localeCompare(a.title));
         break;
-      default: // newest
-        result.sort((a, b) => b.featured ? 1 : -1);
+      case 'featured':
+        // Featured first, otherwise keep the API's newest-first order.
+        result.sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)));
+        break;
+      default:
+        // 'newest' — the API already returns createdAt desc, so leave it alone.
+        break;
     }
 
     return result;

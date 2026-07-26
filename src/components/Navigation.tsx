@@ -3,9 +3,11 @@
 import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
 import { useCart } from '@/context/CartContext';
+import AuthPanel from '@/components/AuthPanel';
 
 export default function Navigation() {
   const { cart, getItemCount } = useCart();
+  const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [isClient, setIsClient] = useState(false);
   const [language, setLanguage] = useState('ENGLISH');
@@ -153,9 +155,13 @@ export default function Navigation() {
 
             {/* Account Icons */}
             <div className="flex items-center gap-3 sm:gap-4">
-              <Link href="/admin/login" className="text-xs sm:text-sm font-semibold text-black hover:text-gray-600">
+              <button
+                type="button"
+                onClick={() => setAuthPanelOpen(true)}
+                className="text-xs sm:text-sm font-semibold text-black hover:text-gray-600"
+              >
                 LOGIN / REGISTER
-              </Link>
+              </button>
               <Link href="/wishlist" className="relative text-xl hover:text-gray-600" title="Wishlist">
                 ♡
                 <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
@@ -252,6 +258,16 @@ export default function Navigation() {
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="sm:hidden bg-white border-t border-gray-200 px-4 py-3 space-y-3">
+          <button
+            type="button"
+            onClick={() => {
+              setMobileMenuOpen(false);
+              setAuthPanelOpen(true);
+            }}
+            className="block w-full text-left py-2 font-semibold hover:text-gray-600"
+          >
+            LOGIN / REGISTER
+          </button>
           <Link href="/shop" className="block py-2 hover:text-gray-600">SHOP</Link>
           <Link href="/gallery" className="block py-2 hover:text-gray-600">GEMSTONES</Link>
           <Link href="/tracking" className="block py-2 hover:text-gray-600">TRACK ORDER</Link>
@@ -270,6 +286,9 @@ export default function Navigation() {
           </div>
         </div>
       )}
+
+      {/* Sign in / Register slide-out panel */}
+      <AuthPanel open={authPanelOpen} onClose={() => setAuthPanelOpen(false)} />
     </header>
   );
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { sendVerificationEmail } from '@/lib/email';
+import { verifyRecaptcha } from '@/lib/recaptcha';
 import bcryptjs from 'bcryptjs';
 
 function generateVerificationCode() {
@@ -9,7 +10,15 @@ function generateVerificationCode() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, password } = await request.json();
+    const { name, email, password, captchaToken } = await request.json();
+
+    // Bot check (no-op unless RECAPTCHA_SECRET_KEY is configured)
+    if (!(await verifyRecaptcha(captchaToken))) {
+      return NextResponse.json(
+        { error: 'Captcha verification failed. Please try again.' },
+        { status: 400 }
+      );
+    }
 
     // Validation
     if (!name || !email || !password) {
@@ -19,11 +28,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (password.length < 8) {
-      return NextResponse.json(
-        { error: 'Password must be at least 8 characters' },
-        { status: 400 }
-      );
+    // Same policy the sign-up forms advertise, enforced server-side so it
+    // cannot be skipped by calling the API directly.
+    const passwordError =
+      password.length < 8
+        ? 'Password must be at least 8 characters'
+        : !/[A-Z]/.test(password)
+        ? 'Password must contain an uppercase letter'
+        : !/[a-z]/.test(password)
+        ? 'Password must contain a lowercase letter'
+        : !/[0-9]/.test(password)
+        ? 'Password must contain a number'
+        : !/[!@#$%^&*]/.test(password)
+        ? 'Password must contain a special character (!@#$%^&*)'
+        : '';
+
+    if (passwordError) {
+      return NextResponse.json({ error: passwordError }, { status: 400 });
     }
 
     // Check if user exists
@@ -58,8 +79,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Send verification email
-    await sendVerificationEmail(email, verificationCode);
+    // Send the verification email without blocking the response. An
+    // unreachable SMTP host takes ~55s to time out, which otherwise leaves the
+    // sign-up form spinning long after the account has been created. Delivery
+    // failures were already non-fatal here — the code is stored on the user.
+    void sendVerificationEmail(email, verificationCode).catch((emailError) => {
+      console.error('Verification email failed for', email, emailError);
+    });
 
     return NextResponse.json(
       { message: 'Registration successful. Check your email for verification code.' },

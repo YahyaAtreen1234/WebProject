@@ -15,6 +15,7 @@ interface Product {
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [heroIndex, setHeroIndex] = useState(0);
 
@@ -31,10 +32,16 @@ export default function Home() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('/api/products');
-      if (response.ok) {
-        const data = await response.json();
-        setProducts(data);
+      const [allResponse, featuredResponse] = await Promise.all([
+        fetch('/api/products'),
+        fetch('/api/products?featured=true'),
+      ]);
+
+      if (allResponse.ok) {
+        setProducts(await allResponse.json());
+      }
+      if (featuredResponse.ok) {
+        setFeaturedProducts(await featuredResponse.json());
       }
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -82,6 +89,44 @@ export default function Home() {
           </Link>
         </div>
       </section>
+
+      {/* Featured Products Section - driven by the admin "Featured" checkbox */}
+      {!loading && featuredProducts.length > 0 && (
+        <section className="py-16 px-4 sm:px-6">
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-center text-3xl font-bold mb-12">FEATURED PRODUCTS</h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {featuredProducts.map((product) => (
+                <Link key={product.id} href="/shop">
+                  <div className="bg-black rounded-2xl p-6 text-white text-center cursor-pointer hover:opacity-90 transition h-full relative">
+                    <span className="absolute top-4 left-4 bg-gold-500 text-black text-xs font-bold px-2 py-1 rounded">
+                      FEATURED
+                    </span>
+                    <div className="bg-gradient-to-b from-gray-700 to-black h-40 rounded-lg flex items-center justify-center mb-4 overflow-hidden">
+                      {product.image ? (
+                        <img src={product.image} alt={product.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-5xl">💎</span>
+                      )}
+                    </div>
+                    <p className="font-bold mb-2 line-clamp-2 text-sm">{product.title}</p>
+                    <p className="text-gray-400 mb-2 text-sm">{product.category}</p>
+                    <p className="font-bold text-lg text-gold-300">${product.price.toFixed(2)}</p>
+                    <p className="text-xs text-gray-400 mt-2">Stock: {product.stock}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            <div className="text-center">
+              <Link href="/shop?sort=featured" className="inline-block bg-black text-white font-bold px-8 py-3 rounded hover:bg-gray-800">
+                VIEW ALL FEATURED
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* All Products Section - Grid View */}
       <section className="py-16 px-4 sm:px-6">

@@ -37,6 +37,8 @@ next-env.d.ts
 # Prisma
 prisma/*.db
 prisma/*.db-journal
+prisma/**/*.db
+prisma/**/*.db-journal
 .env
 .env.production.local
 
