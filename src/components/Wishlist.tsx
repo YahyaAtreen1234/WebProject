@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useCart } from '@/context/CartContext';
 
 interface WishlistItem {
   id: string;
@@ -20,6 +21,7 @@ export default function Wishlist() {
   const [products, setProducts] = useState<{ [key: string]: Product }>({});
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState('');
+  const { addItem } = useCart();
 
   useEffect(() => {
     const savedToken = localStorage.getItem('user_token');
@@ -84,16 +86,17 @@ export default function Wishlist() {
   const addToCart = (productId: string) => {
     const product = products[productId];
     if (product) {
-      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-      const existingItem = cart.find((item: any) => item.productId === productId);
-
-      if (existingItem) {
-        existingItem.quantity += 1;
-      } else {
-        cart.push({ productId, quantity: 1, price: product.price });
-      }
-
-      localStorage.setItem('cart', JSON.stringify(cart));
+      // Go through CartContext rather than writing localStorage directly, so
+      // the header, cart page and checkout all see the item.
+      addItem(
+        {
+          id: product.id,
+          name: product.title,
+          price: product.price,
+          image: product.image || '',
+        },
+        1
+      );
       alert('Added to cart!');
     }
   };

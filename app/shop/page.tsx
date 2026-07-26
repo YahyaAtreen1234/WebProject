@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import ProductCard from '@/components/ProductCard';
 import CartUI from '@/components/Cart';
-import { useCart } from '@/hooks/useCart';
+import { useCart } from '@/context/CartContext';
 
 interface Product {
   id: string;
@@ -101,7 +101,7 @@ export default function ShopPage() {
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const cart = useCart();
+  const { addItem } = useCart();
 
   // Get unique categories
   const categories = allProducts.length > 0 ? [...new Set(allProducts.map((p) => p.category))] : [];
@@ -242,11 +242,9 @@ export default function ShopPage() {
               {viewMode === 'grid' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {paginatedProducts.map((product) => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      onAddToCart={cart.addToCart}
-                    />
+                    // ProductCard adds to the cart itself via CartContext;
+                    // passing onAddToCart as well would add each item twice.
+                    <ProductCard key={product.id} product={product} />
                   ))}
                 </div>
               )}
@@ -281,7 +279,17 @@ export default function ShopPage() {
                             Stock: <span className="text-white font-semibold">{product.stock}</span>
                           </span>
                           <button
-                            onClick={() => cart.addToCart(product, 1)}
+                            onClick={() =>
+                              addItem(
+                                {
+                                  id: product.id,
+                                  name: product.title,
+                                  price: product.price,
+                                  image: product.image || '',
+                                },
+                                1
+                              )
+                            }
                             disabled={product.stock === 0}
                             className="px-6 py-2 btn-primary text-sm disabled:opacity-50"
                           >

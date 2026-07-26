@@ -1,11 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { useCart } from '@/hooks/useCart';
+import Link from 'next/link';
+import { useCart } from '@/context/CartContext';
+import { cartUtils } from '@/lib/cart';
 
 export default function CartUI() {
   const [isOpen, setIsOpen] = useState(false);
-  const { items, total, removeFromCart, updateQuantity } = useCart();
+  const { cart, removeItem, updateQuantity, getItemCount } = useCart();
+
+  const items = cart.items;
+  const itemCount = getItemCount();
+  const { subtotal } = cartUtils.getCartTotals(cart);
 
   return (
       <>
@@ -15,9 +21,9 @@ export default function CartUI() {
           className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-r from-sapphire-600 to-amethyst-600 text-white shadow-lg hover:shadow-2xl transform hover:scale-110 transition-all flex items-center justify-center text-2xl"
         >
           🛒
-          {items.length > 0 && (
+          {itemCount > 0 && (
             <span className="absolute -top-2 -right-2 bg-rose-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
-              {items.length}
+              {itemCount}
             </span>
           )}
         </button>
@@ -26,7 +32,7 @@ export default function CartUI() {
         {isOpen && (
           <div className="fixed bottom-24 right-6 w-80 bg-midnight-800 border border-sapphire-500/30 rounded-2xl shadow-2xl backdrop-blur-xl z-40 max-h-96 overflow-y-auto">
             <div className="sticky top-0 bg-midnight-800 border-b border-sapphire-500/30 p-4">
-              <h3 className="text-lg font-bold text-white">Shopping Cart ({items.length})</h3>
+              <h3 className="text-lg font-bold text-white">Shopping Cart ({itemCount})</h3>
             </div>
 
             {items.length === 0 ? (
@@ -43,8 +49,8 @@ export default function CartUI() {
                       className="flex gap-3 items-center bg-midnight-700/50 p-3 rounded-lg border border-sapphire-500/20"
                     >
                       <div className="flex-1">
-                        <p className="text-sm font-semibold text-white line-clamp-1">{item.title}</p>
-                        <p className="text-xs text-gold-300">${item.price}</p>
+                        <p className="text-sm font-semibold text-white line-clamp-1">{item.name}</p>
+                        <p className="text-xs text-gold-300">${item.price.toFixed(2)}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <button
@@ -62,7 +68,7 @@ export default function CartUI() {
                         </button>
                       </div>
                       <button
-                        onClick={() => removeFromCart(item.id)}
+                        onClick={() => removeItem(item.id)}
                         className="text-xs text-rose-400 hover:text-rose-300"
                       >
                         ✕
@@ -73,10 +79,12 @@ export default function CartUI() {
 
                 <div className="sticky bottom-0 bg-midnight-800 border-t border-sapphire-500/30 p-4 space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-white font-semibold">Total:</span>
-                    <span className="text-lg font-bold text-gold-300">${total.toFixed(2)}</span>
+                    <span className="text-white font-semibold">Subtotal:</span>
+                    <span className="text-lg font-bold text-gold-300">${subtotal.toFixed(2)}</span>
                   </div>
-                  <button className="w-full btn-primary">Checkout</button>
+                  <Link href="/cart" className="block w-full btn-primary text-center">
+                    View Cart & Checkout
+                  </Link>
                 </div>
               </>
             )}

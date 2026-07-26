@@ -38,11 +38,27 @@ export const cartUtils = {
   saveCart: (cart: Cart): void => {
     if (typeof window === 'undefined') return;
 
+    cart.lastUpdated = new Date().toISOString();
+    const write = (value: Cart) =>
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(value));
+
     try {
-      cart.lastUpdated = new Date().toISOString();
-      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+      write(cart);
     } catch (error) {
-      console.error('Error saving cart to localStorage:', error);
+      // Product images are frequently inline base64 data URIs (~85KB each),
+      // which can exhaust the ~5MB localStorage quota. Losing the images is
+      // far better than losing the cart, so drop them and retry.
+      try {
+        write({
+          ...cart,
+          items: cart.items.map((item) =>
+            item.image?.startsWith('data:') ? { ...item, image: '' } : item
+          ),
+        });
+        console.warn('[cart] Storage quota reached — saved cart without inline images.');
+      } catch (retryError) {
+        console.error('Error saving cart to localStorage:', retryError);
+      }
     }
   },
 

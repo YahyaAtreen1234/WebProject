@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
 import { useCart } from '@/context/CartContext';
+import { cartUtils } from '@/lib/cart';
 import AuthPanel from '@/components/AuthPanel';
 import Logo from '@/components/Logo';
 
@@ -10,6 +11,7 @@ export default function Navigation() {
   const { cart, getItemCount } = useCart();
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [cartSubtotal, setCartSubtotal] = useState(0);
   const [isClient, setIsClient] = useState(false);
   const [language, setLanguage] = useState('ENGLISH');
   const [currency, setCurrency] = useState('USD');
@@ -24,6 +26,7 @@ export default function Navigation() {
   useEffect(() => {
     setIsClient(true);
     setCartCount(getItemCount());
+    setCartSubtotal(cartUtils.getCartTotals(cart).subtotal);
   }, [cart, getItemCount]);
 
   useEffect(() => {
@@ -171,7 +174,7 @@ export default function Navigation() {
                 <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{cartCount}</span>
               </Link>
               <Link href="/cart" className="text-sm font-bold text-gold-600 hover:text-gray-600">
-                ${(cartCount * 50).toFixed(2)}
+                ${cartSubtotal.toFixed(2)}
               </Link>
             </div>
 

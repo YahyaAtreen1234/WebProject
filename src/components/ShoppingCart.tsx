@@ -42,13 +42,21 @@ export default function ShoppingCart() {
                 key={item.id}
                 className="card-glass p-6 border border-sapphire-500/20 flex items-center gap-6"
               >
-                <div className="text-5xl">{item.image}</div>
+                <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-lg bg-midnight-800 text-4xl">
+                  {item.image && /^(https?:|data:|\/)/.test(item.image) ? (
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                  ) : (
+                    item.image || '💎'
+                  )}
+                </div>
 
                 <div className="flex-1">
                   <h3 className="text-white font-bold text-lg">{item.name}</h3>
-                  <p className="text-midnight-400 text-sm mt-1">
-                    {item.color} • {item.weight} • {item.origin}
-                  </p>
+                  {(item.color || item.weight || item.origin) && (
+                    <p className="text-midnight-400 text-sm mt-1">
+                      {[item.color, item.weight, item.origin].filter(Boolean).join(' • ')}
+                    </p>
+                  )}
                   <p className="text-sapphire-400 font-semibold mt-2">${item.price.toFixed(2)}</p>
                 </div>
 
