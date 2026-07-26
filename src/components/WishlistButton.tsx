@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { getStoredUserToken } from '@/lib/clientAuth';
 
 interface WishlistButtonProps {
   productId: string;
@@ -14,7 +15,7 @@ export default function WishlistButton({ productId, onAdded }: WishlistButtonPro
   const handleAddToWishlist = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('user_token');
+      const token = getStoredUserToken();
 
       if (!token) {
         alert('Please sign in to use wishlist');

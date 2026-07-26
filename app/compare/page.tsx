@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { getStoredUserToken, notifyCompareChanged } from '@/lib/clientAuth';
 
 interface CompareItem {
   id: string;
@@ -23,7 +25,7 @@ export default function ComparePage() {
   const [token, setToken] = useState('');
 
   useEffect(() => {
-    const savedToken = localStorage.getItem('user_token');
+    const savedToken = getStoredUserToken();
     setToken(savedToken || '');
     if (savedToken) {
       fetchCompareList(savedToken);
@@ -75,7 +77,8 @@ export default function ComparePage() {
       });
 
       if (response.ok) {
-        setCompareList(compareList.filter((item) => item.id !== compareItemId));
+        setCompareList((prev) => prev.filter((item) => item.id !== compareItemId));
+        notifyCompareChanged();
       }
     } catch (error) {
       console.error('Failed to remove from compare:', error);
@@ -86,8 +89,15 @@ export default function ComparePage() {
     return (
       <div className="min-h-screen bg-white py-12 px-4">
         <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-bold text-black mb-8">Product Comparison</h2>
           <div className="bg-gray-50 rounded-lg p-8 text-center">
             <p className="text-gray-600 mb-4">Sign in to compare products</p>
+            <Link
+              href="/login"
+              className="inline-block bg-black text-white font-bold px-6 py-3 rounded hover:bg-gray-800"
+            >
+              Sign In
+            </Link>
           </div>
         </div>
       </div>

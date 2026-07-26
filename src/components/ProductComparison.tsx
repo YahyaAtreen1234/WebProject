@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getStoredUserToken } from '@/lib/clientAuth';
 
 interface Product {
   id: string;
@@ -36,7 +37,7 @@ export default function ProductComparison() {
 
       const response = await fetch('/api/comparisons', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('user_token') || ''}`,
+          'Authorization': `Bearer ${getStoredUserToken() || ''}`,
         },
       });
 

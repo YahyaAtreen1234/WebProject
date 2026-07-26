@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { getStoredUserToken, notifyCompareChanged } from '@/lib/clientAuth';
 
 interface CompareProps {
   productId: string;
@@ -14,7 +15,7 @@ export default function Compare({ productId, onAdded }: CompareProps) {
   const handleAddToCompare = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('user_token');
+      const token = getStoredUserToken();
 
       if (!token) {
         alert('Please sign in to use compare');
@@ -32,10 +33,14 @@ export default function Compare({ productId, onAdded }: CompareProps) {
 
       if (response.ok) {
         setIsAdded(true);
+        notifyCompareChanged();
         onAdded?.();
         setTimeout(() => setIsAdded(false), 2000);
       } else if (response.status === 409) {
         alert('Product already in compare list');
+      } else {
+        const data = await response.json().catch(() => ({}));
+        alert(data.error || 'Failed to add to compare');
       }
     } catch (error) {
       console.error('Failed to add to compare:', error);

@@ -31,6 +31,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(compareList);
   } catch (error) {
+    console.error('[api/compare] GET failed:', error);
     return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 });
   }
 }
@@ -68,6 +69,7 @@ export async function POST(request: NextRequest) {
         { status: 409 }
       );
     }
+    console.error('[api/compare] POST failed:', error);
     return NextResponse.json({ error: 'Failed to create' }, { status: 500 });
   }
 }

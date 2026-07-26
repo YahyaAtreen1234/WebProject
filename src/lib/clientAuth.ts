@@ -51,6 +51,27 @@ export function pruneEphemeralAuth() {
   }
 }
 
+/**
+ * The customer JWT. Login writes it as "userToken"; several components used to
+ * read a "user_token" key that is never written, so every authenticated
+ * feature they gated (compare, wishlist, custom orders, support tickets)
+ * behaved as if the visitor were signed out.
+ */
+export function getStoredUserToken(): string | null {
+  if (typeof window === 'undefined') return null;
+
+  const token = localStorage.getItem('userToken');
+  return token?.trim() ? token.trim() : null;
+}
+
+/** Fired after the compare list changes so the header badge can refresh. */
+export const COMPARE_CHANGED_EVENT = 'compareChanged';
+
+export function notifyCompareChanged() {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new Event(COMPARE_CHANGED_EVENT));
+}
+
 export interface StoredAdminInfo {
   id?: string;
   email?: string;

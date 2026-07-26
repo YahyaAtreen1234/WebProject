@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getStoredUserToken } from '@/lib/clientAuth';
 
 interface CustomOrder {
   id: string;
@@ -27,7 +28,7 @@ export default function CustomOrders() {
   });
 
   useEffect(() => {
-    const savedToken = localStorage.getItem('user_token');
+    const savedToken = getStoredUserToken();
     setToken(savedToken || '');
     if (savedToken) {
       fetchOrders(savedToken);

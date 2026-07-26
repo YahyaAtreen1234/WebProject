@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
+import { getStoredUserToken } from '@/lib/clientAuth';
 
 interface WishlistItem {
   id: string;
@@ -24,7 +25,7 @@ export default function Wishlist() {
   const { addItem } = useCart();
 
   useEffect(() => {
-    const savedToken = localStorage.getItem('user_token');
+    const savedToken = getStoredUserToken();
     setToken(savedToken || '');
     if (savedToken) {
       fetchWishlist(savedToken);

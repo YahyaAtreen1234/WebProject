@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getStoredUserToken } from '@/lib/clientAuth';
 
 interface SupportTicket {
   id: string;
@@ -36,7 +37,7 @@ export default function SupportTickets() {
   });
 
   useEffect(() => {
-    const savedToken = localStorage.getItem('user_token');
+    const savedToken = getStoredUserToken();
     setToken(savedToken || '');
     fetchTickets(savedToken || '');
   }, []);
