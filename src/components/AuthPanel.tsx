@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { pruneEphemeralAuth, setAuthPersistence } from '@/lib/clientAuth';
+import { notifyUserAuthChanged, pruneEphemeralAuth, setAuthPersistence } from '@/lib/clientAuth';
 import Logo from '@/components/Logo';
 
 const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
@@ -220,6 +220,55 @@ export default function AuthPanel({ open, onClose, initialMode = 'signin' }: Aut
     return '';
   };
 
+  /**
+   * Authenticates, persists the session and routes to the right dashboard.
+   * Returns false (with `error` set) if the credentials were rejected.
+   */
+  const signIn = async (email: string, password: string, rememberMe: boolean) => {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, captchaToken }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      setError(data.error || 'Invalid username or password');
+      return false;
+    }
+
+    const account = data.admin ?? data.user;
+    if (!data.token || !account?.id) {
+      throw new Error('Login response was incomplete');
+    }
+
+    // Tokens always go to localStorage — that is where the rest of the app
+    // reads them. "Remember me" only controls how long they survive.
+    setAuthPersistence(rememberMe);
+    const profile = JSON.stringify({
+      id: account.id,
+      name: account.name || account.email,
+      email: account.email,
+      role: account.role,
+    });
+
+    const isAdmin = data.isAdmin || account.role === 'admin';
+    if (isAdmin) {
+      localStorage.setItem('adminToken', data.token);
+      localStorage.setItem('adminInfo', profile);
+    }
+    // The customer keys are always written: the header account menu and every
+    // user-facing feature read them, admin or not.
+    localStorage.setItem('userToken', data.token);
+    localStorage.setItem('userInfo', profile);
+
+    notifyUserAuthChanged();
+    onClose();
+    router.push(isAdmin ? '/admin/dashboard' : '/user/dashboard');
+    router.refresh();
+    return true;
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     resetFeedback();
@@ -231,46 +280,8 @@ export default function AuthPanel({ open, onClose, initialMode = 'signin' }: Aut
 
     setLoading(true);
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: identifier, password: loginPassword, captchaToken }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        setError(data.error || 'Invalid username or password');
-        return;
-      }
-
-      const account = data.admin ?? data.user;
-      if (!data.token || !account?.id) {
-        throw new Error('Login response was incomplete');
-      }
-
-      // Tokens always go to localStorage — that is where the rest of the app
-      // reads them. "Remember me" only controls how long they survive.
-      setAuthPersistence(remember);
-      const store = window.localStorage;
-      const profile = JSON.stringify({
-        id: account.id,
-        name: account.name || account.email,
-        email: account.email,
-        role: account.role,
-      });
-
-      if (data.isAdmin || account.role === 'admin') {
-        store.setItem('adminToken', data.token);
-        store.setItem('adminInfo', profile);
-        onClose();
-        router.push('/admin/dashboard');
-      } else {
-        store.setItem('userToken', data.token);
-        store.setItem('userInfo', profile);
-        onClose();
-        router.push('/user/dashboard');
-      }
-      router.refresh();
+      const signedIn = await signIn(identifier, loginPassword, remember);
+      if (!signedIn) return;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
     } finally {
@@ -340,6 +351,12 @@ export default function AuthPanel({ open, onClose, initialMode = 'signin' }: Aut
         setError(data.error || 'Verification failed');
         return;
       }
+
+      // Sign the new account in straight away — having just proved ownership
+      // of the address and typed the password, being bounced back to a login
+      // form is a pointless extra step.
+      const signedIn = await signIn(regEmail, regPassword, false);
+      if (signedIn) return;
 
       setSuccess('Email verified. You can sign in now.');
       setIdentifier(regEmail);

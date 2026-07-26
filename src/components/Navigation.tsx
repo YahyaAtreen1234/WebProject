@@ -6,8 +6,12 @@ import { useCart } from '@/context/CartContext';
 import { cartUtils } from '@/lib/cart';
 import {
   COMPARE_CHANGED_EVENT,
+  USER_AUTH_CHANGED_EVENT,
   WISHLIST_CHANGED_EVENT,
+  clearStoredUserAuth,
+  getStoredUserInfo,
   getStoredUserToken,
+  type StoredUserInfo,
 } from '@/lib/clientAuth';
 import AuthPanel from '@/components/AuthPanel';
 import Logo from '@/components/Logo';
@@ -19,6 +23,8 @@ export default function Navigation() {
   const [cartSubtotal, setCartSubtotal] = useState(0);
   const [compareCount, setCompareCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
+  const [user, setUser] = useState<StoredUserInfo | null>(null);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [language, setLanguage] = useState('ENGLISH');
   const [currency, setCurrency] = useState('USD');
@@ -64,16 +70,47 @@ export default function Navigation() {
     const refreshCompare = () => loadCount('/api/compare', setCompareCount);
     const refreshWishlist = () => loadCount('/api/wishlist', setWishlistCount);
 
-    refreshCompare();
-    refreshWishlist();
+    // Signing in or out changes whose lists these are, so refresh both.
+    const refreshAuth = () => {
+      setUser(getStoredUserInfo());
+      refreshCompare();
+      refreshWishlist();
+    };
+
+    refreshAuth();
 
     window.addEventListener(COMPARE_CHANGED_EVENT, refreshCompare);
     window.addEventListener(WISHLIST_CHANGED_EVENT, refreshWishlist);
+    window.addEventListener(USER_AUTH_CHANGED_EVENT, refreshAuth);
+    // Keep other tabs in sync.
+    window.addEventListener('storage', refreshAuth);
     return () => {
       window.removeEventListener(COMPARE_CHANGED_EVENT, refreshCompare);
       window.removeEventListener(WISHLIST_CHANGED_EVENT, refreshWishlist);
+      window.removeEventListener(USER_AUTH_CHANGED_EVENT, refreshAuth);
+      window.removeEventListener('storage', refreshAuth);
     };
   }, []);
+
+  // Close the account dropdown when clicking anywhere else.
+  useEffect(() => {
+    if (!accountMenuOpen) return;
+
+    const onDocumentClick = (event: MouseEvent) => {
+      if (!(event.target as HTMLElement)?.closest('[data-account-menu]')) {
+        setAccountMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('click', onDocumentClick);
+    return () => document.removeEventListener('click', onDocumentClick);
+  }, [accountMenuOpen]);
+
+  const handleLogout = () => {
+    clearStoredUserAuth();
+    setAccountMenuOpen(false);
+    window.location.href = '/';
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -200,13 +237,74 @@ export default function Navigation() {
 
             {/* Account Icons */}
             <div className="flex items-center gap-3 sm:gap-4">
-              <button
-                type="button"
-                onClick={() => setAuthPanelOpen(true)}
-                className="text-xs sm:text-sm font-semibold text-black hover:text-gray-600"
-              >
-                LOGIN / REGISTER
-              </button>
+              {user ? (
+                <div className="relative" data-account-menu>
+                  <button
+                    type="button"
+                    onClick={() => setAccountMenuOpen((open) => !open)}
+                    className="flex items-center gap-1.5 max-w-[180px] text-xs sm:text-sm font-semibold text-black hover:text-gray-600"
+                    title={user.email}
+                  >
+                    <span className="text-base">👤</span>
+                    <span className="truncate">{user.email || user.name}</span>
+                    <span className="text-[10px]">▼</span>
+                  </button>
+
+                  {accountMenuOpen && (
+                    <div className="absolute right-0 top-full z-50 mt-2 w-56 border border-gray-200 bg-white shadow-lg">
+                      <div className="border-b border-gray-100 px-4 py-3">
+                        <p className="text-sm font-semibold text-black truncate">{user.name}</p>
+                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                      </div>
+                      <Link
+                        href="/user/dashboard"
+                        onClick={() => setAccountMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-black hover:bg-gray-100"
+                      >
+                        My Account
+                      </Link>
+                      <Link
+                        href="/orders"
+                        onClick={() => setAccountMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-black hover:bg-gray-100"
+                      >
+                        My Orders
+                      </Link>
+                      <Link
+                        href="/wishlist"
+                        onClick={() => setAccountMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-black hover:bg-gray-100"
+                      >
+                        My Wishlist
+                      </Link>
+                      {user.role === 'admin' && (
+                        <Link
+                          href="/admin/dashboard"
+                          onClick={() => setAccountMenuOpen(false)}
+                          className="block px-4 py-2 text-sm text-black hover:bg-gray-100"
+                        >
+                          Admin Panel
+                        </Link>
+                      )}
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="block w-full border-t border-gray-100 px-4 py-2 text-left text-sm font-semibold text-red-600 hover:bg-gray-100"
+                      >
+                        Log Out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setAuthPanelOpen(true)}
+                  className="text-xs sm:text-sm font-semibold text-black hover:text-gray-600"
+                >
+                  LOGIN / REGISTER
+                </button>
+              )}
               <Link href="/wishlist" className="relative text-xl hover:text-gray-600" title="Wishlist">
                 ♡
                 <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
@@ -307,16 +405,36 @@ export default function Navigation() {
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="sm:hidden bg-white border-t border-gray-200 px-4 py-3 space-y-3">
-          <button
-            type="button"
-            onClick={() => {
-              setMobileMenuOpen(false);
-              setAuthPanelOpen(true);
-            }}
-            className="block w-full text-left py-2 font-semibold hover:text-gray-600"
-          >
-            LOGIN / REGISTER
-          </button>
+          {user ? (
+            <div className="border-b border-gray-200 pb-3">
+              <p className="py-2 text-sm font-semibold text-black truncate">👤 {user.email}</p>
+              <Link
+                href="/user/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2 hover:text-gray-600"
+              >
+                MY ACCOUNT
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="block w-full py-2 text-left font-semibold text-red-600 hover:text-red-700"
+              >
+                LOG OUT
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setAuthPanelOpen(true);
+              }}
+              className="block w-full text-left py-2 font-semibold hover:text-gray-600"
+            >
+              LOGIN / REGISTER
+            </button>
+          )}
           <Link href="/shop" className="block py-2 hover:text-gray-600">SHOP</Link>
           <Link href="/gallery" className="block py-2 hover:text-gray-600">GEMSTONES</Link>
           <Link href="/tracking" className="block py-2 hover:text-gray-600">TRACK ORDER</Link>

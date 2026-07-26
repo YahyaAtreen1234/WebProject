@@ -43,6 +43,7 @@ export function pruneEphemeralAuth() {
         localStorage.removeItem(key)
       );
       localStorage.removeItem(EPHEMERAL_KEY);
+      notifyUserAuthChanged();
     }
 
     sessionStorage.setItem(SESSION_MARKER, '1');
@@ -62,6 +63,45 @@ export function getStoredUserToken(): string | null {
 
   const token = localStorage.getItem('userToken');
   return token?.trim() ? token.trim() : null;
+}
+
+export interface StoredUserInfo {
+  id?: string;
+  email?: string;
+  name?: string;
+  role?: string;
+}
+
+export function getStoredUserInfo(): StoredUserInfo | null {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const info = localStorage.getItem('userInfo');
+    return info ? (JSON.parse(info) as StoredUserInfo) : null;
+  } catch (error) {
+    console.error('[clientAuth] Failed to read user info:', error);
+    return null;
+  }
+}
+
+export function clearStoredUserAuth() {
+  if (typeof window === 'undefined') return;
+
+  localStorage.removeItem('userToken');
+  localStorage.removeItem('userInfo');
+  localStorage.removeItem(EPHEMERAL_KEY);
+  notifyUserAuthChanged();
+}
+
+/**
+ * Fired when the signed-in customer changes, so the header can swap between
+ * "Login / Register" and the account menu without a page reload.
+ */
+export const USER_AUTH_CHANGED_EVENT = 'userAuthChanged';
+
+export function notifyUserAuthChanged() {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new Event(USER_AUTH_CHANGED_EVENT));
 }
 
 /** Fired after the compare list changes so the header badge can refresh. */
