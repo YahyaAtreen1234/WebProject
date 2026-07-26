@@ -36,6 +36,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('[api/wishlist/:id] DELETE failed:', error);
     return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });
   }
 }

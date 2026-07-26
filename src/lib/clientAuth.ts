@@ -72,6 +72,14 @@ export function notifyCompareChanged() {
   window.dispatchEvent(new Event(COMPARE_CHANGED_EVENT));
 }
 
+/** Fired after the wishlist changes so the header badge can refresh. */
+export const WISHLIST_CHANGED_EVENT = 'wishlistChanged';
+
+export function notifyWishlistChanged() {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new Event(WISHLIST_CHANGED_EVENT));
+}
+
 export interface StoredAdminInfo {
   id?: string;
   email?: string;

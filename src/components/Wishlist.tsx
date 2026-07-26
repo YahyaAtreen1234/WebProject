@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
-import { getStoredUserToken } from '@/lib/clientAuth';
+import Link from 'next/link';
+import { getStoredUserToken, notifyWishlistChanged } from '@/lib/clientAuth';
 
 interface WishlistItem {
   id: string;
@@ -55,9 +56,11 @@ export default function Wishlist() {
     try {
       const response = await fetch('/api/products');
       if (response.ok) {
+        // /api/products returns a bare array, not { products: [...] }.
         const data = await response.json();
+        const all: Product[] = Array.isArray(data) ? data : data.products || [];
         const productMap: { [key: string]: Product } = {};
-        data.products.forEach((p: Product) => {
+        all.forEach((p) => {
           if (productIds.includes(p.id)) {
             productMap[p.id] = p;
           }
@@ -77,7 +80,8 @@ export default function Wishlist() {
       });
 
       if (response.ok) {
-        setWishlist(wishlist.filter((item) => item.productId !== productId));
+        setWishlist((prev) => prev.filter((item) => item.productId !== productId));
+        notifyWishlistChanged();
       }
     } catch (error) {
       console.error('Failed to remove from wishlist:', error);
@@ -106,6 +110,12 @@ export default function Wishlist() {
     return (
       <div className="card-glass p-8 border border-sapphire-500/20 text-center">
         <p className="text-midnight-300 mb-4">Sign in to view your wishlist</p>
+        <Link
+          href="/login"
+          className="inline-block px-6 py-3 bg-gradient-to-r from-sapphire-600 to-sapphire-700 text-white rounded-lg hover:from-sapphire-700 hover:to-sapphire-800 transition-all font-semibold"
+        >
+          Sign In
+        </Link>
       </div>
     );
   }
@@ -123,7 +133,13 @@ export default function Wishlist() {
         <div className="text-center py-8 text-midnight-300">Loading...</div>
       ) : wishlist.length === 0 ? (
         <div className="card-glass p-8 border border-sapphire-500/20 text-center">
-          <p className="text-midnight-300">Your wishlist is empty</p>
+          <p className="text-midnight-300 mb-4">Your wishlist is empty</p>
+          <Link
+            href="/shop"
+            className="inline-block px-6 py-3 bg-gradient-to-r from-sapphire-600 to-sapphire-700 text-white rounded-lg hover:from-sapphire-700 hover:to-sapphire-800 transition-all font-semibold"
+          >
+            Browse Products
+          </Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

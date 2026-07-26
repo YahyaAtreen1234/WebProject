@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { getStoredUserToken } from '@/lib/clientAuth';
+import { getStoredUserToken, notifyWishlistChanged } from '@/lib/clientAuth';
 
 interface WishlistButtonProps {
   productId: string;
@@ -33,9 +33,14 @@ export default function WishlistButton({ productId, onAdded }: WishlistButtonPro
 
       if (response.ok) {
         setIsFavorite(true);
+        notifyWishlistChanged();
         onAdded?.();
       } else if (response.status === 409) {
+        setIsFavorite(true);
         alert('Product already in wishlist');
+      } else {
+        const data = await response.json().catch(() => ({}));
+        alert(data.error || 'Failed to add to wishlist');
       }
     } catch (error) {
       console.error('Failed to add to wishlist:', error);

@@ -4,7 +4,11 @@ import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
 import { useCart } from '@/context/CartContext';
 import { cartUtils } from '@/lib/cart';
-import { COMPARE_CHANGED_EVENT, getStoredUserToken } from '@/lib/clientAuth';
+import {
+  COMPARE_CHANGED_EVENT,
+  WISHLIST_CHANGED_EVENT,
+  getStoredUserToken,
+} from '@/lib/clientAuth';
 import AuthPanel from '@/components/AuthPanel';
 import Logo from '@/components/Logo';
 
@@ -14,6 +18,7 @@ export default function Navigation() {
   const [cartCount, setCartCount] = useState(0);
   const [cartSubtotal, setCartSubtotal] = useState(0);
   const [compareCount, setCompareCount] = useState(0);
+  const [wishlistCount, setWishlistCount] = useState(0);
   const [isClient, setIsClient] = useState(false);
   const [language, setLanguage] = useState('ENGLISH');
   const [currency, setCurrency] = useState('USD');
@@ -31,31 +36,43 @@ export default function Navigation() {
     setCartSubtotal(cartUtils.getCartTotals(cart).subtotal);
   }, [cart, getItemCount]);
 
-  // Compare list lives server-side, so the badge is refreshed on mount and
-  // whenever a product is added or removed anywhere in the app.
+  // Compare and wishlist live server-side, so their badges are refreshed on
+  // mount and whenever an item is added or removed anywhere in the app.
   useEffect(() => {
-    const refreshCompareCount = async () => {
+    const loadCount = async (
+      endpoint: string,
+      apply: (count: number) => void
+    ) => {
       const token = getStoredUserToken();
       if (!token) {
-        setCompareCount(0);
+        apply(0);
         return;
       }
 
       try {
-        const response = await fetch('/api/compare', {
+        const response = await fetch(endpoint, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!response.ok) return;
         const data = await response.json();
-        setCompareCount(Array.isArray(data) ? data.length : 0);
+        apply(Array.isArray(data) ? data.length : 0);
       } catch (error) {
-        console.error('[Navigation] Failed to load compare count:', error);
+        console.error(`[Navigation] Failed to load count from ${endpoint}:`, error);
       }
     };
 
-    refreshCompareCount();
-    window.addEventListener(COMPARE_CHANGED_EVENT, refreshCompareCount);
-    return () => window.removeEventListener(COMPARE_CHANGED_EVENT, refreshCompareCount);
+    const refreshCompare = () => loadCount('/api/compare', setCompareCount);
+    const refreshWishlist = () => loadCount('/api/wishlist', setWishlistCount);
+
+    refreshCompare();
+    refreshWishlist();
+
+    window.addEventListener(COMPARE_CHANGED_EVENT, refreshCompare);
+    window.addEventListener(WISHLIST_CHANGED_EVENT, refreshWishlist);
+    return () => {
+      window.removeEventListener(COMPARE_CHANGED_EVENT, refreshCompare);
+      window.removeEventListener(WISHLIST_CHANGED_EVENT, refreshWishlist);
+    };
   }, []);
 
   useEffect(() => {
@@ -192,7 +209,9 @@ export default function Navigation() {
               </button>
               <Link href="/wishlist" className="relative text-xl hover:text-gray-600" title="Wishlist">
                 ♡
-                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {wishlistCount}
+                </span>
               </Link>
               <Link href="/compare" className="relative text-xl hover:text-gray-600" title="Compare">
                 ⟷
