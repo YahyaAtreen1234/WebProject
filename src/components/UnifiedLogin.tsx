@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Logo from '@/components/Logo';
 
 export default function UnifiedLogin() {
   const router = useRouter();
@@ -89,10 +90,7 @@ export default function UnifiedLogin() {
         <div className="card-glass p-8 border border-sapphire-500/20">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-sapphire-400 via-amethyst-400 to-emerald-400 shadow-lg flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">💎</span>
-            </div>
-            <h1 className="text-3xl font-display font-bold text-white mb-2">StonesLand</h1>
+            <Logo variant="full" size={180} href={null} className="mb-4 inline-block" />
             <p className="text-midnight-400">Sign in to your account</p>
           </div>
 

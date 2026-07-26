@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { pruneEphemeralAuth, setAuthPersistence } from '@/lib/clientAuth';
+import Logo from '@/components/Logo';
 
 const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
@@ -381,7 +382,10 @@ export default function AuthPanel({ open, onClose, initialMode = 'signin' }: Aut
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 px-7 py-5">
-          <h2 className="text-[26px] font-normal text-black">{title}</h2>
+          <div className="flex items-center gap-3">
+            <Logo size={38} href={null} />
+            <h2 className="text-[26px] font-normal text-black">{title}</h2>
+          </div>
           <button
             type="button"
             onClick={onClose}

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Logo from '@/components/Logo';
 
 export default function CustomerAuth() {
   const router = useRouter();
@@ -105,7 +106,7 @@ export default function CustomerAuth() {
     <div className="min-h-screen bg-midnight-950 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="card-glass p-8 border border-sapphire-500/20 rounded-2xl">
-          <h1 className="text-3xl font-display font-bold text-white text-center mb-2">StonesLand</h1>
+          <Logo variant="full" size={180} href={null} className="mb-2 block text-center" />
           <p className="text-midnight-400 text-center mb-8">
             {mode === 'login' ? 'Sign in to your account' : 'Create your account'}
           </p>

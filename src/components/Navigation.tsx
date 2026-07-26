@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
 import { useCart } from '@/context/CartContext';
 import AuthPanel from '@/components/AuthPanel';
+import Logo from '@/components/Logo';
 
 export default function Navigation() {
   const { cart, getItemCount } = useCart();
@@ -127,12 +128,7 @@ export default function Navigation() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between gap-4">
             {/* Logo */}
-            <Link href="/" className="flex-shrink-0">
-              <div className="flex flex-col">
-                <span className="text-lg sm:text-xl font-bold text-black">💎 StonesLand</span>
-                <span className="text-xs sm:text-sm text-gray-600">Premium Gems & Minerals</span>
-              </div>
-            </Link>
+            <Logo label="StonesLand" tagline="Premium Gems & Minerals" size={48} />
 
             {/* Search Bar */}
             <form onSubmit={handleSearch} className="flex-1 max-w-md hidden sm:flex">

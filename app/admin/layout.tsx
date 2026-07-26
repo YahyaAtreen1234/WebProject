@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import Logo from '@/components/Logo';
 
 const adminMenuItems = [
   { label: 'Dashboard', href: '/admin/dashboard', icon: '📊' },
@@ -79,15 +80,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               {/* Logo */}
-              <Link href="/admin/orders" className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sapphire-400 via-amethyst-400 to-emerald-400 shadow-lg flex items-center justify-center">
-                  <span className="text-white font-bold">💎</span>
-                </div>
-                <div className="hidden sm:block">
-                  <p className="text-h4 font-display text-gradient font-bold">StonesLand</p>
-                  <p className="text-xs text-gold-300">Admin Panel</p>
-                </div>
-              </Link>
+              <Logo
+                href="/admin/orders"
+                size={40}
+                label="StonesLand"
+                tagline="Admin Panel"
+                labelClassName="text-h4 font-display text-gradient font-bold"
+                taglineClassName="text-xs text-gold-300"
+              />
 
               {/* Desktop Menu */}
               <nav className="hidden md:flex items-center gap-1">

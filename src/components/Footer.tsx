@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import Logo from '@/components/Logo';
 
 export default function Footer() {
   const [newsletter, setNewsletter] = useState('');
@@ -176,6 +177,7 @@ export default function Footer() {
 
       {/* Copyright Section */}
       <div className="border-t border-gray-800 py-8 px-4 sm:px-6 text-center text-sm text-gray-500">
+        <Logo variant="full" size={200} className="mb-6 inline-block" />
         <p>© 2026 StonesLand. Established 1968. All Rights Reserved.</p>
       </div>
     </footer>
