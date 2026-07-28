@@ -30,6 +30,13 @@ export default function Home() {
     fetchProducts();
   }, []);
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setHeroIndex((prevIndex) => (prevIndex + 1) % heroEvents.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [heroEvents.length]);
+
   const fetchProducts = async () => {
     try {
       const [allResponse, featuredResponse] = await Promise.all([
