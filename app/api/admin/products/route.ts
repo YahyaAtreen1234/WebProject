@@ -76,13 +76,26 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { title, description, price, category, stock, image, featured } = body;
+    const { title, description, price, category, stock, image, featured, trackingNumber } = body;
 
     if (!title || !description || price === undefined || !category) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
+    }
+
+    // Check if tracking number is unique (if provided)
+    if (trackingNumber) {
+      const existing = await prisma.product.findUnique({
+        where: { trackingNumber },
+      });
+      if (existing) {
+        return NextResponse.json(
+          { error: 'Tracking number already exists. Please use a unique tracking number.' },
+          { status: 400 }
+        );
+      }
     }
 
     const product = await prisma.product.create({
@@ -94,6 +107,7 @@ export async function POST(request: NextRequest) {
         stock: parseInt(stock?.toString() || '0'),
         image: image || null,
         featured: featured || false,
+        trackingNumber: trackingNumber || null,
       },
     });
 

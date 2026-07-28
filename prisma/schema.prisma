@@ -64,23 +64,25 @@ model Compare {
 }
 
 model Product {
-  id        String     @id @default(cuid())
-  title     String     @unique
-  description String
-  price     Float
-  image     String?              // Main/featured image (for backward compatibility)
-  images    String     @default("[]") // JSON array of image URLs
-  category  String
-  stock     Int        @default(0)
-  featured  Boolean    @default(false)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id              String     @id @default(cuid())
+  title           String     @unique
+  description     String
+  price           Float
+  image           String?              // Main/featured image (for backward compatibility)
+  images          String     @default("[]") // JSON array of image URLs
+  category        String
+  stock           Int        @default(0)
+  featured        Boolean    @default(false)
+  trackingNumber  String?    @unique  // SKU/Tracking number for customer orders
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
 
-  orderItems OrderItem[]
-  reviews    ProductReview[]
+  orderItems      OrderItem[]
+  reviews         ProductReview[]
 
   @@index([category])
   @@index([featured])
+  @@index([trackingNumber])
 }
 
 model ProductReview {
@@ -173,16 +175,18 @@ model Order {
 }
 
 model OrderItem {
-  id        String   @id @default(cuid())
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId   String
-  product   Product  @relation(fields: [productId], references: [id])
-  productId String
-  quantity  Int
-  price     Float
-  title     String
+  id              String   @id @default(cuid())
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId         String
+  product         Product  @relation(fields: [productId], references: [id])
+  productId       String
+  quantity        Int
+  price           Float
+  title           String
+  trackingNumber  String?  // Product's tracking number at time of order
 
   @@index([orderId])
+  @@index([trackingNumber])
 }
 
 model Contact {

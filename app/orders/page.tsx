@@ -18,6 +18,7 @@ interface OrderData {
     title: string;
     quantity: number;
     price: number;
+    trackingNumber?: string;
   }>;
   address: string;
   city: string;
@@ -267,12 +268,20 @@ export default function OrdersPage() {
               <h2 className="text-xl font-bold text-black mb-6">Order Items</h2>
               <div className="space-y-4">
                 {orderData.items.map((item) => (
-                  <div key={item.id} className="flex justify-between items-center py-4 border-b border-gray-200 last:border-b-0">
-                    <div>
-                      <p className="font-semibold text-black">{item.title}</p>
-                      <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                  <div key={item.id} className="py-4 border-b border-gray-200 last:border-b-0">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <p className="font-semibold text-black">{item.title}</p>
+                        <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                      </div>
+                      <p className="font-semibold text-black">${(item.price * item.quantity).toFixed(2)}</p>
                     </div>
-                    <p className="font-semibold text-black">${(item.price * item.quantity).toFixed(2)}</p>
+                    {item.trackingNumber && (
+                      <div className="bg-blue-50 border border-blue-200 rounded p-2 mt-2">
+                        <p className="text-xs text-blue-600 font-semibold">Product Tracking Number (SKU)</p>
+                        <p className="text-sm font-mono text-blue-900">{item.trackingNumber}</p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

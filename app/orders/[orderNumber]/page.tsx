@@ -205,12 +205,20 @@ export default function OrderTrackingPage() {
             <h2 className="text-xl font-bold text-white mb-4">Items</h2>
             <div className="space-y-3">
               {orderData.items.map((item: any) => (
-                <div key={item.id} className="flex justify-between pb-3 border-b border-midnight-700">
-                  <div>
-                    <p className="text-white font-semibold">{item.title}</p>
-                    <p className="text-midnight-400 text-sm">Qty: {item.quantity}</p>
+                <div key={item.id} className="pb-3 border-b border-midnight-700">
+                  <div className="flex justify-between mb-2">
+                    <div>
+                      <p className="text-white font-semibold">{item.title}</p>
+                      <p className="text-midnight-400 text-sm">Qty: {item.quantity}</p>
+                    </div>
+                    <p className="text-sapphire-400 font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
                   </div>
-                  <p className="text-sapphire-400 font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
+                  {item.trackingNumber && (
+                    <div className="bg-sapphire-500/10 border border-sapphire-500/20 rounded p-2">
+                      <p className="text-xs text-sapphire-400 font-semibold">Product Tracking Number (SKU)</p>
+                      <p className="text-sm font-mono text-sapphire-300">{item.trackingNumber}</p>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

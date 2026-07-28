@@ -71,7 +71,23 @@ export async function PATCH(
 
   try {
     const body = await request.json();
-    const { title, description, price, category, stock, image, featured } = body;
+    const { title, description, price, category, stock, image, featured, trackingNumber } = body;
+
+    // Check if tracking number is unique (if provided and different from current)
+    if (trackingNumber) {
+      const existing = await prisma.product.findFirst({
+        where: {
+          trackingNumber,
+          NOT: { id: params.id },
+        },
+      });
+      if (existing) {
+        return NextResponse.json(
+          { error: 'Tracking number already exists. Please use a unique tracking number.' },
+          { status: 400 }
+        );
+      }
+    }
 
     const product = await prisma.product.update({
       where: { id: params.id },
@@ -83,6 +99,7 @@ export async function PATCH(
         ...(stock !== undefined && { stock: parseInt(stock.toString()) }),
         ...(image && { image }),
         ...(featured !== undefined && { featured }),
+        ...(trackingNumber !== undefined && { trackingNumber: trackingNumber || null }),
       },
     });
 

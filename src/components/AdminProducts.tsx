@@ -12,6 +12,7 @@ interface Product {
   stock: number;
   category: string;
   featured: boolean;
+  trackingNumber?: string;
   createdAt: string;
   totalSold?: number;
 }
@@ -36,6 +37,7 @@ export default function AdminProducts() {
     stock: '',
     image: '',
     featured: false,
+    trackingNumber: '',
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -263,6 +265,15 @@ export default function AdminProducts() {
                 className="px-4 py-2 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-500"
               />
             </div>
+
+            <input
+              type="text"
+              placeholder="Tracking Number / SKU (e.g., SKU-001, TRACK-12345)"
+              value={formData.trackingNumber}
+              onChange={(e) => setFormData({ ...formData, trackingNumber: e.target.value })}
+              className="w-full px-4 py-2 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-500"
+            />
+            <p className="text-xs text-midnight-400">This tracking number will be shown to customers when they receive their order</p>
 
             <div className="grid grid-cols-2 gap-4">
               <select

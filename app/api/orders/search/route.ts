@@ -55,6 +55,7 @@ export async function GET(request: NextRequest) {
         title: item.product?.title || item.title,
         quantity: item.quantity,
         price: item.price,
+        trackingNumber: item.trackingNumber || item.product?.trackingNumber,
       })),
       address: order.address,
       city: order.city,
