@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { notifyUserAuthChanged, pruneEphemeralAuth, setAuthPersistence } from '@/lib/clientAuth';
+import { verifyHuman, type HumanCheckPayload } from '@/lib/humanCheck';
 import Logo from '@/components/Logo';
 
 const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
@@ -144,6 +145,9 @@ export default function AuthPanel({ open, onClose, initialMode = 'signin' }: Aut
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [captchaToken, setCaptchaToken] = useState('');
+  const [captchaQuestion, setCaptchaQuestion] = useState('');
+  const [captchaAnswer, setCaptchaAnswer] = useState('');
+  const [showCaptcha, setShowCaptcha] = useState(true);
 
   // Sign in
   const [identifier, setIdentifier] = useState('');
@@ -167,8 +171,10 @@ export default function AuthPanel({ open, onClose, initialMode = 'signin' }: Aut
   const switchMode = useCallback(
     (next: Mode) => {
       resetFeedback();
-      setCaptchaToken('');
       setMode(next);
+      if (next !== 'verify') {
+        loadCaptcha();
+      }
     },
     [resetFeedback]
   );
@@ -177,10 +183,24 @@ export default function AuthPanel({ open, onClose, initialMode = 'signin' }: Aut
   // which would otherwise become the containing block for our fixed positioning.
   useEffect(() => {
     setMounted(true);
-    // Navigation renders this panel on every page, so this is the reliable
-    // place to expire a previous session's "Remember me: off" login.
     pruneEphemeralAuth();
+    loadCaptcha();
   }, []);
+
+  const loadCaptcha = async () => {
+    try {
+      const response = await fetch('/api/captcha');
+      if (response.ok) {
+        const { token, question } = await response.json();
+        setCaptchaToken(token);
+        setCaptchaQuestion(question);
+        setCaptchaAnswer('');
+        setShowCaptcha(true);
+      }
+    } catch (error) {
+      console.error('[AuthPanel] Failed to load captcha:', error);
+    }
+  };
 
   // Close on Escape, lock background scroll, focus the first field.
   useEffect(() => {
@@ -278,6 +298,22 @@ export default function AuthPanel({ open, onClose, initialMode = 'signin' }: Aut
       return;
     }
 
+    if (!RECAPTCHA_SITE_KEY) {
+      if (!captchaToken || !captchaAnswer) {
+        setError('Please complete the verification challenge.');
+        return;
+      }
+      const humanCheck = await verifyHuman({
+        captchaToken,
+        captchaAnswer,
+      });
+      if (!humanCheck.ok) {
+        setError(humanCheck.error || 'Verification failed. Please try again.');
+        loadCaptcha();
+        return;
+      }
+    }
+
     setLoading(true);
     try {
       const signedIn = await signIn(identifier, loginPassword, remember);
@@ -302,6 +338,22 @@ export default function AuthPanel({ open, onClose, initialMode = 'signin' }: Aut
 
     if (RECAPTCHA_SITE_KEY && !captchaToken) {
       return setError('Please confirm you are not a robot.');
+    }
+
+    if (!RECAPTCHA_SITE_KEY) {
+      if (!captchaToken || !captchaAnswer) {
+        setError('Please complete the verification challenge.');
+        return;
+      }
+      const humanCheck = await verifyHuman({
+        captchaToken,
+        captchaAnswer,
+      });
+      if (!humanCheck.ok) {
+        setError(humanCheck.error || 'Verification failed. Please try again.');
+        loadCaptcha();
+        return;
+      }
     }
 
     setLoading(true);
@@ -455,6 +507,20 @@ export default function AuthPanel({ open, onClose, initialMode = 'signin' }: Aut
                   />
                 </div>
 
+                {!RECAPTCHA_SITE_KEY && showCaptcha && (
+                  <div className="rounded-md border border-amber-200 bg-amber-50 p-4">
+                    <p className="text-sm font-medium text-gray-700 mb-3">{captchaQuestion}</p>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={captchaAnswer}
+                      onChange={(e) => setCaptchaAnswer(e.target.value)}
+                      placeholder="Your answer"
+                      className={inputClass}
+                    />
+                  </div>
+                )}
+
                 <Recaptcha onChange={setCaptchaToken} />
 
                 <button
@@ -576,6 +642,20 @@ export default function AuthPanel({ open, onClose, initialMode = 'signin' }: Aut
                     autoComplete="new-password"
                   />
                 </div>
+
+                {!RECAPTCHA_SITE_KEY && showCaptcha && (
+                  <div className="rounded-md border border-amber-200 bg-amber-50 p-4">
+                    <p className="text-sm font-medium text-gray-700 mb-3">{captchaQuestion}</p>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={captchaAnswer}
+                      onChange={(e) => setCaptchaAnswer(e.target.value)}
+                      placeholder="Your answer"
+                      className={inputClass}
+                    />
+                  </div>
+                )}
 
                 <Recaptcha onChange={setCaptchaToken} />
 
