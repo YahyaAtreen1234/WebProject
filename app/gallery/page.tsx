@@ -77,12 +77,13 @@ export default function GalleryPage() {
     try {
       setLoading(true);
       setError('');
-      const response = await fetch('/api/products?limit=1000');
+      const response = await fetch('/api/products');
       if (!response.ok) throw new Error('Failed to fetch products');
       const data = await response.json();
-      setProducts(data.products || []);
-      setTotalProducts(data.products?.length || 0);
-      console.log('[GalleryPage] Products fetched:', data.products?.length);
+      const productsList = Array.isArray(data) ? data : (data.products || []);
+      setProducts(productsList);
+      setTotalProducts(productsList.length);
+      console.log('[GalleryPage] Products fetched:', productsList.length);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error loading products');
       console.error('[GalleryPage] Error fetching products:', err);
