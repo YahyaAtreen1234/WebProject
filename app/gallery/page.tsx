@@ -14,6 +14,7 @@ interface Product {
   featured: boolean;
   stock: number;
   description: string;
+  createdAt: string;
 }
 
 interface FilterState {
@@ -133,7 +134,7 @@ export default function GalleryPage() {
         break;
       case 'newest':
       default:
-        result.sort((a, b) => new Date(b.id).getTime() - new Date(a.id).getTime());
+        result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     }
 
     setFilteredProducts(result);
