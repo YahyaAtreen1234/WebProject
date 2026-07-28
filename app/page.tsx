@@ -18,12 +18,20 @@ export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [heroIndex, setHeroIndex] = useState(0);
+  const [promoIndex, setPromoIndex] = useState(0);
 
   const heroEvents = [
     'Sainte Marie 61st Show France 2026',
     'Nanjing (International) Mineral, Gemstone & Fossil Expo 2026',
     'The Tucson Gem & Fine Mineral Show 2026',
     'The Munich Show 2025',
+  ];
+
+  const promotions = [
+    { title: 'FREE WORLDWIDE SHIPPING', subtitle: 'On all orders', color: 'from-yellow-400 to-amber-500' },
+    { title: '15 DAY MONEY BACK', subtitle: 'Guaranteed satisfaction', color: 'from-blue-400 to-cyan-500' },
+    { title: 'AUTHENTIC GEMSTONES', subtitle: 'Premium quality certified', color: 'from-purple-400 to-pink-500' },
+    { title: 'EXPERT SUPPORT', subtitle: '24/7 customer service', color: 'from-emerald-400 to-teal-500' },
   ];
 
   useEffect(() => {
@@ -36,6 +44,13 @@ export default function Home() {
     }, 5000);
     return () => clearInterval(timer);
   }, [heroEvents.length]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setPromoIndex((prevIndex) => (prevIndex + 1) % promotions.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [promotions.length]);
 
   const fetchProducts = async () => {
     try {
@@ -94,6 +109,68 @@ export default function Home() {
           <Link href="/gallery" className="inline-block bg-black text-white font-bold px-8 py-3 rounded hover:bg-gray-800">
             VIEW ALL
           </Link>
+        </div>
+      </section>
+
+      {/* Promotional Banner Carousel */}
+      <section className="bg-black py-16 px-4 sm:px-6 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="relative flex items-center justify-between min-h-64">
+            {/* Left Arrow */}
+            <button
+              onClick={() => setPromoIndex((prevIndex) => (prevIndex - 1 + promotions.length) % promotions.length)}
+              className="absolute left-0 z-10 p-3 text-white hover:bg-white/10 rounded-full transition"
+              aria-label="Previous promotion"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </button>
+
+            {/* Promo Content */}
+            <div className="flex-1 flex items-center justify-center px-12">
+              <div className="text-center max-w-2xl">
+                <p className="text-gray-400 text-lg mb-4 uppercase tracking-widest">{promotions[promoIndex].subtitle}</p>
+                <h2 className={`text-6xl font-black mb-8 bg-gradient-to-r ${promotions[promoIndex].color} bg-clip-text text-transparent uppercase tracking-tight`}>
+                  {promotions[promoIndex].title}
+                </h2>
+                <Link
+                  href="/shop"
+                  className="inline-block bg-white text-black font-bold px-8 py-3 rounded hover:bg-gray-200 transition"
+                >
+                  Shop Now
+                </Link>
+              </div>
+
+              {/* Gemstone Image Placeholder */}
+              <div className="absolute right-12 h-64 w-64 flex items-center justify-center">
+                <div className="text-8xl">💎</div>
+              </div>
+            </div>
+
+            {/* Right Arrow */}
+            <button
+              onClick={() => setPromoIndex((prevIndex) => (prevIndex + 1) % promotions.length)}
+              className="absolute right-0 z-10 p-3 text-white hover:bg-white/10 rounded-full transition"
+              aria-label="Next promotion"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </div>
+
+          {/* Promo Indicators */}
+          <div className="flex justify-center gap-2 mt-8">
+            {promotions.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setPromoIndex(i)}
+                className={`w-2 h-2 rounded-full transition ${i === promoIndex ? 'bg-white' : 'bg-gray-600'}`}
+                aria-label={`Go to promotion ${i + 1}`}
+              />
+            ))}
+          </div>
         </div>
       </section>
 
