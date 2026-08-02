@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     // Build where clause based on search parameters
     const where: Record<string, unknown> = {};
     if (orderNumber) where.orderNumber = orderNumber;
-    if (email) where.email = email;
+    if (email) where.customerEmail = email;
 
     // Search for the order
     const order = await prisma.order.findFirst({
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     const response = {
       id: order.id,
       orderNumber: order.orderNumber,
-      email: order.email,
+      email: order.customerEmail,
       status: order.status,
       totalAmount: order.totalAmount,
       createdAt: order.createdAt,
