@@ -9,30 +9,21 @@ async function main() {
   // Create default admin
   const hashedPassword = await bcryptjs.hash('admin123', 10);
 
-  const admin = await prisma.admin.upsert({
+  const admin = await prisma.user.upsert({
     where: { email: 'admin@stonesland.local' },
     update: {},
     create: {
       email: 'admin@stonesland.local',
       password: hashedPassword,
       name: 'Admin User',
+      role: 'admin',
+      emailVerified: true,
     },
   });
 
   console.log('✅ Admin created:', admin.email);
-
-  // Create default site settings
-  const settings = await prisma.siteSettings.upsert({
-    where: { id: 'main' },
-    update: {},
-    create: {
-      id: 'main',
-      siteName: 'StonesLand',
-      siteTagline: 'Premium Gems & Minerals',
-    },
-  });
-
-  console.log('✅ Site settings created');
+  console.log('📧 Email: admin@stonesland.local');
+  console.log('🔑 Password: admin123');
 
   console.log('✨ Database seeded successfully!');
 }
