@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
             product: true,
           },
         },
+        delivery: true,
       },
     });
 
@@ -47,9 +48,9 @@ export async function GET(request: NextRequest) {
       status: order.status,
       totalAmount: order.totalAmount,
       createdAt: order.createdAt,
-      estimatedDelivery: order.estimatedDelivery,
-      trackingNumber: order.trackingNumber,
-      carrier: order.carrier,
+      estimatedDelivery: order.delivery?.estimatedDelivery || null,
+      trackingNumber: order.delivery?.trackingNumber || null,
+      carrier: order.delivery?.carrier || null,
       items: order.items.map((item: any) => ({
         id: item.id,
         title: item.product?.title || item.title,
