@@ -74,6 +74,7 @@ model Product {
   stock           Int        @default(0)
   featured        Boolean    @default(false)
   trackingNumber  String?              // SKU/Tracking number for customer orders
+  dealDeadline    DateTime?            // Deadline for special promotion (e.g., 15-day money back)
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 
@@ -83,6 +84,7 @@ model Product {
   @@index([category])
   @@index([featured])
   @@index([trackingNumber])
+  @@index([dealDeadline])
 }
 
 model ProductReview {

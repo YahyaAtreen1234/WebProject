@@ -13,6 +13,7 @@ interface Product {
   category: string;
   featured: boolean;
   trackingNumber?: string;
+  dealDeadline?: string;
   createdAt: string;
   totalSold?: number;
 }
@@ -38,6 +39,7 @@ export default function AdminProducts() {
     image: '',
     featured: false,
     trackingNumber: '',
+    dealDeadline: '',
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -129,6 +131,7 @@ export default function AdminProducts() {
           image: formData.image,
           featured: formData.featured,
           trackingNumber: formData.trackingNumber || null,
+          dealDeadline: formData.dealDeadline ? new Date(formData.dealDeadline) : null,
         }),
       });
 
@@ -185,6 +188,7 @@ export default function AdminProducts() {
       image: '',
       featured: product.featured,
       trackingNumber: product.trackingNumber || '',
+      dealDeadline: product.dealDeadline ? product.dealDeadline.split('T')[0] : '',
     });
     setShowForm(true);
   };
@@ -200,6 +204,7 @@ export default function AdminProducts() {
       image: '',
       featured: false,
       trackingNumber: '',
+      dealDeadline: '',
     });
     setShowForm(false);
   };
@@ -277,6 +282,15 @@ export default function AdminProducts() {
               className="w-full px-4 py-2 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-500"
             />
             <p className="text-xs text-midnight-400">This tracking number will be shown to customers when they receive their order</p>
+
+            <input
+              type="date"
+              placeholder="Deal Deadline (e.g., 15-day money back)"
+              value={formData.dealDeadline}
+              onChange={(e) => setFormData({ ...formData, dealDeadline: e.target.value })}
+              className="w-full px-4 py-2 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-500"
+            />
+            <p className="text-xs text-midnight-400">Optional: Set a deadline for a special promotion (will appear in carousel)</p>
 
             <div className="grid grid-cols-2 gap-4">
               <select

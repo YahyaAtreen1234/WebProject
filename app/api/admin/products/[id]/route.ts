@@ -71,7 +71,7 @@ export async function PATCH(
 
   try {
     const body = await request.json();
-    const { title, description, price, category, stock, image, featured, trackingNumber } = body;
+    const { title, description, price, category, stock, image, featured, trackingNumber, dealDeadline } = body;
 
     // Check if tracking number is unique (if provided and different from current)
     if (trackingNumber) {
@@ -100,6 +100,7 @@ export async function PATCH(
         ...(image && { image }),
         ...(featured !== undefined && { featured }),
         ...(trackingNumber !== undefined && { trackingNumber: trackingNumber || null }),
+        ...(dealDeadline !== undefined && { dealDeadline: dealDeadline ? new Date(dealDeadline) : null }),
       },
     });
 

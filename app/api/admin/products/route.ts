@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { title, description, price, category, stock, image, featured, trackingNumber } = body;
+    const { title, description, price, category, stock, image, featured, trackingNumber, dealDeadline } = body;
 
     if (!title || !description || price === undefined || !category) {
       return NextResponse.json(
@@ -108,6 +108,7 @@ export async function POST(request: NextRequest) {
         image: image || null,
         featured: featured || false,
         trackingNumber: trackingNumber || null,
+        dealDeadline: dealDeadline ? new Date(dealDeadline) : null,
       },
     });
 

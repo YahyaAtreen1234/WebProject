@@ -11,6 +11,7 @@ interface Product {
   description: string;
   stock: number;
   image?: string;
+  dealDeadline?: string;
 }
 
 export default function Home() {
@@ -18,12 +19,13 @@ export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [promoIndex, setPromoIndex] = useState(0);
+  const [promotions, setPromotions] = useState<any[]>([]);
 
-  const promotions = [
-    { title: 'FREE WORLDWIDE SHIPPING', subtitle: 'On all orders', color: 'from-yellow-400 to-amber-500' },
-    { title: '15 DAY MONEY BACK', subtitle: 'Guaranteed satisfaction', color: 'from-blue-400 to-cyan-500' },
-    { title: 'AUTHENTIC GEMSTONES', subtitle: 'Premium quality certified', color: 'from-purple-400 to-pink-500' },
-    { title: 'EXPERT SUPPORT', subtitle: '24/7 customer service', color: 'from-emerald-400 to-teal-500' },
+  const staticPromotions = [
+    { title: 'FREE WORLDWIDE SHIPPING', subtitle: 'On all orders', color: 'from-yellow-400 to-amber-500', type: 'static' },
+    { title: '15 DAY MONEY BACK', subtitle: 'Guaranteed satisfaction', color: 'from-blue-400 to-cyan-500', type: 'static' },
+    { title: 'AUTHENTIC GEMSTONES', subtitle: 'Premium quality certified', color: 'from-purple-400 to-pink-500', type: 'static' },
+    { title: 'EXPERT SUPPORT', subtitle: '24/7 customer service', color: 'from-emerald-400 to-teal-500', type: 'static' },
   ];
 
   useEffect(() => {
@@ -32,7 +34,7 @@ export default function Home() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setPromoIndex((prevIndex) => (prevIndex + 1) % promotions.length);
+      setPromoIndex((prevIndex) => (prevIndex + 1) % (promotions.length || 1));
     }, 6000);
     return () => clearInterval(timer);
   }, [promotions.length]);
@@ -45,13 +47,40 @@ export default function Home() {
       ]);
 
       if (allResponse.ok) {
-        setProducts(await allResponse.json());
+        const allProducts = await allResponse.json();
+        setProducts(allProducts);
+
+        // Filter products with active deal deadlines
+        const now = new Date();
+        const productsWithDeals = Array.isArray(allProducts) ? allProducts : [];
+        const activeDeals = productsWithDeals.filter((product: Product) => {
+          if (product.dealDeadline) {
+            const deadline = new Date(product.dealDeadline);
+            return deadline > now;
+          }
+          return false;
+        });
+
+        // Build promotions combining static promos and product deals
+        const dynamicPromotions = activeDeals.slice(0, 4).map((product: Product) => ({
+          type: 'product',
+          title: product.title,
+          subtitle: `$${product.price.toFixed(2)} - Limited Time`,
+          color: 'from-rose-400 to-red-500',
+          product: product,
+        }));
+
+        // Combine with static promotions
+        const combined = [...staticPromotions, ...dynamicPromotions];
+        setPromotions(combined.length > 0 ? combined : staticPromotions);
       }
+
       if (featuredResponse.ok) {
         setFeaturedProducts(await featuredResponse.json());
       }
     } catch (error) {
       console.error('Error fetching products:', error);
+      setPromotions(staticPromotions);
     } finally {
       setLoading(false);
     }
@@ -96,21 +125,29 @@ export default function Home() {
             {/* Promo Content */}
             <div className="flex-1 flex items-center justify-center px-12">
               <div className="text-center max-w-2xl">
-                <p className="text-gray-400 text-lg mb-4 uppercase tracking-widest">{promotions[promoIndex].subtitle}</p>
-                <h2 className={`text-6xl font-black mb-8 bg-gradient-to-r ${promotions[promoIndex].color} bg-clip-text text-transparent uppercase tracking-tight`}>
-                  {promotions[promoIndex].title}
+                <p className="text-gray-400 text-lg mb-4 uppercase tracking-widest">{promotions[promoIndex]?.subtitle}</p>
+                <h2 className={`text-6xl font-black mb-8 bg-gradient-to-r ${promotions[promoIndex]?.color} bg-clip-text text-transparent uppercase tracking-tight`}>
+                  {promotions[promoIndex]?.title}
                 </h2>
                 <Link
                   href="/shop"
                   className="inline-block bg-white text-black font-bold px-8 py-3 rounded hover:bg-gray-200 transition"
                 >
-                  Shop Now
+                  {promotions[promoIndex]?.type === 'product' ? 'View Product' : 'Shop Now'}
                 </Link>
               </div>
 
               {/* Gemstone Image Placeholder */}
               <div className="absolute right-12 h-64 w-64 flex items-center justify-center">
-                <div className="text-8xl">💎</div>
+                {promotions[promoIndex]?.product?.image ? (
+                  <img
+                    src={promotions[promoIndex].product.image}
+                    alt={promotions[promoIndex].product.title}
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                ) : (
+                  <div className="text-8xl">💎</div>
+                )}
               </div>
             </div>
 
