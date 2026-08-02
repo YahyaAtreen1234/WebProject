@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
 
     // Check if tracking number is unique (if provided)
     if (trackingNumber) {
-      const existing = await prisma.product.findUnique({
+      const existing = await prisma.product.findFirst({
         where: { trackingNumber },
       });
       if (existing) {
