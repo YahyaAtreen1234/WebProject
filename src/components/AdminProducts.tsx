@@ -178,11 +178,11 @@ export default function AdminProducts() {
     setEditingId(product.id);
     setFormData({
       title: product.title,
-      description: product.description,
+      description: '',
       price: product.price.toString(),
       category: product.category,
       stock: product.stock.toString(),
-      image: product.image || '',
+      image: '',
       featured: product.featured,
       trackingNumber: product.trackingNumber || '',
     });
