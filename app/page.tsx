@@ -17,15 +17,7 @@ export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [heroIndex, setHeroIndex] = useState(0);
   const [promoIndex, setPromoIndex] = useState(0);
-
-  const heroEvents = [
-    'Sainte Marie 61st Show France 2026',
-    'Nanjing (International) Mineral, Gemstone & Fossil Expo 2026',
-    'The Tucson Gem & Fine Mineral Show 2026',
-    'The Munich Show 2025',
-  ];
 
   const promotions = [
     { title: 'FREE WORLDWIDE SHIPPING', subtitle: 'On all orders', color: 'from-yellow-400 to-amber-500' },
@@ -37,13 +29,6 @@ export default function Home() {
   useEffect(() => {
     fetchProducts();
   }, []);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setHeroIndex((prevIndex) => (prevIndex + 1) % heroEvents.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [heroEvents.length]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -93,25 +78,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Carousel Section */}
-      <section className="bg-gray-50 py-16 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl font-bold mb-8">{heroEvents[heroIndex]}</h1>
-          <div className="flex justify-center gap-2 mb-8">
-            {heroEvents.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setHeroIndex(i)}
-                className={`w-3 h-3 rounded-full ${i === heroIndex ? 'bg-red-600' : 'bg-gray-400'}`}
-              />
-            ))}
-          </div>
-          <Link href="/gallery" className="inline-block bg-black text-white font-bold px-8 py-3 rounded hover:bg-gray-800">
-            VIEW ALL
-          </Link>
-        </div>
-      </section>
-
       {/* Promotional Banner Carousel */}
       <section className="bg-black py-16 px-4 sm:px-6 relative overflow-hidden">
         <div className="max-w-7xl mx-auto">
