@@ -128,6 +128,7 @@ export default function AdminProducts() {
           stock: parseInt(formData.stock),
           image: formData.image,
           featured: formData.featured,
+          trackingNumber: formData.trackingNumber || null,
         }),
       });
 
@@ -177,12 +178,13 @@ export default function AdminProducts() {
     setEditingId(product.id);
     setFormData({
       title: product.title,
-      description: '',
+      description: product.description,
       price: product.price.toString(),
       category: product.category,
       stock: product.stock.toString(),
-      image: '',
+      image: product.image || '',
       featured: product.featured,
+      trackingNumber: product.trackingNumber || '',
     });
     setShowForm(true);
   };
@@ -197,6 +199,7 @@ export default function AdminProducts() {
       stock: '',
       image: '',
       featured: false,
+      trackingNumber: '',
     });
     setShowForm(false);
   };
