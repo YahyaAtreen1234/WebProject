@@ -114,8 +114,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(product, { status: 201 });
   } catch (error) {
+    console.error('[POST /api/admin/products] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to create product';
     return NextResponse.json(
-      { error: 'Failed to create product' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
