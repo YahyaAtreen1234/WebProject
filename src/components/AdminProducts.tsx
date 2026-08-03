@@ -102,6 +102,13 @@ export default function AdminProducts() {
     setError('');
     setSuccess('');
 
+    // Validation
+    if (!formData.title.trim()) return setError('Title is required');
+    if (!formData.description.trim()) return setError('Description is required');
+    if (!formData.price || isNaN(parseFloat(formData.price))) return setError('Price must be a valid number');
+    if (!formData.category) return setError('Category is required');
+    if (!formData.stock || isNaN(parseInt(formData.stock))) return setError('Stock must be a valid number');
+
     try {
       const savedToken = getStoredAdminToken() || token;
       if (!savedToken) {
@@ -115,36 +122,39 @@ export default function AdminProducts() {
         ? `/api/admin/products/${editingId}`
         : '/api/admin/products';
 
-      console.log('AdminProducts submit token:', savedToken?.slice(0, 20));
+      const payload = {
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        price: parseFloat(formData.price),
+        category: formData.category,
+        stock: parseInt(formData.stock),
+        image: formData.image || null,
+        featured: formData.featured,
+        trackingNumber: formData.trackingNumber || null,
+        dealDeadline: formData.dealDeadline || null,
+      };
+
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${savedToken}`,
         },
-        body: JSON.stringify({
-          title: formData.title,
-          description: formData.description,
-          price: parseFloat(formData.price),
-          category: formData.category,
-          stock: parseInt(formData.stock),
-          image: formData.image,
-          featured: formData.featured,
-          trackingNumber: formData.trackingNumber || null,
-          dealDeadline: formData.dealDeadline ? new Date(formData.dealDeadline) : null,
-        }),
+        body: JSON.stringify(payload),
       });
+
+      const errorData = await response.json();
 
       if (response.ok) {
         setSuccess(`Product ${editingId ? 'updated' : 'created'} successfully!`);
         fetchProducts();
         resetForm();
       } else {
-        const errorData = await response.json();
         setError(errorData.error || 'Failed to save product');
       }
     } catch (error) {
-      setError('An error occurred: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      setError('An error occurred: ' + errorMsg);
       console.error('Error saving product:', error);
     }
   };
