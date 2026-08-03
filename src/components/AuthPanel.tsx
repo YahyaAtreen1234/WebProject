@@ -293,27 +293,6 @@ export default function AuthPanel({ open, onClose, initialMode = 'signin' }: Aut
     e.preventDefault();
     resetFeedback();
 
-    if (RECAPTCHA_SITE_KEY && !captchaToken) {
-      setError('Please confirm you are not a robot.');
-      return;
-    }
-
-    if (!RECAPTCHA_SITE_KEY) {
-      if (!captchaToken || !captchaAnswer) {
-        setError('Please complete the verification challenge.');
-        return;
-      }
-      const humanCheck = await verifyHuman({
-        captchaToken,
-        captchaAnswer,
-      });
-      if (!humanCheck.ok) {
-        setError(humanCheck.error || 'Verification failed. Please try again.');
-        loadCaptcha();
-        return;
-      }
-    }
-
     setLoading(true);
     try {
       const signedIn = await signIn(identifier, loginPassword, remember);
@@ -506,20 +485,6 @@ export default function AuthPanel({ open, onClose, initialMode = 'signin' }: Aut
                     autoComplete="current-password"
                   />
                 </div>
-
-                {!RECAPTCHA_SITE_KEY && showCaptcha && (
-                  <div className="rounded-md border border-amber-200 bg-amber-50 p-4">
-                    <p className="text-sm font-medium text-gray-700 mb-3">{captchaQuestion}</p>
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      value={captchaAnswer}
-                      onChange={(e) => setCaptchaAnswer(e.target.value)}
-                      placeholder="Your answer"
-                      className={inputClass}
-                    />
-                  </div>
-                )}
 
                 <Recaptcha onChange={setCaptchaToken} />
 
