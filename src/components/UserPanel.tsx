@@ -1,13 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 
 interface UserInfo {
   name: string;
   email: string;
   phone?: string;
-  avatar?: string;
   joinDate: string;
 }
 
@@ -18,6 +16,7 @@ interface Order {
   status: string;
   total: number;
   items: number;
+  trackingNumber?: string;
 }
 
 interface Address {
@@ -39,6 +38,7 @@ interface PaymentMethod {
 
 interface Shipment {
   id: string;
+  orderNumber?: string;
   trackingNumber: string;
   status: string;
   carrier: string;
@@ -61,7 +61,6 @@ export default function UserPanel() {
   const [totalSpent, setTotalSpent] = useState(0);
 
   useEffect(() => {
-    // Initialize with mock data
     setOrders([
       {
         id: '1',
@@ -70,6 +69,7 @@ export default function UserPanel() {
         status: 'Delivered',
         total: 349.99,
         items: 3,
+        trackingNumber: 'TRK-20260615-A1B2',
       },
       {
         id: '2',
@@ -78,6 +78,7 @@ export default function UserPanel() {
         status: 'In Transit',
         total: 599.99,
         items: 2,
+        trackingNumber: 'TRK-20260610-C3D4',
       },
       {
         id: '3',
@@ -128,6 +129,7 @@ export default function UserPanel() {
     setShipments([
       {
         id: '1',
+        orderNumber: 'ORD-2026-0615-001',
         trackingNumber: 'TRK-20260615-A1B2',
         status: 'Delivered',
         carrier: 'FedEx',
@@ -135,17 +137,11 @@ export default function UserPanel() {
       },
       {
         id: '2',
+        orderNumber: 'ORD-2026-0610-005',
         trackingNumber: 'TRK-20260610-C3D4',
         status: 'In Transit',
         carrier: 'UPS',
         estimatedDelivery: '2026-06-20',
-      },
-      {
-        id: '3',
-        trackingNumber: 'TRK-20260605-E5F6',
-        status: 'Processing',
-        carrier: 'DHL',
-        estimatedDelivery: '2026-06-22',
       },
     ]);
 
@@ -155,429 +151,274 @@ export default function UserPanel() {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'delivered':
-        return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+        return 'bg-green-500/20 text-green-400';
       case 'in transit':
-        return 'bg-sapphire-500/20 text-sapphire-400 border-sapphire-500/30';
+        return 'bg-blue-500/20 text-blue-400';
       case 'processing':
-        return 'bg-amethyst-500/20 text-amethyst-400 border-amethyst-500/30';
-      case 'pending':
-        return 'bg-gold-500/20 text-gold-400 border-gold-500/30';
-      case 'cancelled':
-        return 'bg-rose-500/20 text-rose-400 border-rose-500/30';
+        return 'bg-yellow-500/20 text-yellow-400';
       default:
-        return 'bg-midnight-800 text-midnight-300 border-midnight-700';
+        return 'bg-gray-500/20 text-gray-400';
     }
   };
 
+  const tabs = [
+    { id: 'overview', label: 'Dashboard', icon: '📊' },
+    { id: 'orders', label: 'My Orders', icon: '📦' },
+    { id: 'shipments', label: 'Shipments', icon: '🚚' },
+    { id: 'addresses', label: 'Addresses', icon: '📍' },
+    { id: 'payments', label: 'Payments', icon: '💳' },
+    { id: 'settings', label: 'Settings', icon: '⚙️' },
+  ];
+
   return (
-    <div className="min-h-screen bg-midnight-950 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-sapphire-400 via-amethyst-400 to-emerald-400 flex items-center justify-center">
-              <span className="text-2xl">👤</span>
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-3xl shadow-lg">
+                👤
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold text-white">{userInfo.name}</h1>
+                <p className="text-gray-400">{userInfo.email}</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-display font-bold text-white">{userInfo.name}</h1>
-              <p className="text-midnight-400">{userInfo.email}</p>
-            </div>
+            <button className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition">
+              Logout
+            </button>
           </div>
 
-          {/* Quick Stats */}
+          {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="card-glass p-4 border border-sapphire-500/20">
-              <p className="text-midnight-400 text-sm">Total Orders</p>
-              <p className="text-2xl font-bold text-white mt-1">{orders.length}</p>
+            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 backdrop-blur">
+              <p className="text-gray-400 text-sm mb-2">Total Orders</p>
+              <p className="text-3xl font-bold text-white">{orders.length}</p>
             </div>
-            <div className="card-glass p-4 border border-emerald-500/20">
-              <p className="text-midnight-400 text-sm">Total Spent</p>
-              <p className="text-2xl font-bold text-emerald-400 mt-1">${totalSpent.toFixed(2)}</p>
+            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 backdrop-blur">
+              <p className="text-gray-400 text-sm mb-2">Total Spent</p>
+              <p className="text-3xl font-bold text-green-400">${totalSpent.toFixed(2)}</p>
             </div>
-            <div className="card-glass p-4 border border-amethyst-500/20">
-              <p className="text-midnight-400 text-sm">Active Shipments</p>
-              <p className="text-2xl font-bold text-amethyst-400 mt-1">
+            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 backdrop-blur">
+              <p className="text-gray-400 text-sm mb-2">Active Shipments</p>
+              <p className="text-3xl font-bold text-blue-400">
                 {shipments.filter((s) => s.status !== 'Delivered').length}
               </p>
             </div>
-            <div className="card-glass p-4 border border-gold-500/20">
-              <p className="text-midnight-400 text-sm">Member Since</p>
-              <p className="text-lg font-bold text-gold-400 mt-1">2024</p>
+            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 backdrop-blur">
+              <p className="text-gray-400 text-sm mb-2">Member Since</p>
+              <p className="text-3xl font-bold text-yellow-400">2024</p>
             </div>
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="mb-8">
-          <div className="flex gap-2 overflow-x-auto pb-4 border-b border-sapphire-500/20">
-            {[
-              { id: 'overview', label: '📊 Overview', icon: '📊' },
-              { id: 'orders', label: '📦 Orders', icon: '📦' },
-              { id: 'shipments', label: '🚚 Shipments', icon: '🚚' },
-              { id: 'addresses', label: '📍 Addresses', icon: '📍' },
-              { id: 'payments', label: '💳 Payments', icon: '💳' },
-              { id: 'settings', label: '⚙️ Settings', icon: '⚙️' },
-            ].map((tab) => (
+        {/* Tabs */}
+        <div className="mb-8 border-b border-gray-700">
+          <div className="flex gap-1 overflow-x-auto pb-0">
+            {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-2 font-semibold whitespace-nowrap transition-all rounded-lg ${
+                className={`px-6 py-4 font-semibold whitespace-nowrap transition-all border-b-2 ${
                   activeTab === tab.id
-                    ? 'bg-sapphire-600 text-white'
-                    : 'text-midnight-400 hover:text-white hover:bg-sapphire-500/20'
+                    ? 'border-yellow-400 text-white bg-gray-800/50'
+                    : 'border-transparent text-gray-400 hover:text-white'
                 }`}
               >
-                {tab.label}
+                {tab.icon} {tab.label}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Content Sections */}
-        {activeTab === 'overview' && (
-          <div className="space-y-6">
-            {/* Recent Orders */}
-            <div className="card-glass p-6 border border-sapphire-500/20">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-white">Recent Orders</h2>
-                <Link href="#orders" className="text-sapphire-400 hover:text-sapphire-300 text-sm">
-                  View All →
-                </Link>
+        {/* Content */}
+        <div className="space-y-6">
+          {/* Overview Tab */}
+          {activeTab === 'overview' && (
+            <div className="space-y-6">
+              {/* Recent Orders */}
+              <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 backdrop-blur">
+                <h2 className="text-2xl font-bold text-white mb-6">Recent Orders</h2>
+                <div className="space-y-3">
+                  {orders.slice(0, 3).map((order) => (
+                    <div key={order.id} className="bg-gray-900/50 rounded-lg p-4 flex items-center justify-between hover:bg-gray-900 transition">
+                      <div className="flex-1">
+                        <p className="text-white font-semibold">{order.orderNumber}</p>
+                        <p className="text-gray-400 text-sm">{order.date}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-white font-bold">${order.total.toFixed(2)}</p>
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mt-1 ${getStatusColor(order.status)}`}>
+                          {order.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              <div className="space-y-3">
-                {orders.slice(0, 3).map((order) => (
-                  <div
-                    key={order.id}
-                    className="flex items-center justify-between p-4 bg-midnight-800/30 rounded-lg hover:bg-midnight-800/50 transition-colors"
-                  >
-                    <div className="flex-1">
-                      <p className="text-white font-semibold">{order.orderNumber}</p>
-                      <p className="text-midnight-400 text-sm">{order.date}</p>
+              {/* Quick Actions */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 hover:border-blue-500/50 transition cursor-pointer">
+                  <span className="text-4xl mb-3 block">📦</span>
+                  <p className="text-gray-400 text-sm mb-1">My Orders</p>
+                  <p className="text-2xl font-bold text-white">{orders.length}</p>
+                </div>
+                <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 hover:border-green-500/50 transition cursor-pointer">
+                  <span className="text-4xl mb-3 block">📍</span>
+                  <p className="text-gray-400 text-sm mb-1">Saved Addresses</p>
+                  <p className="text-2xl font-bold text-white">{addresses.length}</p>
+                </div>
+                <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 hover:border-yellow-500/50 transition cursor-pointer">
+                  <span className="text-4xl mb-3 block">💳</span>
+                  <p className="text-gray-400 text-sm mb-1">Payment Methods</p>
+                  <p className="text-2xl font-bold text-white">{paymentMethods.length}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Orders Tab */}
+          {activeTab === 'orders' && (
+            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 backdrop-blur">
+              <h2 className="text-2xl font-bold text-white mb-6">My Orders</h2>
+              <div className="space-y-4">
+                {orders.map((order) => (
+                  <div key={order.id} className="bg-gray-900/50 rounded-lg p-6 hover:bg-gray-900 transition border border-gray-700/50">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <p className="text-white font-bold text-lg">{order.orderNumber}</p>
+                        <p className="text-gray-400">{order.date} • {order.items} items</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-white">${order.total.toFixed(2)}</p>
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mt-2 ${getStatusColor(order.status)}`}>
+                          {order.status}
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-white font-bold">${order.total.toFixed(2)}</p>
-                      <span
-                        className={`inline-block px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
-                          order.status
-                        )}`}
-                      >
-                        {order.status}
-                      </span>
-                    </div>
+                    {order.trackingNumber && (
+                      <div className="pt-4 border-t border-gray-700/50">
+                        <p className="text-sm text-gray-400">Tracking: <span className="text-white font-mono">{order.trackingNumber}</span></p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
             </div>
+          )}
 
-            {/* Active Shipments */}
-            <div className="card-glass p-6 border border-emerald-500/20">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-white">Active Shipments</h2>
-                <Link href="#shipments" className="text-emerald-400 hover:text-emerald-300 text-sm">
-                  View All →
-                </Link>
-              </div>
-
-              <div className="space-y-3">
-                {shipments
-                  .filter((s) => s.status !== 'Delivered')
-                  .map((shipment) => (
-                    <div key={shipment.id} className="p-4 bg-midnight-800/30 rounded-lg border border-emerald-500/20">
-                      <div className="flex items-center justify-between mb-3">
-                        <div>
-                          <p className="text-white font-semibold">{shipment.trackingNumber}</p>
-                          <p className="text-midnight-400 text-sm">{shipment.carrier}</p>
-                        </div>
-                        <span className="px-3 py-1 bg-sapphire-500/20 text-sapphire-400 rounded-full text-xs font-semibold border border-sapphire-500/30">
-                          {shipment.status}
-                        </span>
+          {/* Shipments Tab */}
+          {activeTab === 'shipments' && (
+            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 backdrop-blur">
+              <h2 className="text-2xl font-bold text-white mb-6">Shipments</h2>
+              <div className="space-y-4">
+                {shipments.map((shipment) => (
+                  <div key={shipment.id} className="bg-gray-900/50 rounded-lg p-6 border border-gray-700/50 hover:border-blue-500/50 transition">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <p className="text-white font-bold">{shipment.trackingNumber}</p>
+                        <p className="text-gray-400">{shipment.carrier}</p>
                       </div>
-                      <p className="text-emerald-400 text-sm">
-                        📅 Expected: {new Date(shipment.estimatedDelivery).toLocaleDateString()}
-                      </p>
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(shipment.status)}`}>
+                        {shipment.status}
+                      </span>
                     </div>
-                  ))}
-              </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Link
-                href="#addresses"
-                className="card-glass p-6 border border-amethyst-500/20 hover:border-amethyst-500/40 hover:bg-amethyst-500/5 transition-all group"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl">📍</span>
-                  <div>
-                    <p className="text-midnight-400 text-sm">Saved Addresses</p>
-                    <p className="text-2xl font-bold text-white">{addresses.length}</p>
-                  </div>
-                </div>
-              </Link>
-
-              <Link
-                href="#payments"
-                className="card-glass p-6 border border-gold-500/20 hover:border-gold-500/40 hover:bg-gold-500/5 transition-all group"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl">💳</span>
-                  <div>
-                    <p className="text-midnight-400 text-sm">Payment Methods</p>
-                    <p className="text-2xl font-bold text-white">{paymentMethods.length}</p>
-                  </div>
-                </div>
-              </Link>
-
-              <Link
-                href="#settings"
-                className="card-glass p-6 border border-rose-500/20 hover:border-rose-500/40 hover:bg-rose-500/5 transition-all group"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl">⚙️</span>
-                  <div>
-                    <p className="text-midnight-400 text-sm">Account Settings</p>
-                    <p className="text-sm text-midnight-300">Manage preferences</p>
-                  </div>
-                </div>
-              </Link>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'orders' && (
-          <div id="orders" className="card-glass p-6 border border-sapphire-500/20">
-            <h2 className="text-xl font-bold text-white mb-6">All Orders</h2>
-            <div className="space-y-3">
-              {orders.map((order) => (
-                <div
-                  key={order.id}
-                  className="flex items-center justify-between p-4 bg-midnight-800/30 rounded-lg hover:bg-midnight-800/50 transition-colors cursor-pointer"
-                >
-                  <div className="flex-1">
-                    <p className="text-white font-semibold">{order.orderNumber}</p>
-                    <p className="text-midnight-400 text-sm">
-                      {order.date} • {order.items} item(s)
+                    <p className="text-gray-400">
+                      <span className="text-blue-400">📅 Expected Delivery:</span> {new Date(shipment.estimatedDelivery).toLocaleDateString()}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-white font-bold">${order.total.toFixed(2)}</p>
-                    <span
-                      className={`inline-block px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
-                        order.status
-                      )}`}
-                    >
-                      {order.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {activeTab === 'shipments' && (
-          <div id="shipments" className="card-glass p-6 border border-emerald-500/20">
-            <h2 className="text-xl font-bold text-white mb-6">Shipment Tracking</h2>
-            <div className="space-y-4">
-              {shipments.map((shipment) => (
-                <div key={shipment.id} className="p-4 bg-midnight-800/30 rounded-lg border border-emerald-500/20">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <p className="text-white font-semibold">{shipment.trackingNumber}</p>
-                      <p className="text-midnight-400 text-sm">{shipment.carrier}</p>
+          {/* Addresses Tab */}
+          {activeTab === 'addresses' && (
+            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 backdrop-blur">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white">Saved Addresses</h2>
+                <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition">
+                  + Add Address
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {addresses.map((address) => (
+                  <div key={address.id} className="bg-gray-900/50 rounded-lg p-5 border border-gray-700/50 hover:border-green-500/50 transition">
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-white font-bold">{address.type}</p>
+                      {address.isDefault && (
+                        <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded font-semibold">Default</span>
+                      )}
                     </div>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
-                        shipment.status
-                      )}`}
-                    >
-                      {shipment.status}
-                    </span>
+                    <p className="text-gray-300">{address.street}</p>
+                    <p className="text-gray-400">{address.city}</p>
+                    <p className="text-gray-400">{address.country}</p>
                   </div>
-                  <div className="flex items-center justify-between pt-3 border-t border-midnight-700">
-                    <p className="text-emerald-400 text-sm">
-                      📅 Expected: {new Date(shipment.estimatedDelivery).toLocaleDateString()}
-                    </p>
-                    <button className="text-sapphire-400 hover:text-sapphire-300 text-sm font-semibold">
-                      Track →
-                    </button>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {activeTab === 'addresses' && (
-          <div id="addresses" className="card-glass p-6 border border-amethyst-500/20">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-white">Saved Addresses</h2>
-              <button className="px-4 py-2 bg-sapphire-600 text-white rounded-lg hover:bg-sapphire-700 transition-all font-semibold text-sm">
-                + Add New Address
-              </button>
-            </div>
-            <div className="space-y-4">
-              {addresses.map((address) => (
-                <div key={address.id} className="p-4 bg-midnight-800/30 rounded-lg border border-amethyst-500/20">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <p className="text-white font-semibold">{address.type}</p>
-                      <p className="text-midnight-400 text-sm mt-1">{address.street}</p>
-                      <p className="text-midnight-400 text-sm">{address.city}</p>
-                      <p className="text-midnight-400 text-sm">{address.country}</p>
+          {/* Payments Tab */}
+          {activeTab === 'payments' && (
+            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 backdrop-blur">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white">Payment Methods</h2>
+                <button className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg text-sm font-semibold transition">
+                  + Add Card
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {paymentMethods.map((method) => (
+                  <div key={method.id} className="bg-gradient-to-br from-gray-900 to-gray-950 rounded-lg p-6 border border-gray-700/50 hover:border-yellow-500/50 transition">
+                    <div className="flex items-center justify-between mb-4">
+                      <p className="text-white font-bold text-lg">{method.type}</p>
+                      {method.isDefault && (
+                        <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs rounded font-semibold">Default</span>
+                      )}
                     </div>
-                    {address.isDefault && (
-                      <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-xs font-semibold border border-emerald-500/30">
-                        Default
-                      </span>
-                    )}
+                    <p className="text-2xl text-gray-300 tracking-widest font-mono mb-3">•••• {method.lastFour}</p>
+                    <p className="text-gray-400 text-sm">Expires: {method.expiry}</p>
                   </div>
-                  <div className="flex gap-2 pt-3 border-t border-midnight-700">
-                    <button className="text-sapphire-400 hover:text-sapphire-300 text-sm font-semibold">
-                      Edit
-                    </button>
-                    {!address.isDefault && (
-                      <>
-                        <span className="text-midnight-600">•</span>
-                        <button className="text-rose-400 hover:text-rose-300 text-sm font-semibold">
-                          Delete
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {activeTab === 'payments' && (
-          <div id="payments" className="card-glass p-6 border border-gold-500/20">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-white">Payment Methods</h2>
-              <button className="px-4 py-2 bg-sapphire-600 text-white rounded-lg hover:bg-sapphire-700 transition-all font-semibold text-sm">
-                + Add Payment Method
-              </button>
-            </div>
-            <div className="space-y-4">
-              {paymentMethods.map((method) => (
-                <div key={method.id} className="p-4 bg-midnight-800/30 rounded-lg border border-gold-500/20">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <p className="text-white font-semibold">
-                        {method.type} •••• {method.lastFour}
-                      </p>
-                      <p className="text-midnight-400 text-sm">Expires: {method.expiry}</p>
-                    </div>
-                    {method.isDefault && (
-                      <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-xs font-semibold border border-emerald-500/30">
-                        Default
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex gap-2 pt-3 border-t border-midnight-700">
-                    <button className="text-sapphire-400 hover:text-sapphire-300 text-sm font-semibold">
-                      Edit
-                    </button>
-                    {!method.isDefault && (
-                      <>
-                        <span className="text-midnight-600">•</span>
-                        <button className="text-rose-400 hover:text-rose-300 text-sm font-semibold">
-                          Delete
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'settings' && (
-          <div id="settings" className="space-y-6">
-            {/* Profile Settings */}
-            <div className="card-glass p-6 border border-rose-500/20">
-              <h2 className="text-xl font-bold text-white mb-6">Profile Settings</h2>
+          {/* Settings Tab */}
+          {activeTab === 'settings' && (
+            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 backdrop-blur">
+              <h2 className="text-2xl font-bold text-white mb-6">Account Settings</h2>
               <div className="space-y-4">
-                <div>
-                  <label className="block text-midnight-300 text-sm font-semibold mb-2">Full Name</label>
-                  <input
-                    type="text"
-                    defaultValue={userInfo.name}
-                    className="w-full px-4 py-2 bg-midnight-800 border border-midnight-700 rounded-lg text-white placeholder-midnight-500 focus:border-sapphire-500 focus:outline-none transition-colors"
-                  />
+                <div className="bg-gray-900/50 rounded-lg p-5 border border-gray-700/50">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-white font-semibold">Email Notifications</p>
+                      <p className="text-gray-400 text-sm">Receive order updates</p>
+                    </div>
+                    <input type="checkbox" defaultChecked className="w-5 h-5 cursor-pointer" />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-midnight-300 text-sm font-semibold mb-2">Email Address</label>
-                  <input
-                    type="email"
-                    defaultValue={userInfo.email}
-                    className="w-full px-4 py-2 bg-midnight-800 border border-midnight-700 rounded-lg text-white placeholder-midnight-500 focus:border-sapphire-500 focus:outline-none transition-colors"
-                  />
+                <div className="bg-gray-900/50 rounded-lg p-5 border border-gray-700/50">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-white font-semibold">SMS Notifications</p>
+                      <p className="text-gray-400 text-sm">Delivery alerts via text</p>
+                    </div>
+                    <input type="checkbox" className="w-5 h-5 cursor-pointer" />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-midnight-300 text-sm font-semibold mb-2">Phone Number</label>
-                  <input
-                    type="tel"
-                    defaultValue={userInfo.phone}
-                    className="w-full px-4 py-2 bg-midnight-800 border border-midnight-700 rounded-lg text-white placeholder-midnight-500 focus:border-sapphire-500 focus:outline-none transition-colors"
-                  />
+                <div className="bg-gray-900/50 rounded-lg p-5 border border-gray-700/50">
+                  <button className="w-full px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg font-semibold transition">
+                    🔒 Change Password
+                  </button>
                 </div>
-                <button className="px-6 py-2 bg-sapphire-600 text-white rounded-lg hover:bg-sapphire-700 transition-all font-semibold">
-                  Save Changes
-                </button>
               </div>
             </div>
-
-            {/* Security Settings */}
-            <div className="card-glass p-6 border border-amethyst-500/20">
-              <h2 className="text-xl font-bold text-white mb-6">Security Settings</h2>
-              <div className="space-y-3">
-                <button className="w-full p-4 bg-midnight-800/30 rounded-lg hover:bg-midnight-800/50 transition-colors text-left border border-amethyst-500/20">
-                  <p className="text-white font-semibold">🔐 Change Password</p>
-                  <p className="text-midnight-400 text-sm mt-1">Update your password regularly for security</p>
-                </button>
-                <button className="w-full p-4 bg-midnight-800/30 rounded-lg hover:bg-midnight-800/50 transition-colors text-left border border-amethyst-500/20">
-                  <p className="text-white font-semibold">🛡️ Two-Factor Authentication</p>
-                  <p className="text-midnight-400 text-sm mt-1">Enabled • Requires code on login</p>
-                </button>
-                <button className="w-full p-4 bg-midnight-800/30 rounded-lg hover:bg-midnight-800/50 transition-colors text-left border border-amethyst-500/20">
-                  <p className="text-white font-semibold">🔒 Login History</p>
-                  <p className="text-midnight-400 text-sm mt-1">View recent login activity</p>
-                </button>
-              </div>
-            </div>
-
-            {/* Preferences */}
-            <div className="card-glass p-6 border border-gold-500/20">
-              <h2 className="text-xl font-bold text-white mb-6">Preferences</h2>
-              <div className="space-y-4">
-                <label className="flex items-center gap-3 p-3 bg-midnight-800/30 rounded-lg cursor-pointer hover:bg-midnight-800/50 transition-colors">
-                  <input type="checkbox" defaultChecked className="w-4 h-4" />
-                  <span className="text-white font-semibold">Receive order updates via email</span>
-                </label>
-                <label className="flex items-center gap-3 p-3 bg-midnight-800/30 rounded-lg cursor-pointer hover:bg-midnight-800/50 transition-colors">
-                  <input type="checkbox" defaultChecked className="w-4 h-4" />
-                  <span className="text-white font-semibold">Receive marketing emails</span>
-                </label>
-                <label className="flex items-center gap-3 p-3 bg-midnight-800/30 rounded-lg cursor-pointer hover:bg-midnight-800/50 transition-colors">
-                  <input type="checkbox" className="w-4 h-4" />
-                  <span className="text-white font-semibold">Notify me about special offers</span>
-                </label>
-              </div>
-            </div>
-
-            {/* Danger Zone */}
-            <div className="card-glass p-6 border border-rose-500/20">
-              <h2 className="text-xl font-bold text-rose-400 mb-6">Danger Zone</h2>
-              <button className="w-full px-6 py-3 bg-rose-600/20 border border-rose-600/40 text-rose-400 rounded-lg hover:bg-rose-600/30 transition-all font-semibold">
-                🗑️ Delete Account
-              </button>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
