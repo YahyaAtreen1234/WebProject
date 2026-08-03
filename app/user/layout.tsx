@@ -6,12 +6,12 @@ import { usePathname } from 'next/navigation';
 import Logo from '@/components/Logo';
 
 const userMenuItems = [
-  { label: 'Dashboard', href: '/user/dashboard', icon: '📊' },
-  { label: 'My Orders', href: '/user/orders', icon: '📦' },
-  { label: 'Shipments', href: '/user/shipments', icon: '🚚' },
-  { label: 'Addresses', href: '/user/addresses', icon: '📍' },
-  { label: 'Payments', href: '/user/payments', icon: '💳' },
-  { label: 'Settings', href: '/user/settings', icon: '⚙️' },
+  { label: 'Dashboard', href: '/user/dashboard?tab=overview', icon: '📊' },
+  { label: 'My Orders', href: '/user/dashboard?tab=orders', icon: '📦' },
+  { label: 'Shipments', href: '/user/dashboard?tab=shipments', icon: '🚚' },
+  { label: 'Addresses', href: '/user/dashboard?tab=addresses', icon: '📍' },
+  { label: 'Payments', href: '/user/dashboard?tab=payments', icon: '💳' },
+  { label: 'Settings', href: '/user/dashboard?tab=settings', icon: '⚙️' },
 ];
 
 export default function UserLayout({ children }: { children: React.ReactNode }) {

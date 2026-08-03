@@ -61,6 +61,15 @@ export default function UserPanel() {
   const [totalSpent, setTotalSpent] = useState(0);
 
   useEffect(() => {
+    // Read tab from URL query parameter
+    const searchParams = new URLSearchParams(window.location.search);
+    const tabParam = searchParams.get('tab');
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, []);
+
+  useEffect(() => {
     setOrders([
       {
         id: '1',
