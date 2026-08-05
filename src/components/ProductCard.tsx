@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import WishlistButton from './WishlistButton';
 import Compare from './Compare';
 import { useCart } from '@/context/CartContext';
@@ -194,6 +195,14 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
                 >
                   Add {quantity} to Cart - ${(product.price * quantity).toFixed(2)}
                 </button>
+
+                <Link
+                  href={`/shop/${product.id}`}
+                  onClick={() => setShowModal(false)}
+                  className="block text-center mt-4 text-sm text-sapphire-400 hover:text-sapphire-300 transition-colors"
+                >
+                  View full details →
+                </Link>
               </div>
             </div>
           </div>
