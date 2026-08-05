@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import AnnouncementBar from '@/components/AnnouncementBar';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { CartProvider } from '@/context/CartContext';
@@ -41,6 +42,7 @@ export default function RootLayout({
         <LanguageProvider>
           <CurrencyProvider>
             <CartProvider>
+              <AnnouncementBar />
               <Navigation />
               <main className="flex-1">{children}</main>
               <Footer />

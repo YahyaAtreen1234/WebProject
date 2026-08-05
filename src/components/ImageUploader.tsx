@@ -6,9 +6,14 @@ import { getStoredAdminToken } from '@/lib/clientAuth';
 interface ImageUploaderProps {
   onImageSelect: (imageUrl: string) => void;
   currentImage?: string;
+  label?: string;
 }
 
-export default function ImageUploader({ onImageSelect, currentImage }: ImageUploaderProps) {
+export default function ImageUploader({
+  onImageSelect,
+  currentImage,
+  label = 'Product Image',
+}: ImageUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState(currentImage || '');
   const [error, setError] = useState('');
@@ -63,7 +68,7 @@ export default function ImageUploader({ onImageSelect, currentImage }: ImageUplo
 
   return (
     <div className="space-y-3">
-      <label className="block text-sm font-medium text-white mb-2">Product Image</label>
+      <label className="block text-sm font-medium text-white mb-2">{label}</label>
 
       {preview && (
         <div className="relative w-full h-48 rounded-lg overflow-hidden border border-sapphire-500/30 bg-midnight-800">

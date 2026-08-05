@@ -724,5 +724,26 @@ model SiteSettings {
   @@unique([id])
 }
 
+model Banner {
+  id          String    @id @default(cuid())
+  type        String    @default("hero")   // announcement | hero | promo
+  title       String
+  subtitle    String?
+  image       String?
+  link        String?
+  buttonText  String?
+  bgColor     String?                      // tailwind gradient classes, e.g. "from-yellow-400 to-amber-500"
+  active      Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  startDate   DateTime?                    // optional schedule window
+  endDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([type])
+  @@index([active])
+  @@index([sortOrder])
+}
+
 // Update User model to include relations
 // (Already has wishlist, adding custom orders and support tickets)
