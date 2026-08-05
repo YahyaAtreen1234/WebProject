@@ -126,7 +126,10 @@ export default function Home() {
             subtitle: `$${product.price.toFixed(2)} — Limited Time`,
             color: 'from-rose-400 to-red-500',
             image: product.image,
-            link: '/shop',
+            // There is no product detail route, so deep-link into the shop with
+            // its search filter pre-applied — otherwise "View Product" dumps the
+            // visitor on the full catalogue with no idea which item was promoted.
+            link: `/shop?search=${encodeURIComponent(product.title)}`,
             buttonText: 'View Product',
           }));
       }
@@ -262,7 +265,7 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               {featuredProducts.map((product) => (
-                <Link key={product.id} href="/shop">
+                <Link key={product.id} href={`/shop?search=${encodeURIComponent(product.title)}`}>
                   <div className="bg-black rounded-2xl p-6 text-white text-center cursor-pointer hover:opacity-90 transition h-full relative">
                     <span className="absolute top-4 left-4 bg-gold-500 text-black text-xs font-bold px-2 py-1 rounded">
                       FEATURED
@@ -309,7 +312,7 @@ export default function Home() {
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {allProducts.map((product) => (
-                  <Link key={product.id} href={`/shop`}>
+                  <Link key={product.id} href={`/shop?search=${encodeURIComponent(product.title)}`}>
                     <div className="bg-black rounded-2xl p-6 text-white text-center cursor-pointer hover:opacity-90 transition h-full">
                       <div className="bg-gradient-to-b from-gray-700 to-black h-40 rounded-lg flex items-center justify-center mb-4 overflow-hidden">
                         {product.image ? (

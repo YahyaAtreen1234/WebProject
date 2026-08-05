@@ -66,9 +66,10 @@ export default function ShopPage() {
           const searchParams = new URLSearchParams(window.location.search);
           const searchParam = searchParams.get('search');
           if (searchParam) {
-            const decodedSearch = decodeURIComponent(searchParam);
-            console.log('[ShopPage] Applying search filter from URL:', decodedSearch);
-            setFilters(prev => ({ ...prev, searchTerm: decodedSearch }));
+            // URLSearchParams.get() has already percent-decoded this. Decoding
+            // again throws URIError on any title containing a literal "%".
+            console.log('[ShopPage] Applying search filter from URL:', searchParam);
+            setFilters(prev => ({ ...prev, searchTerm: searchParam }));
           }
 
           // Honour ?sort= from the navigation links (Best Sellers, New Arrivals,
