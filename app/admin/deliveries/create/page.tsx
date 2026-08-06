@@ -46,11 +46,22 @@ export default function CreateDeliveryPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!response.ok) throw new Error('Failed to fetch orders');
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.error || `Failed to fetch orders (${response.status})`);
+      }
       const data = await response.json();
-      
-      const ordersWithoutDelivery = data.orders || [];
+
+      // An order can only have one delivery (Delivery.orderId is unique), so
+      // offering ones that already have a record just produces a failed submit.
+      const ordersWithoutDelivery = (data.orders || []).filter(
+        (order: Order & { delivery?: unknown }) => !order.delivery
+      );
       setOrders(ordersWithoutDelivery);
+
+      if (ordersWithoutDelivery.length === 0) {
+        setError('No orders are awaiting a delivery record.');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error loading orders');
     } finally {

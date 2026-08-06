@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AdminOrders from './AdminOrders';
 import AdminProducts from './AdminProducts';
+import AdvancedDeliveryPanel from './AdvancedDeliveryPanel';
 import AdminBanners from './AdminBanners';
 import AdminCustomers from './AdminCustomers';
 import AdminAnalytics from './AdminAnalytics';
@@ -42,6 +43,7 @@ export default function AdminDashboard() {
     { id: 'dashboard', label: '📊 Dashboard', icon: '📊' },
     { id: 'orders', label: '📦 Orders', icon: '📦' },
     { id: 'products', label: '🛍️ Products', icon: '🛍️' },
+    { id: 'deliveries', label: '🚚 Deliveries', icon: '🚚' },
     { id: 'banners', label: '🖼️ Banners', icon: '🖼️' },
     { id: 'customers', label: '👥 Customers', icon: '👥' },
     { id: 'custom-orders', label: '✨ Custom Orders', icon: '✨' },
@@ -180,6 +182,7 @@ export default function AdminDashboard() {
 
         {activeTab === 'orders' && <AdminOrders />}
         {activeTab === 'products' && <AdminProducts />}
+        {activeTab === 'deliveries' && <AdvancedDeliveryPanel />}
         {activeTab === 'banners' && <AdminBanners />}
         {activeTab === 'customers' && <AdminCustomers />}
         {activeTab === 'custom-orders' && <AdminCustomOrders />}

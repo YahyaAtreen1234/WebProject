@@ -58,11 +58,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate JWT token
+    // Generate JWT token.
+    //
+    // `adminId` matters: /api/admin/login issues tokens carrying it, and a large
+    // set of routes (orders, deliveries, shipping rates, product writes) gate on
+    // `payload.adminId` rather than `payload.isAdmin`. Omitting it here meant an
+    // admin who signed in through the site drawer instead of /admin/login got a
+    // token that passed half the admin API and got 403 from the other half --
+    // which is why the delivery screens could never load an order list.
     const isAdmin = user.role === 'admin';
     const token = signToken({
       userId: user.id,
       email: user.email,
+      ...(isAdmin && { adminId: user.id }),
       isAdmin,
       role: user.role
     });
