@@ -21,6 +21,7 @@ export default function AdminCustomOrders() {
   const [orders, setOrders] = useState<CustomOrder[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<CustomOrder | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     status: '',
     quotedPrice: '',
@@ -39,17 +40,24 @@ export default function AdminCustomOrders() {
 
   const fetchOrders = async (authToken: string) => {
     setLoading(true);
+    setError('');
     try {
       const response = await fetch('/api/custom-orders', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setOrders(data);
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.error || `Could not load requests (${response.status})`);
       }
-    } catch (error) {
-      console.error('Failed to fetch orders:', error);
+
+      setOrders(await response.json());
+    } catch (err) {
+      // Surfaced rather than logged: a silent failure here is indistinguishable
+      // from "no customer has requested anything", which is how missed
+      // enquiries go unnoticed.
+      setError(err instanceof Error ? err.message : 'Could not load requests');
+      setOrders([]);
     } finally {
       setLoading(false);
     }
@@ -100,6 +108,12 @@ export default function AdminCustomOrders() {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-white">Custom Orders Management</h2>
+
+      {error && (
+        <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-300">
+          {error}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Orders List */}

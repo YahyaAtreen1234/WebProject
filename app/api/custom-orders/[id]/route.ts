@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import jwt from 'jsonwebtoken';
+import { verifyToken } from '@/lib/auth';
 
-async function verifyAuth(request: NextRequest) {
+function getAuth(request: NextRequest) {
   try {
     const auth = request.headers.get('authorization');
     if (!auth?.startsWith('Bearer ')) return null;
-    const token = auth.substring(7);
-    return jwt.verify(token, process.env.JWT_SECRET || 'secret-key') as any;
+    return verifyToken(auth.substring(7)) as Record<string, unknown> | null;
   } catch {
     return null;
   }
@@ -17,6 +16,11 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const auth = getAuth(request);
+  if (!auth) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const order = await prisma.customOrder.findUnique({
       where: { id: params.id },
@@ -27,8 +31,15 @@ export async function GET(
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
+    // A customer may only read their own request. Reported as 404 rather than
+    // 403 so the endpoint does not confirm that someone else's id exists.
+    if (!auth.isAdmin && order.userId !== auth.userId) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    }
+
     return NextResponse.json(order);
   } catch (error) {
+    console.error('[CustomOrders] Fetch failed:', error);
     return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 });
   }
 }
@@ -37,8 +48,14 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const auth = await verifyAuth(request);
-  
+  // Every field here -- status, admin notes, quoted and final price -- is the
+  // shop's to set. The previous version called the auth helper and then threw
+  // the result away, leaving pricing writable by anyone.
+  const auth = getAuth(request);
+  if (!auth?.isAdmin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const { status, adminNotes, quotedPrice, finalPrice } = body;
@@ -56,6 +73,7 @@ export async function PATCH(
 
     return NextResponse.json(order);
   } catch (error) {
+    console.error('[CustomOrders] Update failed:', error);
     return NextResponse.json({ error: 'Failed to update' }, { status: 500 });
   }
 }
@@ -64,8 +82,11 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const auth = await verifyAuth(request);
-  
+  const auth = getAuth(request);
+  if (!auth?.isAdmin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     await prisma.customOrder.delete({
       where: { id: params.id },
@@ -73,6 +94,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('[CustomOrders] Delete failed:', error);
     return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });
   }
 }

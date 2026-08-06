@@ -36,6 +36,60 @@ export async function sendVerificationEmail(email: string, code: string) {
   }
 }
 
+interface CustomOrderAlertData {
+  customOrderNumber: string;
+  customerName: string;
+  customerEmail: string;
+  description: string;
+  budget?: number | null;
+  deadline?: string | null;
+}
+
+/**
+ * Notifies the shop that a customer has requested a piece.
+ *
+ * Sends to ADMIN_EMAIL, falling back to the configured sender address so a
+ * missing variable degrades to "mail yourself" rather than silently dropping
+ * the alert.
+ */
+export async function sendCustomOrderAlert(data: CustomOrderAlertData) {
+  const adminEmail =
+    process.env.ADMIN_EMAIL || process.env.SMTP_FROM || process.env.SMTP_USER;
+
+  try {
+    if (!process.env.SMTP_USER || !adminEmail) {
+      console.log(`[DEV] Custom order request ${data.customOrderNumber} from ${data.customerEmail}`);
+      return { success: true, isDev: true };
+    }
+
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || 'noreply@stonesland.com',
+      to: adminEmail,
+      replyTo: data.customerEmail,
+      subject: `New product request: ${data.customOrderNumber}`,
+      html: `
+        <h2>New product request</h2>
+        <p><strong>Reference:</strong> ${data.customOrderNumber}</p>
+        <p><strong>From:</strong> ${data.customerName} (${data.customerEmail})</p>
+        ${data.budget ? `<p><strong>Budget:</strong> $${data.budget}</p>` : ''}
+        ${data.deadline ? `<p><strong>Needed by:</strong> ${data.deadline}</p>` : ''}
+        <p><strong>What they are looking for:</strong></p>
+        <div style="border-left: 3px solid #facc15; padding: 8px 16px; margin: 16px 0;">
+          ${data.description.replace(/\n/g, '<br>')}
+        </div>
+        <p style="color: #666; font-size: 13px;">
+          Open the Custom Orders tab in your admin panel to quote this request.
+        </p>
+      `,
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error('Custom order alert email failed:', error);
+    return { success: false, error };
+  }
+}
+
 interface ContactReplyData {
   to: string;
   customerName: string;
