@@ -137,6 +137,7 @@ function PasswordField({
 export default function AuthPanel({ open, onClose, initialMode = 'signin' }: AuthPanelProps) {
   const router = useRouter();
   const panelRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
   const firstFieldRef = useRef<HTMLInputElement>(null);
 
   const [mounted, setMounted] = useState(false);
@@ -230,6 +231,14 @@ export default function AuthPanel({ open, onClose, initialMode = 'signin' }: Aut
       resetFeedback();
     }
   }, [open, initialMode, resetFeedback]);
+
+  // The error banner renders at the top of the scrolling body. On the register
+  // form the submit button sits well below it, so a validation failure was
+  // invisible from where the customer was actually looking — the form simply
+  // appeared to do nothing.
+  useEffect(() => {
+    if (error) bodyRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [error]);
 
   const validatePassword = (password: string) => {
     if (password.length < 8) return 'Password must be at least 8 characters';
@@ -354,6 +363,19 @@ export default function AuthPanel({ open, onClose, initialMode = 'signin' }: Aut
         return;
       }
 
+      // When the server could not send a verification email it creates the
+      // account already verified, and routing to the code screen would strand
+      // the customer waiting on mail that will never arrive.
+      if (data.verificationRequired === false) {
+        const signedIn = await signIn(regEmail, regPassword, false);
+        if (signedIn) return;
+
+        setSuccess('Account created. You can sign in now.');
+        setIdentifier(regEmail);
+        setTimeout(() => switchMode('signin'), 1200);
+        return;
+      }
+
       setSuccess('Account created. Check your email for the verification code.');
       setMode('verify');
     } catch (err) {
@@ -448,7 +470,7 @@ export default function AuthPanel({ open, onClose, initialMode = 'signin' }: Aut
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-7 py-7">
+        <div ref={bodyRef} className="flex-1 overflow-y-auto px-7 py-7">
           {error && (
             <div className="mb-5 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {error}

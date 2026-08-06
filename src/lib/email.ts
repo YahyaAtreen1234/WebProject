@@ -10,9 +10,31 @@ const transporter = nodemailer.createTransport({
   } : undefined,
 });
 
+/**
+ * Whether outbound mail can actually be delivered.
+ *
+ * `.env.example` ships with placeholder credentials, and copying it to `.env`
+ * without editing leaves SMTP_USER set to a non-address. A bare
+ * `!process.env.SMTP_USER` check reads that as configured and every send then
+ * fails authentication at the provider -- silently, for anything dispatched
+ * fire-and-forget. Treat the placeholders as unconfigured.
+ */
+const SMTP_PLACEHOLDERS = ['your-email@gmail.com', 'your-app-specific-password'];
+
+export function isEmailConfigured(): boolean {
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+
+  if (!user || !pass) return false;
+  if (SMTP_PLACEHOLDERS.includes(user) || SMTP_PLACEHOLDERS.includes(pass)) return false;
+  if (!user.includes('@')) return false;
+
+  return true;
+}
+
 export async function sendVerificationEmail(email: string, code: string) {
   try {
-    if (!process.env.SMTP_USER) {
+    if (!isEmailConfigured()) {
       console.log(`[DEV] Verification code for ${email}: ${code}`);
       return { success: true, isDev: true };
     }
@@ -57,7 +79,7 @@ export async function sendCustomOrderAlert(data: CustomOrderAlertData) {
     process.env.ADMIN_EMAIL || process.env.SMTP_FROM || process.env.SMTP_USER;
 
   try {
-    if (!process.env.SMTP_USER || !adminEmail) {
+    if (!isEmailConfigured() || !adminEmail) {
       console.log(`[DEV] Custom order request ${data.customOrderNumber} from ${data.customerEmail}`);
       return { success: true, isDev: true };
     }
@@ -107,7 +129,7 @@ interface ContactReplyData {
  */
 export async function sendContactReply(data: ContactReplyData) {
   try {
-    if (!process.env.SMTP_USER) {
+    if (!isEmailConfigured()) {
       console.log(`[DEV] Contact reply to ${data.to}:`, data.reply);
       return { success: true, isDev: true };
     }
@@ -154,7 +176,7 @@ interface OrderConfirmationData {
 
 export async function sendOrderConfirmation(data: OrderConfirmationData) {
   try {
-    if (!process.env.SMTP_USER) {
+    if (!isEmailConfigured()) {
       console.log(`[DEV] Order confirmation for ${data.customerEmail}:`, data.orderNumber);
       return { success: true, isDev: true };
     }
@@ -221,7 +243,7 @@ export async function sendOrderConfirmation(data: OrderConfirmationData) {
 
 export async function sendPasswordResetEmail(email: string, resetCode: string) {
   try {
-    if (!process.env.SMTP_USER) {
+    if (!isEmailConfigured()) {
       console.log(`[DEV] Password reset code for ${email}: ${resetCode}`);
       return { success: true, isDev: true };
     }
