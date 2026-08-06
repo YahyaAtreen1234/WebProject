@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import AdminOrders from './AdminOrders';
 import AdminProducts from './AdminProducts';
 import AdvancedDeliveryPanel from './AdvancedDeliveryPanel';
+import AdminMessages from './AdminMessages';
 import AdminBanners from './AdminBanners';
 import AdminCustomers from './AdminCustomers';
 import AdminAnalytics from './AdminAnalytics';
@@ -47,6 +48,7 @@ export default function AdminDashboard() {
     { id: 'banners', label: '🖼️ Banners', icon: '🖼️' },
     { id: 'customers', label: '👥 Customers', icon: '👥' },
     { id: 'custom-orders', label: '✨ Custom Orders', icon: '✨' },
+    { id: 'messages', label: '✉️ Messages', icon: '✉️' },
     { id: 'support', label: '💬 Support Tickets', icon: '💬' },
     { id: 'analytics', label: '📈 Analytics', icon: '📈' },
     { id: 'discounts', label: '🏷️ Discounts', icon: '🏷️' },
@@ -186,6 +188,7 @@ export default function AdminDashboard() {
         {activeTab === 'banners' && <AdminBanners />}
         {activeTab === 'customers' && <AdminCustomers />}
         {activeTab === 'custom-orders' && <AdminCustomOrders />}
+        {activeTab === 'messages' && <AdminMessages />}
         {activeTab === 'support' && <AdminSupportTickets />}
         {activeTab === 'analytics' && <AdminAnalytics />}
         {activeTab === 'discounts' && <AdminDiscounts />}

@@ -36,6 +36,53 @@ export async function sendVerificationEmail(email: string, code: string) {
   }
 }
 
+interface ContactReplyData {
+  to: string;
+  customerName: string;
+  subject: string;
+  originalMessage: string;
+  reply: string;
+}
+
+/**
+ * Delivers an admin's reply to a contact-form message.
+ *
+ * Replies are also persisted as ContactReply rows, but the customer has no
+ * account area in which to read them -- email is the only channel that
+ * actually reaches them.
+ */
+export async function sendContactReply(data: ContactReplyData) {
+  try {
+    if (!process.env.SMTP_USER) {
+      console.log(`[DEV] Contact reply to ${data.to}:`, data.reply);
+      return { success: true, isDev: true };
+    }
+
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || 'noreply@stonesland.com',
+      to: data.to,
+      subject: `Re: ${data.subject}`,
+      html: `
+        <p>Hi ${data.customerName},</p>
+        <p>Thank you for contacting StonesLand. Here is our reply:</p>
+        <div style="border-left: 3px solid #facc15; padding: 8px 16px; margin: 16px 0;">
+          ${data.reply.replace(/\n/g, '<br>')}
+        </div>
+        <p style="color: #666; font-size: 13px;">Your original message:</p>
+        <div style="border-left: 3px solid #ccc; padding: 8px 16px; color: #666; font-size: 13px;">
+          ${data.originalMessage.replace(/\n/g, '<br>')}
+        </div>
+        <p style="margin-top: 24px;">— The StonesLand Team</p>
+      `,
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error('Contact reply email failed:', error);
+    return { success: false, error };
+  }
+}
+
 interface OrderConfirmationData {
   orderNumber: string;
   customerEmail: string;

@@ -1,10 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { verifyToken } from '@/lib/auth';
+
+function verifyAdmin(request: NextRequest) {
+  try {
+    const auth = request.headers.get('authorization');
+    if (!auth || !auth.startsWith('Bearer ')) {
+      return null;
+    }
+    const token = auth.substring(7);
+    const payload = verifyToken(token) as Record<string, unknown> | null;
+    return payload?.isAdmin ? payload : null;
+  } catch {
+    return null;
+  }
+}
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  if (!verifyAdmin(request)) {
+    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const message = await prisma.contact.findUnique({
       where: { id: params.id },
@@ -35,6 +54,10 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  if (!verifyAdmin(request)) {
+    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const { read, status } = body;
@@ -65,6 +88,10 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  if (!verifyAdmin(request)) {
+    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     await prisma.contact.delete({
       where: { id: params.id },
