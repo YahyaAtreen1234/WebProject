@@ -34,6 +34,60 @@ interface Slide {
   buttonText: string;
 }
 
+interface CategoryTile {
+  name: string;
+  count: number;
+  image?: string;
+}
+
+const money = (n: number) =>
+  n.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+
+/** Shows scarcity only when it is real. A plain stock count reads like a database dump. */
+function StockNote({ stock }: { stock: number }) {
+  if (stock === 0) return <p className="mt-2 text-xs text-gray-400">Sold</p>;
+  if (stock <= 3) return <p className="mt-2 text-xs text-amber-600">Only {stock} left</p>;
+  return null;
+}
+
+function ProductCard({ product }: { product: Product }) {
+  return (
+    <Link href={`/shop/${product.id}`} className="group block">
+      <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
+        {product.image ? (
+          <img
+            src={product.image}
+            alt={product.title}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+            <span className="text-sm tracking-widest text-gray-400">
+              {product.category?.toUpperCase()}
+            </span>
+          </div>
+        )}
+        {product.stock === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/70">
+            <span className="text-xs font-medium uppercase tracking-widest text-gray-700">
+              Sold
+            </span>
+          </div>
+        )}
+      </div>
+
+      <div className="pt-4">
+        <p className="text-xs uppercase tracking-widest text-gray-400">{product.category}</p>
+        <h3 className="mt-1 text-[15px] leading-snug text-gray-900 group-hover:underline underline-offset-4">
+          {product.title}
+        </h3>
+        <p className="mt-1 text-[15px] font-medium text-gray-900">{money(product.price)}</p>
+        <StockNote stock={product.stock} />
+      </div>
+    </Link>
+  );
+}
+
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -45,10 +99,20 @@ export default function Home() {
   const [fading, setFading] = useState(false);
 
   const staticPromotions: Slide[] = [
-    { title: 'FREE WORLDWIDE SHIPPING', subtitle: 'On all orders', color: 'from-yellow-400 to-amber-500', link: '/shop', buttonText: 'Shop Now' },
-    { title: '15 DAY MONEY BACK', subtitle: 'Guaranteed satisfaction', color: 'from-blue-400 to-cyan-500', link: '/shop', buttonText: 'Shop Now' },
-    { title: 'AUTHENTIC GEMSTONES', subtitle: 'Premium quality certified', color: 'from-purple-400 to-pink-500', link: '/shop', buttonText: 'Shop Now' },
-    { title: 'EXPERT SUPPORT', subtitle: '24/7 customer service', color: 'from-emerald-400 to-teal-500', link: '/support', buttonText: 'Contact Us' },
+    {
+      title: 'Free worldwide shipping',
+      subtitle: 'On every order',
+      color: 'from-amber-200 to-amber-400',
+      link: '/shop',
+      buttonText: 'Browse the collection',
+    },
+    {
+      title: 'Fifteen days to change your mind',
+      subtitle: 'Return anything, for any reason',
+      color: 'from-sky-200 to-cyan-400',
+      link: '/shop',
+      buttonText: 'Browse the collection',
+    },
   ];
 
   useEffect(() => {
@@ -56,8 +120,6 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Matches the 5s cadence of the reference site, and pauses while the visitor
-  // is reading the slide they hovered.
   useEffect(() => {
     if (paused || promotions.length < 2) return;
 
@@ -89,8 +151,6 @@ export default function Home() {
         fetch('/api/banners?type=promo'),
       ]);
 
-      // Banners the admin created take over the carousel; the hard-coded set
-      // below is only a placeholder for a site with none configured yet.
       let adminSlides: Slide[] = [];
       if (heroResponse.ok) {
         const heroBanners = await heroResponse.json();
@@ -98,10 +158,10 @@ export default function Home() {
           adminSlides = heroBanners.map((banner: Banner) => ({
             title: banner.title,
             subtitle: banner.subtitle || '',
-            color: banner.bgColor || 'from-yellow-400 to-amber-500',
+            color: banner.bgColor || 'from-amber-200 to-amber-400',
             image: banner.image,
             link: banner.link || '/shop',
-            buttonText: banner.buttonText || 'Shop Now',
+            buttonText: banner.buttonText || 'Shop now',
           }));
         }
       }
@@ -123,11 +183,11 @@ export default function Home() {
           .slice(0, 4)
           .map((product) => ({
             title: product.title,
-            subtitle: `$${product.price.toFixed(2)} — Limited Time`,
-            color: 'from-rose-400 to-red-500',
+            subtitle: `${money(product.price)} — limited time`,
+            color: 'from-rose-200 to-red-400',
             image: product.image,
             link: `/shop/${product.id}`,
-            buttonText: 'View Product',
+            buttonText: 'View this piece',
           }));
       }
 
@@ -145,194 +205,243 @@ export default function Home() {
     }
   };
 
-  const categories = [
-    { name: 'BERYL', icon: '💎' },
-    { name: 'BROOKITE', icon: '💎' },
-    { name: 'BRUCITE', icon: '💎' },
-    { name: 'CALCITE', icon: '💎' },
-    { name: 'CORUNDUM', icon: '💎' },
-    { name: 'EPIDOTE', icon: '💎' },
-    { name: 'FLUORITE', icon: '💎' },
-    { name: 'GARNET', icon: '💎' },
-    { name: 'GOLD', icon: '💎' },
-    { name: 'PYRITE', icon: '💎' },
-    { name: 'QUARTZ', icon: '💎' },
-    { name: 'RHODOCHROSITE', icon: '💎' },
-  ];
+  // Categories are derived from the catalogue rather than hard-coded, so the
+  // homepage can never advertise a category with nothing behind it, and each
+  // tile shows a real piece from that category instead of a repeated icon.
+  const categories: CategoryTile[] = (() => {
+    const grouped = new Map<string, CategoryTile>();
 
-  const vaultProducts = products.slice(0, 5);
-  const newArrivals = products.slice(5, 10);
-  const allProducts = products;
+    products.forEach((product) => {
+      if (!product.category) return;
+      const existing = grouped.get(product.category);
+      if (existing) {
+        existing.count += 1;
+        if (!existing.image && product.image) existing.image = product.image;
+      } else {
+        grouped.set(product.category, {
+          name: product.category,
+          count: 1,
+          image: product.image,
+        });
+      }
+    });
+
+    return [...grouped.values()].sort((a, b) => b.count - a.count).slice(0, 6);
+  })();
+
+  const newArrivals = products.slice(0, 8);
+  const slide = promotions[promoIndex];
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Promotional Banner Carousel — slides come from Admin → Banners */}
-      {promotions.length > 0 && (
+      {/* Hero — slides are managed in Admin → Banners */}
+      {slide && (
         <section
-          className="bg-black py-16 px-4 sm:px-6 relative overflow-hidden"
+          className="relative overflow-hidden bg-neutral-950 px-4 py-20 sm:px-6 sm:py-28"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
-          <div className="max-w-7xl mx-auto">
-            <div className="relative flex items-center justify-between min-h-64">
-              {/* Left Arrow */}
-              <button
-                onClick={() => goToSlide((promoIndex - 1 + promotions.length) % promotions.length)}
-                className="absolute left-0 z-10 p-3 text-white hover:bg-white/10 rounded-full transition"
-                aria-label="Previous promotion"
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-              </button>
+          <div className="mx-auto max-w-6xl">
+            <div className="relative flex min-h-[16rem] items-center">
+              {promotions.length > 1 && (
+                <button
+                  onClick={() => goToSlide((promoIndex - 1 + promotions.length) % promotions.length)}
+                  className="absolute left-0 z-10 rounded-full p-3 text-white/60 transition hover:bg-white/10 hover:text-white"
+                  aria-label="Previous"
+                >
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <polyline points="15 18 9 12 15 6" />
+                  </svg>
+                </button>
+              )}
 
-              {/* Slide */}
               <div
-                className={`flex-1 flex items-center justify-center px-12 transition-opacity duration-500 ${
+                className={`flex flex-1 flex-col items-center gap-10 px-6 transition-opacity duration-500 sm:px-14 md:flex-row md:justify-between ${
                   fading ? 'opacity-0' : 'opacity-100'
                 }`}
               >
-                <div className="text-center max-w-2xl">
-                  {promotions[promoIndex]?.subtitle && (
-                    <p className="text-gray-400 text-lg mb-4 uppercase tracking-widest">
-                      {promotions[promoIndex].subtitle}
+                <div className="max-w-xl text-center md:text-left">
+                  {slide.subtitle && (
+                    <p className="mb-4 text-xs uppercase tracking-[0.2em] text-white/50">
+                      {slide.subtitle}
                     </p>
                   )}
-                  <h2
-                    className={`text-4xl sm:text-6xl font-black mb-8 bg-gradient-to-r ${promotions[promoIndex]?.color} bg-clip-text text-transparent uppercase tracking-tight`}
+                  <h1
+                    className={`bg-gradient-to-r font-display text-4xl leading-[1.1] sm:text-5xl md:text-6xl ${slide.color} bg-clip-text text-transparent`}
                   >
-                    {promotions[promoIndex]?.title}
-                  </h2>
+                    {slide.title}
+                  </h1>
                   <Link
-                    href={promotions[promoIndex]?.link || '/shop'}
-                    className="inline-block bg-white text-black font-bold px-8 py-3 rounded hover:bg-gray-200 transition"
+                    href={slide.link}
+                    className="mt-8 inline-block border border-white/80 px-8 py-3 text-sm tracking-wide text-white transition hover:bg-white hover:text-black"
                   >
-                    {promotions[promoIndex]?.buttonText || 'Shop Now'}
+                    {slide.buttonText}
                   </Link>
                 </div>
 
-                {/* Banner artwork, uploaded per-banner in the admin panel */}
-                <div className="absolute right-12 h-64 w-64 hidden lg:flex items-center justify-center">
-                  {promotions[promoIndex]?.image ? (
+                {slide.image && (
+                  <div className="h-56 w-56 shrink-0 sm:h-64 sm:w-64">
                     <img
-                      src={promotions[promoIndex].image as string}
-                      alt={promotions[promoIndex].title}
-                      className="w-full h-full object-contain drop-shadow-2xl"
+                      src={slide.image}
+                      alt={slide.title}
+                      className="h-full w-full object-contain drop-shadow-2xl"
                     />
-                  ) : (
-                    <div className="text-8xl">💎</div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
 
-              {/* Right Arrow */}
-              <button
-                onClick={() => goToSlide((promoIndex + 1) % promotions.length)}
-                className="absolute right-0 z-10 p-3 text-white hover:bg-white/10 rounded-full transition"
-                aria-label="Next promotion"
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-              </button>
+              {promotions.length > 1 && (
+                <button
+                  onClick={() => goToSlide((promoIndex + 1) % promotions.length)}
+                  className="absolute right-0 z-10 rounded-full p-3 text-white/60 transition hover:bg-white/10 hover:text-white"
+                  aria-label="Next"
+                >
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </button>
+              )}
             </div>
 
-            {/* Promo Indicators */}
-            <div className="flex justify-center gap-2 mt-8">
-              {promotions.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => goToSlide(i)}
-                  className={`h-2 rounded-full transition-all ${
-                    i === promoIndex ? 'bg-white w-6' : 'bg-gray-600 w-2 hover:bg-gray-400'
-                  }`}
-                  aria-label={`Go to promotion ${i + 1}`}
-                />
+            {promotions.length > 1 && (
+              <div className="mt-10 flex justify-center gap-2">
+                {promotions.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => goToSlide(i)}
+                    className={`h-px transition-all ${
+                      i === promoIndex ? 'w-10 bg-white' : 'w-5 bg-white/30 hover:bg-white/60'
+                    }`}
+                    aria-label={`Go to slide ${i + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* Assurances */}
+      <section className="border-b border-gray-100 px-4 py-8 sm:px-6">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 text-center sm:grid-cols-3">
+          <div>
+            <p className="text-sm font-medium text-gray-900">Shipped worldwide, free</p>
+            <p className="mt-1 text-sm text-gray-500">Insured and tracked to your door</p>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-900">Fifteen days to decide</p>
+            <p className="mt-1 text-sm text-gray-500">Return anything, for any reason</p>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-900">Every piece verified</p>
+            <p className="mt-1 text-sm text-gray-500">Photographed as it will arrive</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured */}
+      {!loading && featuredProducts.length > 0 && (
+        <section className="px-4 py-16 sm:px-6 sm:py-20">
+          <div className="mx-auto max-w-6xl">
+            <div className="mb-10 flex items-end justify-between">
+              <div>
+                <h2 className="font-display text-3xl text-gray-900">This month&rsquo;s selection</h2>
+                <p className="mt-2 text-gray-500">Pieces we think deserve a closer look.</p>
+              </div>
+              <Link
+                href="/shop?sort=featured"
+                className="hidden shrink-0 text-sm text-gray-500 underline-offset-4 hover:text-gray-900 hover:underline sm:block"
+              >
+                See all
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4">
+              {featuredProducts.slice(0, 4).map((product) => (
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           </div>
         </section>
       )}
 
-      {/* Featured Products Section - driven by the admin "Featured" checkbox */}
-      {!loading && featuredProducts.length > 0 && (
-        <section className="py-16 px-4 sm:px-6">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-center text-3xl font-bold mb-12">FEATURED PRODUCTS</h2>
+      {/* Categories — derived from the catalogue */}
+      {!loading && categories.length > 0 && (
+        <section className="bg-neutral-50 px-4 py-16 sm:px-6 sm:py-20">
+          <div className="mx-auto max-w-6xl">
+            <h2 className="mb-10 font-display text-3xl text-gray-900">Browse by stone</h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {featuredProducts.map((product) => (
-                <Link key={product.id} href={`/shop/${product.id}`}>
-                  <div className="bg-black rounded-2xl p-6 text-white text-center cursor-pointer hover:opacity-90 transition h-full relative">
-                    <span className="absolute top-4 left-4 bg-gold-500 text-black text-xs font-bold px-2 py-1 rounded">
-                      FEATURED
-                    </span>
-                    <div className="bg-gradient-to-b from-gray-700 to-black h-40 rounded-lg flex items-center justify-center mb-4 overflow-hidden">
-                      {product.image ? (
-                        <img src={product.image} alt={product.title} className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="text-5xl">💎</span>
-                      )}
-                    </div>
-                    <p className="font-bold mb-2 line-clamp-2 text-sm">{product.title}</p>
-                    <p className="text-gray-400 mb-2 text-sm">{product.category}</p>
-                    <p className="font-bold text-lg text-gold-300">${product.price.toFixed(2)}</p>
-                    <p className="text-xs text-gray-400 mt-2">Stock: {product.stock}</p>
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+              {categories.map((category) => (
+                <Link
+                  key={category.name}
+                  href={`/shop?search=${encodeURIComponent(category.name)}`}
+                  className="group relative block aspect-[4/3] overflow-hidden rounded-lg bg-gray-900"
+                >
+                  {category.image && (
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      className="h-full w-full object-cover opacity-70 transition-all duration-500 group-hover:scale-105 group-hover:opacity-85"
+                    />
+                  )}
+                  <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/70 to-transparent p-5">
+                    <h3 className="font-display text-xl text-white">{category.name}</h3>
+                    <p className="text-xs text-white/70">
+                      {category.count} {category.count === 1 ? 'piece' : 'pieces'}
+                    </p>
                   </div>
                 </Link>
               ))}
             </div>
-
-            <div className="text-center">
-              <Link href="/shop?sort=featured" className="inline-block bg-black text-white font-bold px-8 py-3 rounded hover:bg-gray-800">
-                VIEW ALL FEATURED
-              </Link>
-            </div>
           </div>
         </section>
       )}
 
-      {/* All Products Section - Grid View */}
-      <section className="py-16 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-center text-3xl font-bold mb-12">ALL PRODUCTS</h2>
+      {/* Recent */}
+      <section className="px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-10 flex items-end justify-between">
+            <div>
+              <h2 className="font-display text-3xl text-gray-900">Recently added</h2>
+              <p className="mt-2 text-gray-500">The newest arrivals in the collection.</p>
+            </div>
+            <Link
+              href="/shop"
+              className="hidden shrink-0 text-sm text-gray-500 underline-offset-4 hover:text-gray-900 hover:underline sm:block"
+            >
+              See all
+            </Link>
+          </div>
 
           {loading ? (
-            <div className="text-center py-12">
-              <p className="text-xl text-gray-500">Loading products...</p>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="aspect-square rounded-lg bg-gray-100" />
+                  <div className="mt-4 h-3 w-1/3 rounded bg-gray-100" />
+                  <div className="mt-2 h-3 w-3/4 rounded bg-gray-100" />
+                </div>
+              ))}
             </div>
-          ) : allProducts.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-xl text-gray-500">No products available</p>
-            </div>
+          ) : newArrivals.length === 0 ? (
+            <p className="py-12 text-center text-gray-500">
+              Nothing here just yet — new pieces are added regularly.
+            </p>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                {allProducts.map((product) => (
-                  <Link key={product.id} href={`/shop/${product.id}`}>
-                    <div className="bg-black rounded-2xl p-6 text-white text-center cursor-pointer hover:opacity-90 transition h-full">
-                      <div className="bg-gradient-to-b from-gray-700 to-black h-40 rounded-lg flex items-center justify-center mb-4 overflow-hidden">
-                        {product.image ? (
-                          <img src={product.image} alt={product.title} className="w-full h-full object-cover" />
-                        ) : (
-                          <span className="text-5xl">💎</span>
-                        )}
-                      </div>
-                      <p className="font-bold mb-2 line-clamp-2 text-sm">{product.title}</p>
-                      <p className="text-gray-400 mb-2 text-sm">{product.category}</p>
-                      <p className="font-bold text-lg text-gold-300">${product.price.toFixed(2)}</p>
-                      <p className="text-xs text-gray-400 mt-2">Stock: {product.stock}</p>
-                      <div className="flex justify-center gap-3 mt-4">
-                        <button className="text-xl hover:scale-110">⟷</button>
-                        <button className="text-xl hover:scale-110">♡</button>
-                      </div>
-                    </div>
-                  </Link>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4">
+                {newArrivals.map((product) => (
+                  <ProductCard key={product.id} product={product} />
                 ))}
               </div>
-              <div className="text-center">
-                <Link href="/shop" className="inline-block bg-black text-white font-bold px-8 py-3 rounded hover:bg-gray-800">
-                  VIEW MORE PRODUCTS
+
+              <div className="mt-12 text-center">
+                <Link
+                  href="/shop"
+                  className="inline-block border border-gray-900 px-8 py-3 text-sm tracking-wide text-gray-900 transition hover:bg-gray-900 hover:text-white"
+                >
+                  View the full collection
                 </Link>
               </div>
             </>
@@ -340,74 +449,37 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Categories Section */}
-      <section className="bg-gray-50 py-16 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-center text-3xl font-bold mb-12">FEATURED CATEGORIES</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-            {categories.map((cat, i) => (
-              <Link key={i} href={`/gallery?search=${cat.name}`}>
-                <div className="bg-black rounded-2xl p-6 text-white text-center cursor-pointer hover:opacity-80 transition">
-                  <div className="text-4xl mb-2">{cat.icon}</div>
-                  <p className="font-bold text-sm uppercase">{cat.name}</p>
+      {/* Promo banners — only when configured in Admin → Banners */}
+      {promoBanners.length > 0 && (
+        <section className="px-4 pb-20 sm:px-6">
+          <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 md:grid-cols-2">
+            {promoBanners.map((banner) => (
+              <Link
+                key={banner.id}
+                href={banner.link || '/shop'}
+                className="group relative flex min-h-[15rem] flex-col justify-end overflow-hidden rounded-lg bg-neutral-900 p-8 text-white"
+              >
+                {banner.image && (
+                  <img
+                    src={banner.image}
+                    alt={banner.title}
+                    className="absolute inset-0 h-full w-full object-cover opacity-55 transition-transform duration-500 group-hover:scale-105"
+                  />
+                )}
+                <div className="relative">
+                  <h3 className="font-display text-2xl">{banner.title}</h3>
+                  {banner.subtitle && (
+                    <p className="mt-1 text-sm text-white/75">{banner.subtitle}</p>
+                  )}
+                  <span className="mt-5 inline-block border border-white/80 px-6 py-2.5 text-sm transition group-hover:bg-white group-hover:text-black">
+                    {banner.buttonText || 'Discover'}
+                  </span>
                 </div>
               </Link>
             ))}
           </div>
-          <div className="text-center">
-            <Link href="/gallery" className="inline-block bg-black text-white font-bold px-8 py-3 rounded hover:bg-gray-800">
-              VIEW ALL CATEGORIES
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Promo Banners — managed in Admin → Banners (type: Promo) */}
-      <section className="py-16 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-          {promoBanners.length > 0
-            ? promoBanners.map((banner) => (
-                <Link
-                  key={banner.id}
-                  href={banner.link || '/shop'}
-                  className="group relative rounded-2xl overflow-hidden bg-black text-white min-h-[240px] flex flex-col justify-center p-12"
-                >
-                  {banner.image && (
-                    <img
-                      src={banner.image}
-                      alt={banner.title}
-                      className="absolute inset-0 w-full h-full object-cover opacity-60 transition-transform duration-500 group-hover:scale-105"
-                    />
-                  )}
-                  <div className="relative">
-                    <h3 className="text-3xl font-bold mb-2">{banner.title}</h3>
-                    {banner.subtitle && <p className="text-lg mb-6">{banner.subtitle}</p>}
-                    <span className="inline-block bg-white text-black font-bold px-6 py-3 rounded w-fit group-hover:bg-gray-200 transition">
-                      {banner.buttonText || 'Discover'}
-                    </span>
-                  </div>
-                </Link>
-              ))
-            : (
-              <>
-                <div className="bg-black text-white rounded-2xl p-12 flex flex-col justify-center">
-                  <h3 className="text-3xl font-bold mb-2">💎 Fine Art Gems</h3>
-                  <p className="text-lg mb-6">The Same Legacy. A New Brilliance.</p>
-                  <Link href="/shop" className="bg-white text-black font-bold px-6 py-3 rounded w-fit hover:bg-gray-200">
-                    Explore Gems
-                  </Link>
-                </div>
-                <div className="bg-black text-white rounded-2xl p-12 flex flex-col justify-center">
-                  <h3 className="text-3xl font-bold mb-2">🔨 FAM Auctions</h3>
-                  <p className="text-lg mb-6">Your Trusted Auction Partner</p>
-                  <Link href="/auctions" className="bg-white text-black font-bold px-6 py-3 rounded w-fit hover:bg-gray-200">
-                    Join the Auction
-                  </Link>
-                </div>
-              </>
-            )}
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 }
