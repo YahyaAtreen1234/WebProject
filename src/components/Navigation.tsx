@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useCart } from '@/context/CartContext';
 import { cartUtils } from '@/lib/cart';
 import {
@@ -33,8 +33,8 @@ export default function Navigation() {
   const [searchTerm, setSearchTerm] = useState('');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const [atTop, setAtTop] = useState(true);
+  const tickingRef = useRef(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -112,29 +112,39 @@ export default function Navigation() {
     window.location.href = '/';
   };
 
+  // Drives the guarantee strip: shown at rest, collapsed once the page moves.
+  //
+  // Deliberately keyed to absolute position rather than scroll direction. The
+  // previous version hid the whole header on any downward delta and reshowed it
+  // on any upward one, so the jitter inherent in trackpad and momentum
+  // scrolling flipped it repeatedly — the strip appeared to flash in and out
+  // during a single fast scroll. A position test cannot oscillate that way: it
+  // is one state change on the way down and one on the way back.
+  //
+  // Hysteresis keeps it settled at the boundary — it takes 80px to collapse but
+  // the strip only returns within 20px of the top, so hovering near the
+  // threshold cannot toggle it.
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
+    const COLLAPSE_AT = 80;
+    const RESTORE_AT = 20;
 
-      // Show header if at top
-      if (currentScrollY < 50) {
-        setIsHeaderVisible(true);
-      }
-      // Hide header when scrolling down
-      else if (currentScrollY > lastScrollY) {
-        setIsHeaderVisible(false);
-      }
-      // Show header when scrolling up
-      else if (currentScrollY < lastScrollY) {
-        setIsHeaderVisible(true);
-      }
-
-      setLastScrollY(currentScrollY);
+    const evaluate = () => {
+      const y = window.scrollY;
+      setAtTop((wasAtTop) => (wasAtTop ? y <= COLLAPSE_AT : y <= RESTORE_AT));
+      tickingRef.current = false;
     };
 
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => {
+      // Coalesce bursts of scroll events into one update per frame.
+      if (tickingRef.current) return;
+      tickingRef.current = true;
+      window.requestAnimationFrame(evaluate);
+    };
+
+    evaluate();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -164,13 +174,23 @@ export default function Navigation() {
   };
 
   return (
-    <header
-      className="sticky top-0 z-50 bg-white transition-transform duration-300 ease-in-out"
-      style={{ transform: isHeaderVisible ? 'translateY(0)' : 'translateY(-100%)' }}
-    >
-      {/* Money Back Guarantee Banner */}
-      <div className="bg-red-900 text-white py-2 px-4 sm:px-6 text-center text-sm font-semibold">
-        Shop with confidence with our 15 day money back guarantee
+    <header className="sticky top-0 z-50 bg-white">
+      {/* Money Back Guarantee Banner — collapses away once the page is scrolled,
+          and comes back only on a return to the top. `grid-template-rows` is
+          animated rather than max-height so the strip's own height stays the
+          bound, with no arbitrary ceiling to guess at and no easing dead time
+          if the text ever wraps to two lines. */}
+      <div
+        aria-hidden={!atTop}
+        className={`grid overflow-hidden bg-red-900 text-white transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${
+          atTop ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+        }`}
+      >
+        <div className="min-h-0">
+          <p className="px-4 py-2 text-center text-sm font-semibold sm:px-6">
+            Shop with confidence with our 15 day money back guarantee
+          </p>
+        </div>
       </div>
 
       {/* Top Navigation */}
