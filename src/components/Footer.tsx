@@ -1,184 +1,294 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Logo from '@/components/Logo';
 
+interface FooterLink {
+  id: string;
+  label: string;
+  url: string;
+}
+
+interface FooterSection {
+  id: string;
+  title: string;
+  links: FooterLink[];
+}
+
+interface FooterSettings {
+  siteName?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  newsletterHeading?: string | null;
+  newsletterText?: string | null;
+  addressHeading?: string | null;
+  copyrightText?: string | null;
+  social?: Record<string, string | null | undefined>;
+}
+
+/** Inline SVG rather than emoji — emoji render differently per platform and read as filler. */
+const SOCIAL_ICONS: Record<string, JSX.Element> = {
+  facebook: <path d="M14 9h3V6h-3a4 4 0 0 0-4 4v2H8v3h2v7h3v-7h3l1-3h-4v-2a1 1 0 0 1 1-1Z" />,
+  instagram: (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="3.5" />
+      <circle cx="17" cy="7" r="1" />
+    </>
+  ),
+  whatsapp: (
+    <path d="M12 3a9 9 0 0 0-7.7 13.6L3 21l4.5-1.2A9 9 0 1 0 12 3Zm4.3 12.5c-.2.5-1.1 1-1.5 1-.4 0-.9.2-3-.9s-3.3-3.4-3.5-3.6c-.1-.2-.7-1-.7-1.9s.5-1.3.7-1.5c.2-.2.4-.2.5-.2h.4c.1 0 .3 0 .5.4l.7 1.6c.1.2 0 .4 0 .5l-.3.4c-.1.1-.3.3-.1.6.1.3.6 1 1.3 1.6.9.8 1.6 1 1.9 1.2.2 0 .4 0 .5-.1l.6-.7c.2-.2.3-.2.5-.1l1.6.8c.2.1.4.2.4.3v.6Z" />
+  ),
+  youtube: (
+    <>
+      <rect x="2.5" y="6" width="19" height="12" rx="3.5" />
+      <path d="M10.5 9.8v4.4l4-2.2Z" />
+    </>
+  ),
+  tiktok: <path d="M14 3v10.5a3 3 0 1 1-2.5-3V13a.9.9 0 1 0 .9.9V3H14a4.6 4.6 0 0 0 4.3 4v2.4A7 7 0 0 1 14 7.8Z" />,
+  twitter: <path d="M4 4l7 8.5L4.4 20H7l5.2-5.8L16.6 20H20l-7.3-8.9L19.6 4H17l-4.8 5.4L8.1 4Z" />,
+  linkedin: (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <path d="M7 10v7M7 7v.01M11 17v-4a2 2 0 0 1 4 0v4" />
+    </>
+  ),
+};
+
+const SOCIAL_LABELS: Record<string, string> = {
+  facebook: 'Facebook',
+  instagram: 'Instagram',
+  whatsapp: 'WhatsApp',
+  youtube: 'YouTube',
+  tiktok: 'TikTok',
+  twitter: 'X',
+  linkedin: 'LinkedIn',
+};
+
 export default function Footer() {
+  const [sections, setSections] = useState<FooterSection[]>([]);
+  const [settings, setSettings] = useState<FooterSettings | null>(null);
+
   const [newsletter, setNewsletter] = useState('');
-  const [success, setSuccess] = useState('');
+  const [status, setStatus] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch('/api/footer')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled || !data) return;
+        setSections(data.sections || []);
+        setSettings(data.settings || null);
+      })
+      .catch(() => {
+        /* the footer is chrome — a failure here should not disturb the page */
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newsletter) return;
+    if (!newsletter.trim()) return;
+
+    setSubmitting(true);
+    setStatus(null);
+
     try {
       const response = await fetch('/api/newsletter/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: newsletter }),
+        body: JSON.stringify({ email: newsletter.trim() }),
       });
-      if (response.ok) {
-        setSuccess('✓ Subscribed successfully!');
-        setNewsletter('');
-        setTimeout(() => setSuccess(''), 3000);
+
+      const body = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        // Previously a rejected address failed silently and the field just sat
+        // there, so a duplicate or malformed email looked like a dead button.
+        throw new Error(body.error || 'That did not go through. Please try again.');
       }
-    } catch (error) {
-      console.error('Newsletter error:', error);
+
+      setStatus({ kind: 'ok', text: 'Thanks — you are on the list.' });
+      setNewsletter('');
+    } catch (err) {
+      setStatus({
+        kind: 'error',
+        text: err instanceof Error ? err.message : 'That did not go through.',
+      });
+    } finally {
+      setSubmitting(false);
+      window.setTimeout(() => setStatus(null), 5000);
     }
   };
 
+  const social = Object.entries(settings?.social || {}).filter(
+    ([platform, url]) => url && SOCIAL_ICONS[platform]
+  ) as [string, string][];
+
+  const addressLines = (settings?.address || '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const hasContactColumn =
+    addressLines.length > 0 || settings?.email || settings?.phone || social.length > 0;
+
   return (
     <footer className="bg-black text-white">
-      {/* Trust Badges Section */}
-      <div className="bg-black border-b border-gray-800 py-12 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div className="text-center">
-            <div className="text-3xl mb-2">👤</div>
-            <h3 className="font-bold mb-1">24/7 Support</h3>
-            <p className="text-gray-400 text-sm">Always here to help</p>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl mb-2">🏆</div>
-            <h3 className="font-bold mb-1">Money Back Guarantee</h3>
-            <p className="text-gray-400 text-sm">100% satisfied or refunded</p>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl mb-2">🔒</div>
-            <h3 className="font-bold mb-1">Secure Payment</h3>
-            <p className="text-gray-400 text-sm">SSL encrypted transactions</p>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl mb-2">🚚</div>
-            <h3 className="font-bold mb-1">Worldwide Free Shipping</h3>
-            <p className="text-gray-400 text-sm">Fast delivery worldwide</p>
-          </div>
-        </div>
-      </div>
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5">
+          {/* Link columns — Admin → Footer */}
+          {sections.map((section) => (
+            <div key={section.id}>
+              <h4 className="mb-5 border-b border-white/15 pb-3 text-xs font-semibold uppercase tracking-widest">
+                {section.title}
+              </h4>
+              <ul className="space-y-3 text-sm">
+                {section.links.map((link) => (
+                  <li key={link.id}>
+                    <Link
+                      href={link.url}
+                      className="text-gray-400 transition-colors hover:text-white"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
 
-      {/* Main Footer Content */}
-      <div className="px-4 sm:px-6 py-16">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
-          {/* Column 1: INFORMATION */}
+          {/* Subscribe */}
           <div>
-            <h4 className="text-sm font-bold uppercase mb-6 border-b border-gray-700 pb-4">Information</h4>
-            <ul className="space-y-3 text-sm">
-              <li><Link href="/about" className="text-gray-300 hover:text-white">About Us</Link></li>
-              <li><Link href="/exhibitions" className="text-gray-300 hover:text-white">Exhibitions</Link></li>
-              <li><Link href="/faq" className="text-gray-300 hover:text-white">FAQs</Link></li>
-              <li><Link href="/reviews" className="text-gray-300 hover:text-white">Reviews</Link></li>
-              <li><Link href="/blog" className="text-gray-300 hover:text-white">Blog</Link></li>
-              <li><Link href="/custom-order" className="text-gray-300 hover:text-white">Custom Order</Link></li>
-              <li><Link href="/affiliate" className="text-gray-300 hover:text-white">Affiliate Program</Link></li>
-              <li><Link href="/careers" className="text-gray-300 hover:text-white">Careers</Link></li>
-            </ul>
-          </div>
+            <h4 className="mb-5 border-b border-white/15 pb-3 text-xs font-semibold uppercase tracking-widest">
+              {settings?.newsletterHeading || 'Subscribe'}
+            </h4>
 
-          {/* Column 2: SUPPORT */}
-          <div>
-            <h4 className="text-sm font-bold uppercase mb-6 border-b border-gray-700 pb-4">Support</h4>
-            <ul className="space-y-3 text-sm">
-              <li><Link href="/how-to-order" className="text-gray-300 hover:text-white">How to Order</Link></li>
-              <li><Link href="/payment-info" className="text-gray-300 hover:text-white">Payment Information</Link></li>
-              <li><Link href="/we-buy" className="text-gray-300 hover:text-white">We Buy</Link></li>
-              <li><Link href="/returns" className="text-gray-300 hover:text-white">Refund & Returns</Link></li>
-              <li><Link href="/shipping" className="text-gray-300 hover:text-white">Shipping Policy</Link></li>
-              <li><Link href="/terms" className="text-gray-300 hover:text-white">Terms of Services</Link></li>
-              <li><Link href="/privacy" className="text-gray-300 hover:text-white">Privacy Policy</Link></li>
-              <li><Link href="/contact" className="text-gray-300 hover:text-white">Contact Us</Link></li>
-            </ul>
-          </div>
+            {settings?.newsletterText && (
+              <p className="mb-4 text-sm leading-relaxed text-gray-400">
+                {settings.newsletterText}
+              </p>
+            )}
 
-          {/* Column 3: SHOPPING */}
-          <div>
-            <h4 className="text-sm font-bold uppercase mb-6 border-b border-gray-700 pb-4">Shopping</h4>
-            <ul className="space-y-3 text-sm">
-              <li><Link href="/account" className="text-gray-300 hover:text-white">My Account</Link></li>
-              <li><Link href="/orders" className="text-gray-300 hover:text-white">Order Status</Link></li>
-              <li><Link href="/wishlist" className="text-gray-300 hover:text-white">Wishlist</Link></li>
-              <li><Link href="/cart" className="text-gray-300 hover:text-white">Shopping Cart</Link></li>
-              <li><Link href="/checkout" className="text-gray-300 hover:text-white">Checkout</Link></li>
-              <li><Link href="/guarantee" className="text-gray-300 hover:text-white">Guarantee</Link></li>
-              <li><Link href="/shop" className="text-gray-300 hover:text-white">Shop All</Link></li>
-              <li><Link href="/contact" className="text-gray-300 hover:text-white">Contact Us</Link></li>
-            </ul>
-          </div>
-
-          {/* Column 4: SUBSCRIBE */}
-          <div>
-            <h4 className="text-sm font-bold uppercase mb-6 border-b border-gray-700 pb-4">Subscribe</h4>
-            <p className="text-sm text-gray-300 mb-4">Subscribe to our newsletter, and get exclusive offers & updates.</p>
-            <form onSubmit={handleNewsletterSubmit} className="flex flex-col gap-2 mb-6">
+            <form onSubmit={handleNewsletterSubmit} className="space-y-2">
+              <label htmlFor="footer-newsletter" className="sr-only">
+                Email address
+              </label>
               <input
+                id="footer-newsletter"
                 type="email"
-                placeholder="Enter Your Email Address"
+                required
                 value={newsletter}
                 onChange={(e) => setNewsletter(e.target.value)}
-                className="px-3 py-2 bg-white text-black text-sm rounded focus:outline-none"
-                required
+                placeholder="Your email address"
+                className="w-full rounded border border-white/20 bg-white/5 px-3 py-2.5 text-sm text-white placeholder-gray-500 focus:border-white/50 focus:outline-none"
               />
-              <button type="submit" className="bg-red-600 text-white font-bold px-4 py-2 rounded hover:bg-red-700">
-                JOIN
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full rounded border border-white/80 px-4 py-2.5 text-sm tracking-wide transition hover:bg-white hover:text-black disabled:opacity-50"
+              >
+                {submitting ? 'Joining…' : 'Join'}
               </button>
             </form>
-            {success && <p className="text-green-400 text-xs">{success}</p>}
-            <p className="text-xs text-gray-400 mb-4">Follow us on our social platforms</p>
-            <div className="flex gap-3 flex-wrap">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-xl hover:scale-110">📘</a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-xl hover:scale-110">📷</a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-xl hover:scale-110">💼</a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="text-xl hover:scale-110">📹</a>
-              <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="text-xl hover:scale-110">🎵</a>
-              <a href="https://ebay.com" target="_blank" rel="noopener noreferrer" className="text-xl hover:scale-110">🛍️</a>
-              <a href="https://etsy.com" target="_blank" rel="noopener noreferrer" className="text-xl hover:scale-110">🎨</a>
-              <a href="https://whatsapp.com" target="_blank" rel="noopener noreferrer" className="text-xl hover:scale-110">💬</a>
-            </div>
+
+            {status && (
+              <p
+                role="status"
+                className={`mt-2 text-xs ${
+                  status.kind === 'ok' ? 'text-emerald-400' : 'text-rose-400'
+                }`}
+              >
+                {status.text}
+              </p>
+            )}
+
+            {social.length > 0 && (
+              <div className="mt-6 flex flex-wrap gap-3">
+                {social.map(([platform, url]) => (
+                  <a
+                    key={platform}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={SOCIAL_LABELS[platform] || platform}
+                    title={SOCIAL_LABELS[platform] || platform}
+                    className="rounded-full border border-white/20 p-2 text-gray-400 transition-colors hover:border-white/60 hover:text-white"
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      {SOCIAL_ICONS[platform]}
+                    </svg>
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Column 5: ADDRESS */}
-          <div>
-            <h4 className="text-sm font-bold uppercase mb-6 border-b border-gray-700 pb-4">Address</h4>
-            <div className="text-sm text-gray-300 space-y-2 mb-6">
-              <p>Office No. 1, Al Mukhtiar Gems</p>
-              <p>Chamber, Gem Street, Namak</p>
-              <p>Mandi, Peshawar, Khyber</p>
-              <p>Pakhtunkhwa, 25000, Pakistan.</p>
-            </div>
-            <div className="space-y-2 text-sm">
-              <p className="text-gray-400">
-                <span className="text-lg mr-2">📧</span>
-                <a href="mailto:info@stonesland.com" className="text-gray-300 hover:text-white">info@stonesland.com</a>
-              </p>
-              <p className="text-gray-400">
-                <span className="text-lg mr-2">📱</span>
-                <a href="tel:+923469191091" className="text-gray-300 hover:text-white">+92 346 919 1091</a>
-              </p>
-            </div>
-          </div>
-        </div>
+          {/* Address & contact */}
+          {hasContactColumn && (
+            <div>
+              <h4 className="mb-5 border-b border-white/15 pb-3 text-xs font-semibold uppercase tracking-widest">
+                {settings?.addressHeading || 'Address'}
+              </h4>
 
-        {/* Payment & Security Section */}
-        <div className="border-t border-gray-800 pt-12 pb-8">
-          <div className="text-center mb-8">
-            <h4 className="text-sm font-bold uppercase mb-4 text-gray-400">Payment Methods & Security</h4>
-            <div className="flex justify-center gap-4 flex-wrap mb-4">
-              <span className="text-lg">💳 VISA</span>
-              <span className="text-lg">💳 Mastercard</span>
-              <span className="text-lg">🅿️ PayPal</span>
-              <span className="text-lg">💳 Amex</span>
-              <span className="text-lg">💳 Stripe</span>
+              {addressLines.length > 0 && (
+                <address className="mb-5 space-y-1 text-sm not-italic leading-relaxed text-gray-400">
+                  {addressLines.map((line, i) => (
+                    <p key={i}>{line}</p>
+                  ))}
+                </address>
+              )}
+
+              <div className="space-y-2 text-sm">
+                {settings?.email && (
+                  <p>
+                    <a
+                      href={`mailto:${settings.email}`}
+                      className="text-gray-400 transition-colors hover:text-white"
+                    >
+                      {settings.email}
+                    </a>
+                  </p>
+                )}
+                {settings?.phone && (
+                  <p>
+                    <a
+                      href={`tel:${settings.phone.replace(/[^\d+]/g, '')}`}
+                      className="text-gray-400 transition-colors hover:text-white"
+                    >
+                      {settings.phone}
+                    </a>
+                  </p>
+                )}
+              </div>
             </div>
-            <div className="flex justify-center gap-4 flex-wrap">
-              <span className="text-xs bg-gray-800 px-3 py-1 rounded">🔒 SSL SECURE</span>
-              <span className="text-xs bg-gray-800 px-3 py-1 rounded">🔐 Secure Encryption</span>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* Copyright Section */}
-      <div className="border-t border-gray-800 py-8 px-4 sm:px-6 text-center text-sm text-gray-500">
-        <Logo variant="full" size={200} className="mb-6 inline-block" />
-        <p>© 2026 StonesLand. Established 1968. All Rights Reserved.</p>
+      <div className="border-t border-white/10 px-4 py-8 text-center sm:px-6">
+        <Logo variant="full" size={160} className="mb-5 inline-block" />
+        <p className="text-xs text-gray-500">
+          {settings?.copyrightText ||
+            `© ${new Date().getFullYear()} ${settings?.siteName || 'StonesLand'}. All rights reserved.`}
+        </p>
       </div>
     </footer>
   );

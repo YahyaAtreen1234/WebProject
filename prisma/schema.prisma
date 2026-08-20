@@ -693,6 +693,35 @@ model GuaranteePolicy {
   updatedAt       DateTime  @updatedAt
 }
 
+/// A column of links in the site footer. Titles, order and membership are all
+/// admin-controlled, so columns can be renamed, reordered, added or retired
+/// without a deploy.
+model FooterSection {
+  id        String       @id @default(cuid())
+  title     String
+  sortOrder Int          @default(0)
+  active    Boolean      @default(true)
+  links     FooterLink[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([active, sortOrder])
+}
+
+model FooterLink {
+  id        String        @id @default(cuid())
+  section   FooterSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  sectionId String
+  label     String
+  url       String
+  sortOrder Int           @default(0)
+  active    Boolean       @default(true)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([sectionId, active, sortOrder])
+}
+
 model SiteSettings {
   id                String    @id @default("main")
   siteName          String    @default("StonesLand")
@@ -707,11 +736,22 @@ model SiteSettings {
   phone             String?
   address           String?
 
+  // Footer: subscribe column
+  newsletterHeading String?
+  newsletterText    String?
+
+  // Footer: address column + closing line
+  addressHeading    String?
+  copyrightText     String?
+
   // Social media
   instagramUrl      String?
   twitterUrl        String?
   facebookUrl       String?
   linkedinUrl       String?
+  youtubeUrl        String?
+  tiktokUrl         String?
+  whatsappUrl       String?
 
   // SEO
   seoTitle          String?

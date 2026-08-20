@@ -76,14 +76,7 @@ export async function PUT(request: NextRequest) {
       phone: body.phone || body.contactPhone,
     });
 
-    const {
-      siteName,
-      siteTagline,
-      logo,
-      email,
-      phone,
-      address,
-    } = body;
+    const { siteName, siteTagline, logo, email, phone, address } = body;
 
     // Validation
     if (!siteName || !siteTagline) {
@@ -94,37 +87,42 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    // Footer-owned fields. Spread conditionally so a caller that submits only
+    // the general settings form does not blank out the footer copy, and vice
+    // versa — the two are edited on separate admin screens.
+    const optionalKeys = [
+      'newsletterHeading',
+      'newsletterText',
+      'addressHeading',
+      'copyrightText',
+      'facebookUrl',
+      'instagramUrl',
+      'twitterUrl',
+      'linkedinUrl',
+      'youtubeUrl',
+      'tiktokUrl',
+      'whatsappUrl',
+    ] as const;
+
+    const optional = Object.fromEntries(
+      optionalKeys
+        .filter((key) => body[key] !== undefined)
+        .map((key) => [key, body[key] === '' ? null : body[key]])
+    );
+
+    const data = { siteName, siteTagline, logo, email, phone, address, ...optional };
+
     // Get existing settings or create new one
     let settings = await prisma.siteSettings.findFirst();
     console.log('[SettingsAPI] PUT: Found existing settings:', settings?.id);
 
     if (!settings) {
       console.log('[SettingsAPI] PUT: Creating new settings');
-      settings = await prisma.siteSettings.create({
-        data: {
-          id: 'main',
-          siteName,
-          siteTagline,
-          logo,
-          email,
-          phone,
-          address,
-        },
-      });
+      settings = await prisma.siteSettings.create({ data: { id: 'main', ...data } });
       console.log('[SettingsAPI] PUT: Settings created successfully');
     } else {
       console.log('[SettingsAPI] PUT: Updating existing settings');
-      settings = await prisma.siteSettings.update({
-        where: { id: 'main' },
-        data: {
-          siteName,
-          siteTagline,
-          logo,
-          email,
-          phone,
-          address,
-        },
-      });
+      settings = await prisma.siteSettings.update({ where: { id: 'main' }, data });
       console.log('[SettingsAPI] PUT: Settings updated successfully');
     }
 

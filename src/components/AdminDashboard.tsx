@@ -6,6 +6,7 @@ import AdminOrders from './AdminOrders';
 import AdminProducts from './AdminProducts';
 import AdvancedDeliveryPanel from './AdvancedDeliveryPanel';
 import AdminMessages from './AdminMessages';
+import AdminFooter from './AdminFooter';
 import AdminEarnings from './AdminEarnings';
 import AdminBanners from './AdminBanners';
 import AdminCustomers from './AdminCustomers';
@@ -47,6 +48,7 @@ export default function AdminDashboard() {
     { id: 'products', label: '🛍️ Products', icon: '🛍️' },
     { id: 'deliveries', label: '🚚 Deliveries', icon: '🚚' },
     { id: 'banners', label: '🖼️ Banners', icon: '🖼️' },
+    { id: 'footer', label: '🔗 Footer', icon: '🔗' },
     { id: 'customers', label: '👥 Customers', icon: '👥' },
     { id: 'custom-orders', label: '✨ Custom Orders', icon: '✨' },
     { id: 'messages', label: '✉️ Messages', icon: '✉️' },
@@ -188,6 +190,7 @@ export default function AdminDashboard() {
         {activeTab === 'products' && <AdminProducts />}
         {activeTab === 'deliveries' && <AdvancedDeliveryPanel />}
         {activeTab === 'banners' && <AdminBanners />}
+        {activeTab === 'footer' && <AdminFooter />}
         {activeTab === 'customers' && <AdminCustomers />}
         {activeTab === 'custom-orders' && <AdminCustomOrders />}
         {activeTab === 'messages' && <AdminMessages />}
