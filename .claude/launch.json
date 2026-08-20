@@ -7,6 +7,18 @@
       "runtimeArgs": ["run", "dev"],
       "port": 3000,
       "autoPort": true
+    },
+    {
+      "name": "hvac-site",
+      "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
+      "runtimeArgs": [
+        "E:\\HVAC LLC WEBSITE\\node_modules\\next\\dist\\bin\\next",
+        "dev",
+        "E:\\HVAC LLC WEBSITE",
+        "--port",
+        "3100"
+      ],
+      "port": 3100
     }
   ]
 }

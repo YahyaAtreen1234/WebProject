@@ -162,7 +162,12 @@
       "PowerShell(node \"E:\\\\Claude project\\\\tmp-wishlist-test.js\" remove)",
       "PowerShell(node \"E:\\\\Claude project\\\\tmp-acct-test.js\" code)",
       "PowerShell(node \"E:\\\\Claude project\\\\tmp-acct-test.js\" remove)",
-      "PowerShell(\"cleaned\")"
+      "PowerShell(\"cleaned\")",
+      "Bash(export NEXT_TELEMETRY_DISABLED=1)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(./node_modules/.bin/eslint .)",
+      "Bash(npm test *)",
+      "Bash(git check-ignore *)"
     ]
   }
 }

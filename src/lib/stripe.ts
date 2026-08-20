@@ -24,6 +24,7 @@ export interface CheckoutSessionData {
   subtotal: number;
   tax: number;
   shipping: number;
+  discount?: number;
   total: number;
   successUrl: string;
   cancelUrl: string;
@@ -68,11 +69,26 @@ export async function createCheckoutSession(data: CheckoutSessionData) {
     });
   }
 
+  // Stripe line items cannot carry a negative amount, so a discount is applied
+  // as a one-off coupon on the session rather than as another line. Without
+  // this the customer would be billed the undiscounted sum of the lines.
+  let discounts;
+  if (data.discount && data.discount > 0) {
+    const coupon = await stripe.coupons.create({
+      amount_off: Math.round(data.discount * 100),
+      currency: 'usd',
+      duration: 'once',
+      name: 'Discount',
+    });
+    discounts = [{ coupon: coupon.id }];
+  }
+
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     mode: 'payment',
     customer_email: data.customerEmail,
     line_items: lineItems,
+    ...(discounts && { discounts }),
     success_url: data.successUrl,
     cancel_url: data.cancelUrl,
     metadata: {

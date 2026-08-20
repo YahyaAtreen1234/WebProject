@@ -35,17 +35,69 @@ export async function POST(request: NextRequest) {
         const orderId = session.metadata?.orderId;
 
         if (orderId) {
-          // Update order status to confirmed
+          const existing = await prisma.order.findUnique({
+            where: { id: orderId },
+            select: { paymentStatus: true },
+          });
+
+          // Stripe retries webhooks and may deliver the same event more than
+          // once. Without this guard a retry would decrement stock a second
+          // time for a single sale.
+          if (existing?.paymentStatus === 'succeeded') {
+            console.log('[stripe] Ignoring duplicate completion for', orderId);
+            break;
+          }
+
           const order = await prisma.order.update({
             where: { id: orderId },
             data: {
               paymentStatus: 'succeeded',
               status: 'confirmed',
+              // Captured here rather than at session creation: the payment
+              // intent does not exist until the customer actually pays.
+              stripePaymentId: (session.payment_intent as string) || undefined,
             },
             include: {
               items: true,
             },
           });
+
+          // Money is in. Take the goods out of stock -- nothing else in the
+          // codebase did, so every item stayed permanently in stock and could
+          // be oversold without limit.
+          await Promise.all(
+            order.items.map((item) =>
+              prisma.product.update({
+                where: { id: item.productId },
+                data: { stock: { decrement: item.quantity } },
+              }).catch((stockError) => {
+                // A missing or deleted product must not roll back a paid order.
+                console.error('[stripe] Stock update failed for', item.productId, stockError);
+              })
+            )
+          );
+
+          // Record the receipt so admin earnings reconcile against Stripe.
+          await prisma.paymentRecord.create({
+            data: {
+              orderId: order.id,
+              amount: order.totalAmount,
+              currency: 'USD',
+              type: 'credit_card',
+              status: 'completed',
+              transactionId: (session.payment_intent as string) || session.id,
+              processedAt: new Date(),
+            },
+          }).catch((recordError) => {
+            console.error('[stripe] Payment record failed for', order.id, recordError);
+          });
+
+          if (order.discountCode) {
+            await prisma.discount.updateMany({
+              where: { code: order.discountCode },
+              data: { timesUsed: { increment: 1 } },
+            }).catch(() => undefined);
+          }
 
           // Send confirmation email
           await sendOrderConfirmation({
