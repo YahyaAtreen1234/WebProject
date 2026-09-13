@@ -3,6 +3,12 @@ import HeroSection from '@/components/about/HeroSection';
 import TrustBadgesSection from '@/components/about/TrustBadgesSection';
 import CTASection from '@/components/about/CTASection';
 
+// Read from the environment for the same reason robots.ts and sitemap.ts do:
+// the canonical host belongs in configuration, not in five separate string
+// literals that drift apart. Falls back to localhost so a developer running
+// without an env file does not silently emit production URLs.
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3001';
+
 export const metadata: Metadata = {
   title: 'About StonesLand | Authentic Gemstones & Minerals Since 2015',
   description: 'Learn about StonesLand - your trusted source for authentic, ethically-sourced gemstones and minerals. Over 9 years of excellence in the industry.',
@@ -11,12 +17,14 @@ export const metadata: Metadata = {
     title: 'About StonesLand - Premium Gemstones & Minerals',
     description: 'Discover the story behind StonesLand. Trusted by 50,000+ customers worldwide.',
     type: 'website',
-    url: 'https://stonesland.com/about',
+    url: `${baseUrl}/about`,
     images: [
       {
-        url: 'https://stonesland.com/og-about.jpg',
-        width: 1200,
-        height: 630,
+        // Was og-about.jpg, which is not in public/ and returned a 404 to every
+        // crawler and link preview. The logo is the only image actually shipped.
+        url: `${baseUrl}/logo.png`,
+        width: 1240,
+        height: 1240,
         alt: 'StonesLand - About Us',
       },
     ],
@@ -27,7 +35,7 @@ export const metadata: Metadata = {
     description: 'Your trusted source for authentic gemstones and minerals.',
   },
   alternates: {
-    canonical: 'https://stonesland.com/about',
+    canonical: `${baseUrl}/about`,
   },
 };
 
@@ -37,8 +45,8 @@ const organizationSchema = {
   '@type': 'Organization',
   name: 'StonesLand',
   description: 'Authentic gemstones and minerals marketplace',
-  url: 'https://stonesland.com',
-  logo: 'https://stonesland.com/logo.png',
+  url: baseUrl,
+  logo: `${baseUrl}/logo.png`,
   foundingDate: '2015',
   contactPoint: {
     '@type': 'ContactPoint',

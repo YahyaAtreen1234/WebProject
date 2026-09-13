@@ -141,15 +141,6 @@ export default function AdminLogin() {
           </p>
         </div>
 
-        <div className="mt-6 p-4 bg-midnight-900/50 rounded-lg border border-midnight-700">
-          <p className="text-xs text-midnight-400 text-center">
-            Demo Credentials:
-            <br />
-            Email: admin@stonesland.local
-            <br />
-            Password: admin123
-          </p>
-        </div>
       </div>
     </div>
   );

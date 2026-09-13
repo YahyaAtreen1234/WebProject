@@ -74,16 +74,6 @@ export default function UnifiedLogin() {
     }
   };
 
-  const handleDemoAdmin = () => {
-    setEmail('admin@stonesland.com');
-    setPassword('AdminPassword123!');
-  };
-
-  const handleDemoUser = () => {
-    setEmail('john@example.com');
-    setPassword('UserPassword123!');
-  };
-
   return (
     <div className="min-h-screen bg-midnight-950 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
@@ -164,25 +154,6 @@ export default function UnifiedLogin() {
             </button>
           </form>
 
-          {/* Demo Buttons */}
-          <div className="space-y-2 mb-6">
-            <p className="text-midnight-400 text-sm text-center">Demo Accounts:</p>
-            <button
-              type="button"
-              onClick={handleDemoAdmin}
-              className="w-full px-4 py-2 bg-amethyst-600/20 border border-amethyst-500/30 text-amethyst-300 rounded-lg hover:bg-amethyst-600/30 transition-colors font-semibold text-sm"
-            >
-              👑 Admin Demo
-            </button>
-            <button
-              type="button"
-              onClick={handleDemoUser}
-              className="w-full px-4 py-2 bg-emerald-600/20 border border-emerald-500/30 text-emerald-300 rounded-lg hover:bg-emerald-600/30 transition-colors font-semibold text-sm"
-            >
-              👤 User Demo
-            </button>
-          </div>
-
           {/* Divider */}
           <div className="flex items-center gap-3 mb-6">
             <div className="flex-1 h-px bg-midnight-700"></div>
@@ -211,22 +182,6 @@ export default function UnifiedLogin() {
             </div>
           </div>
 
-          {/* Account Info */}
-          <div className="p-4 bg-midnight-800/30 rounded-lg border border-midnight-700">
-            <p className="text-white font-semibold text-sm mb-3">📋 Demo Credentials:</p>
-            <div className="space-y-2 text-xs text-midnight-300">
-              <div>
-                <p className="text-gold-400 font-semibold">Admin Account:</p>
-                <p>📧 admin@stonesland.com</p>
-                <p>🔐 AdminPassword123!</p>
-              </div>
-              <div className="pt-2 border-t border-midnight-600">
-                <p className="text-emerald-400 font-semibold">User Account:</p>
-                <p>📧 john@example.com</p>
-                <p>🔐 UserPassword123!</p>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Footer */}

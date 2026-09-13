@@ -11,6 +11,10 @@ const description =
   'Discover the world\'s most exquisite gemstones and minerals. Premium quality, ethically sourced, investment-grade pieces for collectors and enthusiasts.';
 
 export const metadata: Metadata = {
+  // Without this, the relative image paths below are emitted to crawlers and
+  // link previews as-is, which they cannot resolve. Open Graph and Twitter
+  // cards require absolute URLs.
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3001'),
   title: 'StonesLand | Premium Gemstones & Minerals E-Commerce',
   description,
   // Favicons come from app/icon.png and app/apple-icon.png (the monogram,
