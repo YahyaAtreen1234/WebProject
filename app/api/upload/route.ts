@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { put } from '@vercel/blob';
-import { generateUniqueFilename } from '@/lib/upload';
 import { withUserAuth, errorResponse, successResponse } from '@/lib/middlewares';
+import { StorageError, storeUpload } from '@/lib/storage';
 
 /**
  * POST /api/upload
- * Upload a single image
- * Requires authentication
+ * Upload a single image. Requires authentication.
+ *
+ * Previously imported `put` from @vercel/blob directly, which made the route —
+ * and therefore the build — depend on one hosting provider. It now uses the
+ * storage adapter, so the same code runs against local disk, any S3-compatible
+ * endpoint, or Vercel Blob, chosen by STORAGE_DRIVER.
  */
 export async function POST(request: NextRequest) {
   const auth = await withUserAuth(request);
@@ -14,42 +17,34 @@ export async function POST(request: NextRequest) {
 
   try {
     const formData = await request.formData();
-    const file = formData.get('file') as File;
+    const file = formData.get('file');
 
-    if (!file) {
+    if (!file || typeof file === 'string') {
       return errorResponse('No file provided', 400);
     }
 
-    // Generate unique filename
-    const filename = generateUniqueFilename(file.name);
-    const folder = `products/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}`;
-    const pathname = `${folder}/${filename}`;
-
-    // Upload to Vercel Blob
-    const blob = await put(pathname, file, {
-      access: 'public',
-      addRandomSuffix: false,
+    const data = Buffer.from(await file.arrayBuffer());
+    const stored = await storeUpload({
+      name: file.name || 'upload',
+      type: file.type || 'application/octet-stream',
+      data,
     });
 
     return successResponse(
       {
-        url: blob.url,
-        filename,
-        size: file.size,
-        type: file.type,
+        url: stored.url,
+        key: stored.key,
+        filename: file.name,
+        size: stored.size,
+        type: stored.contentType,
       },
       201
     );
-  } catch (error: any) {
-    console.error('Upload error:', error);
-
-    if (error.message?.includes('BLOB_READ_WRITE_TOKEN')) {
-      return errorResponse(
-        'Image upload service not configured. This feature requires Vercel deployment.',
-        503
-      );
+  } catch (error) {
+    if (error instanceof StorageError) {
+      return errorResponse(error.message, error.status);
     }
-
+    console.error('Upload error:', error);
     return errorResponse('Failed to upload image', 500);
   }
 }
