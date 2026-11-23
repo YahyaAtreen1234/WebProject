@@ -232,7 +232,7 @@ export default function Navigation() {
       {/* Main Header */}
       <div className="bg-gray-50 px-4 sm:px-6 py-4">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-2 sm:gap-4">
             {/* Logo */}
             <Logo label="StonesLand" tagline="Premium Gems & Minerals" size={48} />
 
@@ -256,9 +256,9 @@ export default function Navigation() {
             </form>
 
             {/* Account Icons */}
-            <div className="flex items-center gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               {user ? (
-                <div className="relative" data-account-menu>
+                <div className="relative hidden sm:block" data-account-menu>
                   <button
                     type="button"
                     onClick={() => setAccountMenuOpen((open) => !open)}
@@ -320,18 +320,26 @@ export default function Navigation() {
                 <button
                   type="button"
                   onClick={() => setAuthPanelOpen(true)}
-                  className="text-xs sm:text-sm font-semibold text-black hover:text-gray-600"
+                  className="hidden text-xs font-semibold text-black hover:text-gray-600 sm:block sm:text-sm"
                 >
                   LOGIN / REGISTER
                 </button>
               )}
-              <Link href="/wishlist" className="relative text-xl hover:text-gray-600" title="Wishlist">
+              <Link
+                href="/wishlist"
+                className="relative hidden text-xl hover:text-gray-600 min-[400px]:block"
+                title="Wishlist"
+              >
                 ♡
                 <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {wishlistCount}
                 </span>
               </Link>
-              <Link href="/compare" className="relative text-xl hover:text-gray-600" title="Compare">
+              <Link
+                href="/compare"
+                className="relative hidden text-xl hover:text-gray-600 min-[400px]:block"
+                title="Compare"
+              >
                 ⟷
                 <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {compareCount}
@@ -341,14 +349,17 @@ export default function Navigation() {
                 🛒
                 <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{cartCount}</span>
               </Link>
-              <Link href="/cart" className="text-sm font-bold text-gold-600 hover:text-gray-600">
+              <Link href="/cart" className="hidden text-sm font-bold text-gold-600 hover:text-gray-600 sm:block">
                 ${cartSubtotal.toFixed(2)}
               </Link>
             </div>
 
             {/* Mobile Menu Button */}
             <button
+              type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileMenuOpen}
               className="sm:hidden text-2xl"
             >
               ☰
@@ -457,6 +468,8 @@ export default function Navigation() {
           )}
           <Link href="/shop" className="block py-2 hover:text-gray-600">SHOP</Link>
           <Link href="/gallery" className="block py-2 hover:text-gray-600">GEMSTONES</Link>
+          <Link href="/wishlist" className="block py-2 hover:text-gray-600">WISHLIST</Link>
+          <Link href="/compare" className="block py-2 hover:text-gray-600">COMPARE</Link>
           <Link href="/tracking" className="block py-2 hover:text-gray-600">TRACK ORDER</Link>
           <Link href="/auctions" className="block py-2 hover:text-gray-600">AUCTIONS</Link>
           <Link href="/about" className="block py-2 hover:text-gray-600">ABOUT US</Link>
