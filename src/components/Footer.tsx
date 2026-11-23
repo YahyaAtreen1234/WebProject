@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import Logo from '@/components/Logo';
+import { parseBusinessEmails } from '@/lib/businessEmails';
 
 interface FooterLink {
   id: string;
@@ -141,9 +142,10 @@ export default function Footer() {
     .split('\n')
     .map((line) => line.trim())
     .filter(Boolean);
+  const businessEmails = parseBusinessEmails(settings?.email);
 
   const hasContactColumn =
-    addressLines.length > 0 || settings?.email || settings?.phone || social.length > 0;
+    addressLines.length > 0 || businessEmails.length > 0 || settings?.phone || social.length > 0;
 
   return (
     <footer className="bg-black text-white">
@@ -261,16 +263,16 @@ export default function Footer() {
               )}
 
               <div className="space-y-2 text-sm">
-                {settings?.email && (
-                  <p>
+                {businessEmails.map((email) => (
+                  <p key={email}>
                     <a
-                      href={`mailto:${settings.email}`}
+                      href={`mailto:${email}`}
                       className="text-gray-400 transition-colors hover:text-white"
                     >
-                      {settings.email}
+                      {email}
                     </a>
                   </p>
-                )}
+                ))}
                 {settings?.phone && (
                   <p>
                     <a

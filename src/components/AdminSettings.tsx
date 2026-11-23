@@ -225,19 +225,20 @@ export default function AdminSettings() {
           </p>
         </div>
 
-        {/* Contact Email */}
+        {/* Business Email Addresses */}
         <div>
           <label className="block text-sm font-medium text-white mb-2">
-            Contact Email
+            Business Email Addresses
           </label>
-          <input
-            type="email"
+          <textarea
             name="email"
             value={formData.email || ''}
             onChange={handleInputChange}
             className="w-full px-4 py-3 bg-midnight-700 border border-sapphire-500/30 rounded-lg text-white focus:outline-none focus:border-sapphire-500 transition-colors"
-            placeholder="contact@example.com"
+            placeholder={'sales@example.com\nsupport@example.com'}
+            rows={4}
           />
+          <p className="mt-2 text-xs text-midnight-400">Enter one email address per line.</p>
         </div>
 
         {/* Contact Phone */}

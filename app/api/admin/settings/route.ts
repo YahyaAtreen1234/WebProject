@@ -1,6 +1,7 @@
 ﻿import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
+import { isValidBusinessEmail, parseBusinessEmails } from '@/lib/businessEmails';
 
 function verifyAdmin(request: NextRequest) {
   try {
@@ -87,6 +88,22 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    if (email !== undefined && email !== null && typeof email !== 'string') {
+      return NextResponse.json(
+        { error: 'Business emails must be provided as text' },
+        { status: 400 }
+      );
+    }
+
+    const emails = parseBusinessEmails(email);
+    if (emails.some((address) => !isValidBusinessEmail(address))) {
+      return NextResponse.json(
+        { error: 'Enter valid email addresses, one per line' },
+        { status: 400 }
+      );
+    }
+    const normalizedEmail = email === undefined ? undefined : emails.join('\n') || null;
+
     // Footer-owned fields. Spread conditionally so a caller that submits only
     // the general settings form does not blank out the footer copy, and vice
     // versa — the two are edited on separate admin screens.
@@ -110,7 +127,15 @@ export async function PUT(request: NextRequest) {
         .map((key) => [key, body[key] === '' ? null : body[key]])
     );
 
-    const data = { siteName, siteTagline, logo, email, phone, address, ...optional };
+    const data = {
+      siteName,
+      siteTagline,
+      logo,
+      email: normalizedEmail,
+      phone,
+      address,
+      ...optional,
+    };
 
     // Get existing settings or create new one
     let settings = await prisma.siteSettings.findFirst();

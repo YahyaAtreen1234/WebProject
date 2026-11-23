@@ -497,7 +497,7 @@ export default function AdminFooter() {
           </div>
 
           <div className="space-y-4">
-            {field('email', 'Contact email', 'info@yoursite.com')}
+            {field('email', 'Business email addresses', 'One email address per line', true)}
             {field('phone', 'Contact phone', '+92 300 000 0000')}
           </div>
 

@@ -220,15 +220,16 @@ export default function SettingsPage() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-semibold text-white mb-2">
-                    Email Address
+                    Business Email Addresses
                   </label>
-                  <input
-                    type="email"
+                  <textarea
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full px-4 py-3 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-400 focus:outline-none focus:border-sapphire-500 transition-colors"
-                    placeholder="contact@stonesland.com"
+                    placeholder={'sales@stonesland.com\nsupport@stonesland.com'}
+                    rows={4}
                   />
+                  <p className="mt-2 text-xs text-midnight-400">Enter one email address per line.</p>
                 </div>
 
                 <div>
