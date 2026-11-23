@@ -102,14 +102,14 @@ export default function Home() {
     {
       title: 'Free worldwide shipping',
       subtitle: 'On every order',
-      color: 'from-amber-200 to-amber-400',
+      color: 'from-gold-100 to-gold-300',
       link: '/shop',
       buttonText: 'Browse the collection',
     },
     {
       title: 'Fifteen days to change your mind',
       subtitle: 'Return anything, for any reason',
-      color: 'from-sky-200 to-cyan-400',
+      color: 'from-emerald-100 to-emerald-300',
       link: '/shop',
       buttonText: 'Browse the collection',
     },

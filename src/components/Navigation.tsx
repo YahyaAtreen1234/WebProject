@@ -182,7 +182,7 @@ export default function Navigation() {
           if the text ever wraps to two lines. */}
       <div
         aria-hidden={!atTop}
-        className={`grid overflow-hidden bg-red-900 text-white transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${
+        className={`grid overflow-hidden bg-emerald-900 text-gold-100 transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${
           atTop ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
         }`}
       >

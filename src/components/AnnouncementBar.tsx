@@ -55,7 +55,7 @@ export default function AnnouncementBar() {
   if (!visible || banners.length === 0) return null;
 
   const current = banners[index];
-  const gradient = current.bgColor || 'from-yellow-400 to-amber-500';
+  const gradient = current.bgColor || 'from-gold-300 to-gold-500';
 
   const message = (
     <span

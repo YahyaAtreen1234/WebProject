@@ -30,12 +30,12 @@
   }
 
   h1 {
-    @apply text-h1 bg-gradient-to-r from-sapphire-300 via-amethyst-300 to-emerald-300 bg-clip-text text-transparent;
+    @apply text-h1 bg-gradient-to-r from-sapphire-300 via-gold-300 to-emerald-300 bg-clip-text text-transparent;
     font-size: clamp(2.25rem, 8vw, 4rem);
   }
 
   h2 {
-    @apply text-h2 bg-gradient-to-r from-gold-300 to-rose-300 bg-clip-text text-transparent;
+    @apply text-h2 bg-gradient-to-r from-gold-300 to-gold-500 bg-clip-text text-transparent;
     font-size: clamp(1.875rem, 6vw, 3rem);
   }
 
@@ -50,24 +50,24 @@
   }
 
   a {
-    @apply hover:text-sapphire-300 transition-all duration-300;
+    @apply hover:text-gold-600 transition-all duration-300;
   }
 }
 
 @layer components {
   .nav-link {
     @apply font-semibold relative transition-colors;
-    color: #cbd5e1;
+    color: #f0ead8;
   }
 
   .nav-link:hover {
-    color: #60a5fa;
+    color: #dbc38a;
   }
 
   .nav-link::after {
     content: '';
     @apply absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300;
-    background: linear-gradient(to right, #3b82f6, #a855f7);
+    background: linear-gradient(to right, #38794f, #dbc38a);
   }
 
   .nav-link:hover::after {
@@ -86,41 +86,42 @@
 
   .btn-primary {
     @apply px-8 py-3 rounded-lg font-bold text-white shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300;
-    background: linear-gradient(to right, #1d4ed8, #7e22ce);
+    background: linear-gradient(to right, #286440, #143322);
   }
 
   .btn-primary:hover {
-    background: linear-gradient(to right, #2563eb, #9333ea);
+    background: linear-gradient(to right, #38794f, #1e432e);
   }
 
   .btn-secondary {
     @apply px-8 py-3 rounded-lg font-bold border-2 transition-all duration-300;
-    color: #3b82f6;
-    border-color: #3b82f6;
+    color: #286440;
+    border-color: #987a3e;
   }
 
   .btn-secondary:hover {
-    background: rgba(59, 130, 246, 0.1);
+    background: rgba(219, 195, 138, 0.16);
   }
 
   .btn-accent {
-    @apply px-8 py-3 rounded-lg font-bold text-white shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300;
-    background: linear-gradient(to right, #d97706, #be185d);
+    @apply px-8 py-3 rounded-lg font-bold shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300;
+    color: #173424;
+    background: linear-gradient(to right, #dbc38a, #b99b56);
   }
 
   .btn-accent:hover {
-    background: linear-gradient(to right, #f59e0b, #db2777);
+    background: linear-gradient(to right, #e9d8ae, #cfb36d);
   }
 
   .card-glass {
     @apply backdrop-blur-xl border rounded-2xl transition-all duration-300;
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(252, 249, 241, 0.05);
+    border-color: rgba(219, 195, 138, 0.18);
   }
 
   .card-glass:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(59, 130, 246, 0.3);
+    background: rgba(252, 249, 241, 0.1);
+    border-color: rgba(219, 195, 138, 0.38);
   }
 
   .card-gradient {
@@ -129,24 +130,35 @@
     border-color: rgba(59, 130, 246, 0.2);
   }
 
+  .card-gradient {
+    background: linear-gradient(to bottom right, rgba(40, 100, 64, 0.12), rgba(219, 195, 138, 0.2));
+    border-color: rgba(49, 89, 62, 0.2);
+  }
+
   .glow-effect {
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+    box-shadow: 0 0 20px rgba(185, 155, 86, 0.24);
   }
 
   .glow-effect:hover {
-    box-shadow: 0 0 40px rgba(168, 85, 247, 0.7);
+    box-shadow: 0 0 32px rgba(185, 155, 86, 0.38);
   }
 
   .text-gradient {
-    background: linear-gradient(to right, #60a5fa, #c084fc, #6ee7b7);
+    background: linear-gradient(to right, #286440, #987a3e, #739879);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
   .shimmer-bg {
-    background: linear-gradient(to right, #2563eb, #9333ea, #2563eb);
+    background: linear-gradient(to right, #1e432e, #dbc38a, #1e432e);
     background-size: 200% auto;
     animation: shimmer 2s infinite;
   }
+}
+
+.bg-white h1,
+.bg-gray-50 h1,
+.bg-neutral-50 h1 {
+  background-image: linear-gradient(to right, #286440, #987a3e);
 }
