@@ -234,7 +234,7 @@ export default function AdminFooter() {
         method: 'PUT',
         body: JSON.stringify({
           ...settings,
-          siteName: settings.siteName || 'StonesLand',
+          siteName: settings.siteName || 'STONES LAND',
           siteTagline: settings.siteTagline || 'Premium Gems & Minerals',
         }),
       });

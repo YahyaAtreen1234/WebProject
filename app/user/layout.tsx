@@ -41,7 +41,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
             <Logo
               href="/"
               size={40}
-              label="StonesLand"
+              label="STONES LAND"
               tagline="My Account"
               labelClassName="text-h4 font-display text-gradient font-bold"
               taglineClassName="text-xs text-gold-300"
@@ -118,7 +118,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <p className="text-sm text-midnight-400">
-              © 2026 StonesLand. All rights reserved.
+              © 2026 STONES LAND. All rights reserved.
             </p>
             <div className="flex items-center gap-4 text-sm text-midnight-400">
               <button onClick={handleLogout} className="hover:text-sapphire-300 transition-colors">

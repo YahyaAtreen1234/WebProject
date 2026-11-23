@@ -117,7 +117,7 @@ export default function Logo({
     variant === 'full' ? (
       <img
         src={src}
-        alt="StonesLand"
+        alt="STONES LAND"
         width={size}
         height={size}
         className="block h-auto rounded-lg"
@@ -133,13 +133,13 @@ export default function Logo({
             // Composition unknown — show the whole thing rather than guessing.
             <img
               src={src}
-              alt="StonesLand"
+              alt="STONES LAND"
               className="absolute inset-0 h-full w-full object-contain"
             />
           ) : (
             <img
               src={src}
-              alt="StonesLand"
+              alt="STONES LAND"
               className="absolute max-w-none"
               style={{
                 width: MARK_SCALE,

@@ -131,7 +131,7 @@ export default function RegisterPage() {
         <div className="text-center mb-8">
           <Logo variant="full" size={180} href={null} className="mb-4 inline-block" />
           <h1 className="text-4xl font-display font-bold text-white mb-2">Create Account</h1>
-          <p className="text-midnight-400">Join StonesLand and start shopping</p>
+          <p className="text-midnight-400">Join STONES LAND and start shopping</p>
         </div>
 
         {/* Card */}

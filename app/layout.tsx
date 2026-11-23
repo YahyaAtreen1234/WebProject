@@ -15,21 +15,21 @@ export const metadata: Metadata = {
   // link previews as-is, which they cannot resolve. Open Graph and Twitter
   // cards require absolute URLs.
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3001'),
-  title: 'StonesLand | Premium Gemstones & Minerals E-Commerce',
+  title: 'STONES LAND | Premium Gemstones & Minerals E-Commerce',
   description,
   // Favicons come from app/icon.png and app/apple-icon.png (the monogram,
   // cropped from the lockup so it stays legible at 16px). Declaring `icons`
   // here would override that convention with the full, unreadable lockup.
   openGraph: {
-    title: 'StonesLand | Premium Gemstones & Minerals',
+    title: 'STONES LAND | Premium Gemstones & Minerals',
     description,
-    siteName: 'StonesLand',
-    images: [{ url: '/logo.png', width: 1240, height: 1240, alt: 'StonesLand' }],
+    siteName: 'STONES LAND',
+    images: [{ url: '/logo.png', width: 1240, height: 1240, alt: 'STONES LAND' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'StonesLand | Premium Gemstones & Minerals',
+    title: 'STONES LAND | Premium Gemstones & Minerals',
     description,
     images: ['/logo.png'],
   },

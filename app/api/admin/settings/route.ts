@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       settings = await prisma.siteSettings.create({
         data: {
           id: 'main',
-          siteName: 'StonesLand',
+          siteName: 'STONES LAND',
           siteTagline: 'Premium Gems & Minerals',
         },
       });

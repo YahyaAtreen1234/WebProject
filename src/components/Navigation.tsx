@@ -234,7 +234,7 @@ export default function Navigation() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between gap-2 sm:gap-4">
             {/* Logo */}
-            <Logo label="StonesLand" tagline="Premium Gems & Minerals" size={48} />
+            <Logo label="STONES LAND" tagline="Premium Gems & Minerals" size={48} />
 
             {/* Search Bar */}
             <form onSubmit={handleSearch} className="flex-1 max-w-md hidden sm:flex">

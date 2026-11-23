@@ -37,7 +37,7 @@ export default function HeroSection() {
           }`}
         >
           <span className="bg-gradient-to-r from-sapphire-400 via-amethyst-400 to-sapphire-400 bg-clip-text text-transparent">
-            StonesLand
+            STONES LAND
           </span>
         </h1>
 

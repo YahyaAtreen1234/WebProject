@@ -15,7 +15,7 @@ interface Settings {
 
 const defaultSettings: Settings = {
   id: 'main',
-  siteName: 'StonesLand',
+  siteName: 'STONES LAND',
   siteTagline: 'Premium Gems & Minerals',
   logo: null,
   email: null,

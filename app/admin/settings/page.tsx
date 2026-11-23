@@ -179,7 +179,7 @@ export default function SettingsPage() {
                     value={formData.siteName}
                     onChange={(e) => setFormData({ ...formData, siteName: e.target.value })}
                     className="w-full px-4 py-3 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-400 focus:outline-none focus:border-sapphire-500 transition-colors"
-                    placeholder="StonesLand"
+                    placeholder="STONES LAND"
                     required
                   />
                 </div>

@@ -10,12 +10,12 @@ import CTASection from '@/components/about/CTASection';
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3001';
 
 export const metadata: Metadata = {
-  title: 'About StonesLand | Authentic Gemstones & Minerals Since 2015',
-  description: 'Learn about StonesLand - your trusted source for authentic, ethically-sourced gemstones and minerals. Over 9 years of excellence in the industry.',
+  title: 'About STONES LAND | Authentic Gemstones & Minerals Since 2015',
+  description: 'Learn about STONES LAND - your trusted source for authentic, ethically-sourced gemstones and minerals. Over 9 years of excellence in the industry.',
   keywords: 'gemstones, minerals, about us, mineral retailer, authentic gems, ethical sourcing',
   openGraph: {
-    title: 'About StonesLand - Premium Gemstones & Minerals',
-    description: 'Discover the story behind StonesLand. Trusted by 50,000+ customers worldwide.',
+    title: 'About STONES LAND - Premium Gemstones & Minerals',
+    description: 'Discover the story behind STONES LAND. Trusted by 50,000+ customers worldwide.',
     type: 'website',
     url: `${baseUrl}/about`,
     images: [
@@ -25,13 +25,13 @@ export const metadata: Metadata = {
         url: `${baseUrl}/logo.png`,
         width: 1240,
         height: 1240,
-        alt: 'StonesLand - About Us',
+        alt: 'STONES LAND - About Us',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'About StonesLand',
+    title: 'About STONES LAND',
     description: 'Your trusted source for authentic gemstones and minerals.',
   },
   alternates: {
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
 const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'StonesLand',
+  name: 'STONES LAND',
   description: 'Authentic gemstones and minerals marketplace',
   url: baseUrl,
   logo: `${baseUrl}/logo.png`,

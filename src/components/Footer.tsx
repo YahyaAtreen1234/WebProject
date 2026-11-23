@@ -70,6 +70,10 @@ const SOCIAL_LABELS: Record<string, string> = {
 export default function Footer() {
   const [sections, setSections] = useState<FooterSection[]>([]);
   const [settings, setSettings] = useState<FooterSettings | null>(null);
+  const siteName =
+    settings?.siteName?.toLowerCase() === 'stonesland'
+      ? 'STONES LAND'
+      : settings?.siteName || 'STONES LAND';
 
   const [newsletter, setNewsletter] = useState('');
   const [status, setStatus] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
@@ -287,7 +291,7 @@ export default function Footer() {
         <Logo variant="full" size={160} className="mb-5 inline-block" />
         <p className="text-xs text-gray-500">
           {settings?.copyrightText ||
-            `© ${new Date().getFullYear()} ${settings?.siteName || 'StonesLand'}. All rights reserved.`}
+            `© ${new Date().getFullYear()} ${siteName}. All rights reserved.`}
         </p>
       </div>
     </footer>
