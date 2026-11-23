@@ -14,6 +14,9 @@ interface Settings {
   facebookUrl?: string;
   twitterUrl?: string;
   linkedinUrl?: string;
+  youtubeUrl?: string;
+  tiktokUrl?: string;
+  whatsappUrl?: string;
 }
 
 export default function SettingsPage() {
@@ -34,6 +37,9 @@ export default function SettingsPage() {
     facebookUrl: '',
     twitterUrl: '',
     linkedinUrl: '',
+    youtubeUrl: '',
+    tiktokUrl: '',
+    whatsappUrl: '',
   });
 
   useEffect(() => {
@@ -76,6 +82,9 @@ export default function SettingsPage() {
         facebookUrl: data.facebookUrl || '',
         twitterUrl: data.twitterUrl || '',
         linkedinUrl: data.linkedinUrl || '',
+        youtubeUrl: data.youtubeUrl || '',
+        tiktokUrl: data.tiktokUrl || '',
+        whatsappUrl: data.whatsappUrl || '',
       });
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Error loading settings';
@@ -314,6 +323,45 @@ export default function SettingsPage() {
                     onChange={(e) => setFormData({ ...formData, linkedinUrl: e.target.value })}
                     className="w-full px-4 py-3 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-400 focus:outline-none focus:border-sapphire-500 transition-colors"
                     placeholder="https://linkedin.com/company/yourcompany"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-white mb-2">
+                    YouTube URL
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.youtubeUrl}
+                    onChange={(e) => setFormData({ ...formData, youtubeUrl: e.target.value })}
+                    className="w-full px-4 py-3 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-400 focus:outline-none focus:border-sapphire-500 transition-colors"
+                    placeholder="https://youtube.com/@yourchannel"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-white mb-2">
+                    TikTok URL
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.tiktokUrl}
+                    onChange={(e) => setFormData({ ...formData, tiktokUrl: e.target.value })}
+                    className="w-full px-4 py-3 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-400 focus:outline-none focus:border-sapphire-500 transition-colors"
+                    placeholder="https://www.tiktok.com/@youraccount"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-white mb-2">
+                    WhatsApp URL
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.whatsappUrl}
+                    onChange={(e) => setFormData({ ...formData, whatsappUrl: e.target.value })}
+                    className="w-full px-4 py-3 bg-midnight-800 border border-sapphire-500/30 rounded-lg text-white placeholder-midnight-400 focus:outline-none focus:border-sapphire-500 transition-colors"
+                    placeholder="https://wa.me/15550000000"
                   />
                 </div>
               </div>
