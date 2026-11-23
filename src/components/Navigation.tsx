@@ -34,7 +34,11 @@ export default function Navigation() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [atTop, setAtTop] = useState(true);
+  const [headerVisible, setHeaderVisible] = useState(true);
   const tickingRef = useRef(false);
+  const lastScrollYRef = useRef(0);
+  const scrollDirectionRef = useRef<'up' | 'down' | null>(null);
+  const scrollDistanceRef = useRef(0);
 
   useEffect(() => {
     setIsClient(true);
@@ -112,25 +116,36 @@ export default function Navigation() {
     window.location.href = '/';
   };
 
-  // Drives the guarantee strip: shown at rest, collapsed once the page moves.
-  //
-  // Deliberately keyed to absolute position rather than scroll direction. The
-  // previous version hid the whole header on any downward delta and reshowed it
-  // on any upward one, so the jitter inherent in trackpad and momentum
-  // scrolling flipped it repeatedly — the strip appeared to flash in and out
-  // during a single fast scroll. A position test cannot oscillate that way: it
-  // is one state change on the way down and one on the way back.
-  //
-  // Hysteresis keeps it settled at the boundary — it takes 80px to collapse but
-  // the strip only returns within 20px of the top, so hovering near the
-  // threshold cannot toggle it.
+  // Keep the guarantee strip at the top and hide the full navigation while
+  // scrolling down. A short direction threshold prevents trackpad jitter from
+  // repeatedly toggling the header.
   useEffect(() => {
     const COLLAPSE_AT = 80;
     const RESTORE_AT = 20;
+    const DIRECTION_THRESHOLD = 12;
 
     const evaluate = () => {
-      const y = window.scrollY;
+      const y = Math.max(window.scrollY, 0);
       setAtTop((wasAtTop) => (wasAtTop ? y <= COLLAPSE_AT : y <= RESTORE_AT));
+
+      const delta = y - lastScrollYRef.current;
+      if (y <= RESTORE_AT) {
+        setHeaderVisible(true);
+        scrollDirectionRef.current = null;
+        scrollDistanceRef.current = 0;
+      } else if (delta !== 0) {
+        const direction = delta > 0 ? 'down' : 'up';
+        if (direction !== scrollDirectionRef.current) {
+          scrollDirectionRef.current = direction;
+          scrollDistanceRef.current = 0;
+        }
+        scrollDistanceRef.current += Math.abs(delta);
+        if (scrollDistanceRef.current >= DIRECTION_THRESHOLD) {
+          setHeaderVisible(direction === 'up');
+        }
+      }
+
+      lastScrollYRef.current = y;
       tickingRef.current = false;
     };
 
@@ -174,7 +189,11 @@ export default function Navigation() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white">
+    <header
+      className={`sticky top-0 z-50 bg-white transition-transform duration-300 ease-out motion-reduce:transition-none ${
+        headerVisible ? 'translate-y-0' : '-translate-y-full'
+      }`}
+    >
       {/* Money Back Guarantee Banner — collapses away once the page is scrolled,
           and comes back only on a return to the top. `grid-template-rows` is
           animated rather than max-height so the strip's own height stays the
