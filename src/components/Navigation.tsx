@@ -400,6 +400,46 @@ export default function Navigation() {
               🔍
             </button>
           </form>
+
+          <div className="grid grid-cols-3 gap-2 pt-3 sm:hidden">
+            <Link
+              href="/wishlist"
+              className="flex min-w-0 items-center justify-center gap-1.5 rounded border border-gray-200 px-2 py-2 text-sm text-black hover:bg-gray-100"
+            >
+              <span aria-hidden="true" className="text-lg font-bold text-rose-700">♥</span>
+              <span>Wishlist</span>
+              <span className="rounded-full bg-red-600 px-1.5 text-xs text-white">{wishlistCount}</span>
+            </Link>
+            <Link
+              href="/compare"
+              className="flex min-w-0 items-center justify-center gap-1.5 rounded border border-gray-200 px-2 py-2 text-sm text-black hover:bg-gray-100"
+            >
+              <span aria-hidden="true" className="text-lg font-bold text-blue-700">⟷</span>
+              <span>Compare</span>
+              <span className="rounded-full bg-red-600 px-1.5 text-xs text-white">{compareCount}</span>
+            </Link>
+            <Link
+              href="/cart"
+              className="flex min-w-0 items-center justify-center gap-1.5 rounded border border-gray-200 px-2 py-2 text-sm text-black hover:bg-gray-100"
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-5 w-5 text-emerald-700"
+              >
+                <path d="M3 4h2l2.2 10.1a2 2 0 0 0 2 1.6h8.9a2 2 0 0 0 1.9-1.4L22 8H6" />
+                <circle cx="10" cy="20" r="1" />
+                <circle cx="18" cy="20" r="1" />
+              </svg>
+              <span>Cart</span>
+              <span className="rounded-full bg-red-600 px-1.5 text-xs text-white">{cartCount}</span>
+            </Link>
+          </div>
         </div>
       </div>
 
