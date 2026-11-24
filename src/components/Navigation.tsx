@@ -191,7 +191,7 @@ export default function Navigation() {
   return (
     <header
       className={`sticky top-0 z-50 bg-white transition-transform duration-300 ease-out motion-reduce:transition-none ${
-        headerVisible ? 'translate-y-0' : '-translate-y-full'
+        mobileMenuOpen ? 'transform-none' : headerVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
     >
       {/* Money Back Guarantee Banner — collapses away once the page is scrolled,
@@ -376,12 +376,14 @@ export default function Navigation() {
             {/* Mobile Menu Button */}
             <button
               type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              onClick={() => setMobileMenuOpen((open) => !open)}
               aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={mobileMenuOpen}
-              className="sm:hidden text-2xl"
+              aria-controls="mobile-navigation-menu"
+              className="ml-auto flex items-center gap-2 text-base font-semibold text-black sm:hidden"
             >
-              ☰
+              <span>MENU</span>
+              <span aria-hidden="true" className="text-2xl leading-none">☰</span>
             </button>
           </div>
 
@@ -454,21 +456,35 @@ export default function Navigation() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="sm:hidden bg-white border-t border-gray-200 px-4 py-3 space-y-3">
+        <div
+          id="mobile-navigation-menu"
+          className="fixed inset-0 z-[60] flex flex-col overflow-y-auto bg-black px-6 py-5 text-white sm:hidden"
+        >
+          <div className="mb-5 flex items-center justify-between border-b border-gray-700 pb-4">
+            <div role="heading" aria-level={2} className="text-xl font-bold tracking-wider text-white">MENU</div>
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(false)}
+              aria-label="Close menu"
+              className="rounded px-3 py-2 text-sm font-semibold text-white hover:bg-gray-800"
+            >
+              CLOSE <span aria-hidden="true" className="ml-1 text-lg">×</span>
+            </button>
+          </div>
           {user ? (
-            <div className="border-b border-gray-200 pb-3">
-              <p className="py-2 text-sm font-semibold text-black truncate">👤 {user.email}</p>
+            <div className="border-b border-gray-700 pb-3">
+              <p className="truncate py-2 text-sm font-semibold text-white">👤 {user.email}</p>
               <Link
                 href="/user/dashboard"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block py-2 hover:text-gray-600"
+                className="block py-3 font-semibold text-white hover:bg-gray-800 hover:text-white"
               >
                 MY ACCOUNT
               </Link>
               <button
                 type="button"
                 onClick={handleLogout}
-                className="block w-full py-2 text-left font-semibold text-red-600 hover:text-red-700"
+                className="block w-full py-3 text-left font-semibold text-red-400 hover:bg-gray-800 hover:text-red-300"
               >
                 LOG OUT
               </button>
@@ -480,25 +496,25 @@ export default function Navigation() {
                 setMobileMenuOpen(false);
                 setAuthPanelOpen(true);
               }}
-              className="block w-full text-left py-2 font-semibold hover:text-gray-600"
+              className="block w-full border-b border-gray-700 py-3 text-left font-semibold text-white hover:bg-gray-800 hover:text-white"
             >
               LOGIN / REGISTER
             </button>
           )}
-          <Link href="/shop" className="block py-2 hover:text-gray-600">SHOP</Link>
-          <Link href="/gallery" className="block py-2 hover:text-gray-600">GEMSTONES</Link>
-          <Link href="/wishlist" className="block py-2 hover:text-gray-600">WISHLIST</Link>
-          <Link href="/compare" className="block py-2 hover:text-gray-600">COMPARE</Link>
-          <Link href="/tracking" className="block py-2 hover:text-gray-600">TRACK ORDER</Link>
-          <Link href="/auctions" className="block py-2 hover:text-gray-600">AUCTIONS</Link>
-          <Link href="/about" className="block py-2 hover:text-gray-600">ABOUT US</Link>
-          <Link href="/contact" className="block py-2 hover:text-gray-600">CONTACT</Link>
-          <div className="flex gap-3 text-xs py-2">
-            <select value={language} onChange={(e) => setLanguage(e.target.value)} className="border rounded px-2 py-1">
+          <Link href="/shop" onClick={() => setMobileMenuOpen(false)} className="block border-b border-gray-800 py-3 font-semibold text-white hover:bg-gray-800 hover:text-white">SHOP</Link>
+          <Link href="/gallery" onClick={() => setMobileMenuOpen(false)} className="block border-b border-gray-800 py-3 font-semibold text-white hover:bg-gray-800 hover:text-white">GEMSTONES</Link>
+          <Link href="/wishlist" onClick={() => setMobileMenuOpen(false)} className="block border-b border-gray-800 py-3 font-semibold text-white hover:bg-gray-800 hover:text-white">WISHLIST</Link>
+          <Link href="/compare" onClick={() => setMobileMenuOpen(false)} className="block border-b border-gray-800 py-3 font-semibold text-white hover:bg-gray-800 hover:text-white">COMPARE</Link>
+          <Link href="/tracking" onClick={() => setMobileMenuOpen(false)} className="block border-b border-gray-800 py-3 font-semibold text-white hover:bg-gray-800 hover:text-white">TRACK ORDER</Link>
+          <Link href="/auctions" onClick={() => setMobileMenuOpen(false)} className="block border-b border-gray-800 py-3 font-semibold text-white hover:bg-gray-800 hover:text-white">AUCTIONS</Link>
+          <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="block border-b border-gray-800 py-3 font-semibold text-white hover:bg-gray-800 hover:text-white">ABOUT US</Link>
+          <Link href="/contact" onClick={() => setMobileMenuOpen(false)} className="block border-b border-gray-800 py-3 font-semibold text-white hover:bg-gray-800 hover:text-white">CONTACT</Link>
+          <div className="flex gap-3 py-4 text-xs">
+            <select value={language} onChange={(e) => setLanguage(e.target.value)} className="rounded border border-gray-600 bg-gray-900 px-2 py-2 text-white">
               <option>ENGLISH</option>
               <option>ESPAÑOL</option>
             </select>
-            <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="border rounded px-2 py-1">
+            <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="rounded border border-gray-600 bg-gray-900 px-2 py-2 text-white">
               <option>USD</option>
               <option>EUR</option>
             </select>
