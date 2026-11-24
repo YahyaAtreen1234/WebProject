@@ -510,13 +510,22 @@ export default function AuthPanel({ open, onClose, initialMode = 'signin' }: Aut
 
                 <Recaptcha onChange={setCaptchaToken} />
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full rounded-md bg-red-600 py-4 text-[15px] font-bold uppercase tracking-wide text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {loading ? 'Signing in…' : 'Log in'}
-                </button>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full rounded-md bg-red-600 py-4 text-[15px] font-bold uppercase tracking-wide text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {loading ? 'Signing in…' : 'Log in'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => switchMode('register')}
+                    className="w-full rounded-md border-2 border-black bg-white py-4 text-[15px] font-bold uppercase tracking-wide text-black transition-colors hover:bg-black hover:text-white"
+                  >
+                    Register
+                  </button>
+                </div>
 
                 <div className="flex items-center justify-between pt-1">
                   <label className="flex cursor-pointer items-center gap-2.5 text-[15px] text-gray-800">
@@ -538,37 +547,6 @@ export default function AuthPanel({ open, onClose, initialMode = 'signin' }: Aut
                 </div>
               </form>
 
-              {/* Register call-to-action */}
-              <div className="mt-9 border-t border-gray-200 pt-8 text-center">
-                <svg
-                  className="mx-auto mb-3 text-gray-400"
-                  width="76"
-                  height="76"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                >
-                  <circle cx="12" cy="8" r="4" />
-                  <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
-                </svg>
-
-                <h3 className="mb-3 text-[26px] font-normal text-black">No account yet?</h3>
-                <p className="text-[15px] leading-relaxed text-gray-600">
-                  Registering for this site allows you to access your order status and history. Just
-                  fill in the fields below, and we&apos;ll get a new account set up for you in no
-                  time. We will only ask you for information necessary to make the purchase process
-                  faster and easier.
-                </p>
-
-                <button
-                  type="button"
-                  onClick={() => switchMode('register')}
-                  className="mt-6 w-full rounded-md border-2 border-black bg-black py-4 text-[15px] font-bold uppercase tracking-wide text-white transition-colors hover:bg-white hover:text-black"
-                >
-                  Register
-                </button>
-              </div>
             </>
           )}
 
