@@ -110,6 +110,19 @@ export default function Navigation() {
     return () => document.removeEventListener('click', onDocumentClick);
   }, [accountMenuOpen]);
 
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const onDocumentClick = (event: MouseEvent) => {
+      if (!(event.target instanceof Element)) return;
+      if (event.target.closest('#mobile-navigation-menu, [aria-controls="mobile-navigation-menu"]')) return;
+      setMobileMenuOpen(false);
+    };
+
+    document.addEventListener('click', onDocumentClick);
+    return () => document.removeEventListener('click', onDocumentClick);
+  }, [mobileMenuOpen]);
+
   const handleLogout = () => {
     clearStoredUserAuth();
     setAccountMenuOpen(false);
