@@ -267,7 +267,12 @@ export default function Navigation() {
 
             {/* Logo */}
             <div className="absolute left-1/2 -translate-x-1/2 scale-[0.833333] sm:static sm:translate-x-0 sm:scale-100">
-              <Logo label="STONES LAND" tagline="Premium Gems & Minerals" size={48} />
+              <Logo
+                label="STONES LAND"
+                tagline="Premium Gems & Minerals"
+                labelClassName="text-base sm:text-xl font-bold text-black tracking-tight [word-spacing:-0.08em]"
+                size={48}
+              />
             </div>
 
             {/* Search Bar */}
@@ -491,7 +496,7 @@ export default function Navigation() {
       {mobileMenuOpen && (
         <div
           id="mobile-navigation-menu"
-          className="absolute inset-x-0 top-full z-[60] flex max-h-[70vh] flex-col overflow-y-auto border-t border-gray-700 bg-black px-6 py-5 text-white shadow-xl sm:hidden"
+          className="fixed inset-y-0 left-0 z-[60] flex h-dvh w-1/2 max-w-sm flex-col overflow-y-auto border-r border-gray-700 bg-black px-4 py-5 text-white shadow-xl sm:hidden"
         >
           <div className="mb-5 flex items-center justify-between border-b border-gray-700 pb-4">
             <div role="heading" aria-level={2} className="text-xl font-bold tracking-wider text-white">MENU</div>
