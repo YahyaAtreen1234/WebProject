@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * Public banner feed. Returns only banners the admin has switched on and that
  * are inside their scheduling window, so a banner can be queued up in advance

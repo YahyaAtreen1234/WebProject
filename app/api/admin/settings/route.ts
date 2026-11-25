@@ -3,6 +3,8 @@ import { prisma } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
 import { isValidBusinessEmail, parseBusinessEmails } from '@/lib/businessEmails';
 
+export const dynamic = 'force-dynamic';
+
 function verifyAdmin(request: NextRequest) {
   try {
     const auth = request.headers.get('authorization');

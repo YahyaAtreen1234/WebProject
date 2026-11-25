@@ -2,6 +2,8 @@ import { prisma } from '@/lib/db';
 import { isValidTrackingNumber } from '@/lib/tracking';
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const trackingNumber = request.nextUrl.searchParams.get('trackingNumber');
