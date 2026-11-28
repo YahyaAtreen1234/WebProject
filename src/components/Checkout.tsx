@@ -2,18 +2,23 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { loadStripe } from '@stripe/stripe-js';
 import { useCart } from '@/context/CartContext';
 import { cartUtils } from '@/lib/cart';
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+type PaymentProvider = 'stripe' | 'paypal' | 'bank_transfer';
 
 export default function Checkout() {
-  const { cart, clearCart } = useCart();
+  const { cart } = useCart();
   const totals = cartUtils.getCartTotals(cart);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [toast, setToast] = useState('');
+  const [paymentProvider, setPaymentProvider] = useState<PaymentProvider>('stripe');
+  const [bankTransferOrder, setBankTransferOrder] = useState<{
+    orderNumber: string;
+    total: number;
+    instructions: string;
+  } | null>(null);
 
   const [formData, setFormData] = useState({
     customerName: '',
@@ -133,24 +138,29 @@ export default function Checkout() {
           discount: discountAmount,
           discountCode: appliedDiscountCode,
           total: finalTotal,
+          paymentProvider,
         }),
       });
 
+      const data = await response.json();
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.error || 'Failed to create checkout session');
       }
 
-      const { sessionId } = await response.json();
-
-      // Redirect to Stripe Checkout
-      const stripe = await stripePromise;
-      if (!stripe) throw new Error('Stripe failed to load');
-
-      const result = await stripe.redirectToCheckout({ sessionId });
-      if (result.error) {
-        throw new Error(result.error.message || 'Stripe checkout failed');
+      if (paymentProvider === 'bank_transfer') {
+        setBankTransferOrder({
+          orderNumber: data.orderNumber,
+          total: data.total,
+          instructions: data.instructions,
+        });
+        return;
       }
+
+      if (typeof data.checkoutUrl !== 'string' || !data.checkoutUrl) {
+        throw new Error('The payment provider did not return a checkout link. Please retry.');
+      }
+
+      window.location.assign(data.checkoutUrl);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'An error occurred';
       setError(message);
@@ -184,6 +194,24 @@ export default function Checkout() {
     <div className="min-h-screen bg-midnight-950 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-display font-bold text-white mb-8">Checkout</h1>
+
+        {bankTransferOrder && (
+          <div className="card-glass p-6 mb-8 border border-gold-500/30" role="status">
+            <h2 className="text-xl font-bold text-white mb-2">Bank transfer order created</h2>
+            <p className="text-midnight-200 mb-1">
+              Reference: <span className="font-mono text-gold-300">{bankTransferOrder.orderNumber}</span>
+            </p>
+            <p className="text-midnight-200 mb-4">
+              Amount due: <span className="font-bold text-gold-300">${bankTransferOrder.total.toFixed(2)}</span>
+            </p>
+            <p className="text-sm text-midnight-300 mb-2">
+              Your order remains pending until the transfer is received and confirmed by the store.
+            </p>
+            <pre className="whitespace-pre-wrap break-words rounded-lg bg-midnight-800 p-4 text-sm text-white">
+              {bankTransferOrder.instructions}
+            </pre>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Checkout Form */}
@@ -280,18 +308,80 @@ export default function Checkout() {
                 </div>
               </div>
 
+              <fieldset className="card-glass p-6 border border-sapphire-500/20">
+                <legend className="px-2 text-xl font-bold text-white">Payment Method</legend>
+                <div className="space-y-3">
+                  <label className="flex items-start gap-3 rounded-lg border border-sapphire-500/20 p-4 text-midnight-100">
+                    <input
+                      type="radio"
+                      name="paymentProvider"
+                      value="stripe"
+                      checked={paymentProvider === 'stripe'}
+                      onChange={() => setPaymentProvider('stripe')}
+                      className="mt-1"
+                    />
+                    <span>
+                      <span className="block font-semibold">Card, Apple Pay, or Google Pay</span>
+                      <span className="block text-sm text-midnight-400">
+                        Secure Stripe checkout. Wallet options appear when enabled for this account and domain.
+                      </span>
+                    </span>
+                  </label>
+                  <label className="flex items-start gap-3 rounded-lg border border-sapphire-500/20 p-4 text-midnight-100">
+                    <input
+                      type="radio"
+                      name="paymentProvider"
+                      value="paypal"
+                      checked={paymentProvider === 'paypal'}
+                      onChange={() => setPaymentProvider('paypal')}
+                      className="mt-1"
+                    />
+                    <span>
+                      <span className="block font-semibold">PayPal</span>
+                      <span className="block text-sm text-midnight-400">
+                        PayPal confirms payment before your order is marked paid.
+                      </span>
+                    </span>
+                  </label>
+                  <label className="flex items-start gap-3 rounded-lg border border-sapphire-500/20 p-4 text-midnight-100">
+                    <input
+                      type="radio"
+                      name="paymentProvider"
+                      value="bank_transfer"
+                      checked={paymentProvider === 'bank_transfer'}
+                      onChange={() => setPaymentProvider('bank_transfer')}
+                      className="mt-1"
+                    />
+                    <span>
+                      <span className="block font-semibold">Bank transfer</span>
+                      <span className="block text-sm text-midnight-400">
+                        Orders stay pending until an administrator confirms receipt.
+                      </span>
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+
               {error && (
                 <div className="card-glass p-4 border border-rose-500/30 bg-rose-500/10">
-                  <p className="text-rose-400">{error}</p>
+                  <p className="text-rose-400" role="alert">{error}</p>
                 </div>
               )}
 
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || Boolean(bankTransferOrder)}
                 className="w-full px-6 py-3 bg-gradient-to-r from-sapphire-600 to-sapphire-700 text-white rounded-lg hover:from-sapphire-700 hover:to-sapphire-800 transition-all font-semibold disabled:opacity-50"
               >
-                {loading ? 'Processing...' : 'Proceed to Payment'}
+                {loading
+                  ? 'Processing...'
+                  : bankTransferOrder
+                    ? 'Bank transfer instructions provided'
+                    : paymentProvider === 'bank_transfer'
+                      ? 'Create bank transfer order'
+                      : paymentProvider === 'paypal'
+                        ? 'Continue to PayPal'
+                        : 'Proceed to Secure Checkout'}
               </button>
 
               <Link

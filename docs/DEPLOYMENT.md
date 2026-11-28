@@ -62,7 +62,10 @@ DATABASE_URL=postgresql://...
 JWT_SECRET=<strong-random-secret>
 STRIPE_SECRET_KEY=sk_live_...
 STRIPE_WEBHOOK_SECRET=whsec_live_...
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
+PAYPAL_MODE=live
+PAYPAL_CLIENT_ID=<PayPal live client ID>
+PAYPAL_CLIENT_SECRET=<PayPal live client secret>
+BANK_TRANSFER_INSTRUCTIONS=<transfer details displayed to customers>
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your@email.com
@@ -101,14 +104,27 @@ Workflows automatically run on push:
 
 ### 4.1 Stripe
 
-1. Go to [stripe.com](https://stripe.com) and create account
-2. Enable production mode
-3. Get API keys from Dashboard
-4. Add webhook endpoint in Vercel:
+1. Enable production mode and set the matching `STRIPE_SECRET_KEY` in Vercel.
+2. Enable card payments and eligible wallet methods in Stripe Dashboard.
+3. Use Stripe-hosted Checkout for wallet payments; Stripe determines whether Apple Pay/Google Pay is available to each customer.
+4. Add a webhook endpoint in Stripe:
    - URL: `https://yourdomain.com/api/webhooks/stripe`
-   - Events: `payment_intent.succeeded`, `payment_intent.payment_failed`
+   - Events: `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`, `checkout.session.expired`, `charge.refunded`
 
-### 4.2 Email Service
+### 4.2 PayPal
+
+1. Create a PayPal business app in PayPal Developer Dashboard.
+2. Test with sandbox client ID and secret using `PAYPAL_MODE=sandbox`.
+3. Add sandbox credentials to Vercel Preview/Development environments.
+4. After test purchases succeed, add live credentials and set `PAYPAL_MODE=live` for Production.
+
+Never commit or share PayPal client secrets. The PayPal return endpoint verifies the order and capture amount with PayPal before updating the order.
+
+### 4.3 Manual Bank Transfer
+
+Set `BANK_TRANSFER_INSTRUCTIONS` in Vercel to the store's transfer details. An order remains pending until an administrator confirms receipt in the Orders panel; do not confirm before the funds arrive.
+
+### 4.4 Email Service
 
 **Gmail Setup:**
 1. Enable 2-factor authentication
@@ -120,7 +136,7 @@ Workflows automatically run on push:
 2. Generate API key
 3. Use API key as SMTP_PASS with username "apikey"
 
-### 4.3 Vercel Blob Storage
+### 4.5 Vercel Blob Storage
 
 1. In Vercel Project → Storage
 2. Create new Blob store

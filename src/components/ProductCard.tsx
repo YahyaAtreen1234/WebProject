@@ -43,7 +43,7 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
 
   return (
     <>
-      <div className="group cursor-pointer">
+      <div className="group min-w-0 cursor-pointer">
         <div className="card-gradient overflow-hidden rounded-2xl h-full">
           {/* Image Container */}
           <div className="relative overflow-hidden aspect-square bg-gradient-to-br from-sapphire-900/50 to-amethyst-900/50 mb-0">
@@ -105,8 +105,8 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
           </div>
 
           {/* Product Info */}
-          <div className="p-6">
-            <h3 className="text-lg font-bold text-white mb-2 group-hover:text-sapphire-300 transition-colors line-clamp-2">
+          <div className="min-w-0 p-4 sm:p-6">
+            <h3 className="break-words text-lg font-bold text-white mb-2 group-hover:text-sapphire-300 transition-colors line-clamp-2">
               {product.title}
             </h3>
 
@@ -114,11 +114,11 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
               {product.description}
             </p>
 
-            <div className="flex items-end justify-between mb-4">
-              <p className="text-2xl font-bold bg-gradient-to-r from-gold-300 to-rose-300 bg-clip-text text-transparent">
+            <div className="mb-4 flex min-w-0 items-end justify-between gap-2">
+              <p className="min-w-0 break-words text-xl font-bold bg-gradient-to-r from-gold-300 to-rose-300 bg-clip-text text-transparent sm:text-2xl">
                 ${product.price.toFixed(2)}
               </p>
-              <div className="text-2xl group-hover:scale-125 transition-transform">⭐</div>
+              <div className="shrink-0 text-2xl group-hover:scale-125 transition-transform">⭐</div>
             </div>
 
             {/* Quick Add to Cart */}

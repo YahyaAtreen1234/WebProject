@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface Order {
@@ -11,6 +11,7 @@ interface Order {
   totalAmount: number;
   status: string;
   paymentStatus: string;
+  paymentMethod?: string | null;
   createdAt: string;
   itemCount: number;
 }
@@ -42,6 +43,8 @@ export default function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<OrderDetail | null>(null);
   const [loading, setLoading] = useState(false);
+  const [confirmingTransfer, setConfirmingTransfer] = useState(false);
+  const [paymentActionError, setPaymentActionError] = useState('');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [paymentStatusFilter, setPaymentStatusFilter] = useState('');
@@ -58,13 +61,7 @@ export default function AdminOrders() {
     setToken(savedToken);
   }, [router]);
 
-  useEffect(() => {
-    if (token) {
-      fetchOrders();
-    }
-  }, [token, search, statusFilter, paymentStatusFilter, offset]);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -89,7 +86,13 @@ export default function AdminOrders() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [limit, offset, paymentStatusFilter, search, statusFilter, token]);
+
+  useEffect(() => {
+    if (token) {
+      fetchOrders();
+    }
+  }, [token, fetchOrders]);
 
   const fetchOrderDetail = async (orderId: string) => {
     try {
@@ -123,6 +126,33 @@ export default function AdminOrders() {
       }
     } catch (error) {
       console.error('Error updating order:', error);
+    }
+  };
+
+  const confirmBankTransfer = async () => {
+    if (!selectedOrder) return;
+    setConfirmingTransfer(true);
+    setPaymentActionError('');
+
+    try {
+      const response = await fetch(`/api/admin/orders/${selectedOrder.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ confirmBankTransfer: true }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not confirm bank transfer.');
+      setSelectedOrder(data);
+      await fetchOrders();
+    } catch (error) {
+      setPaymentActionError(
+        error instanceof Error ? error.message : 'Could not confirm bank transfer.'
+      );
+    } finally {
+      setConfirmingTransfer(false);
     }
   };
 
@@ -184,7 +214,8 @@ export default function AdminOrders() {
           >
             <option value="">All Payment Status</option>
             <option value="pending">Pending</option>
-            <option value="completed">Completed</option>
+            <option value="succeeded">Succeeded</option>
+            <option value="completed">Legacy completed</option>
             <option value="failed">Failed</option>
           </select>
         </div>
@@ -238,7 +269,7 @@ export default function AdminOrders() {
                     </span>
                     <span
                       className={`text-xs px-2 py-1 rounded ${
-                        order.paymentStatus === 'completed'
+                        order.paymentStatus === 'succeeded' || order.paymentStatus === 'completed'
                           ? 'bg-emerald-500/20 text-emerald-400'
                           : 'bg-yellow-500/20 text-yellow-400'
                       }`}
@@ -315,6 +346,26 @@ export default function AdminOrders() {
                   ${selectedOrder.totalAmount.toFixed(2)}
                 </p>
               </div>
+
+              {selectedOrder.paymentMethod === 'bank_transfer' &&
+                selectedOrder.paymentStatus === 'pending' && (
+                  <div className="space-y-2 border-t border-midnight-700 pt-4">
+                    <p className="text-sm text-amber-300">
+                      Confirm only after the funds have arrived in the business bank account.
+                    </p>
+                    {paymentActionError && (
+                      <p className="text-sm text-rose-400" role="alert">{paymentActionError}</p>
+                    )}
+                    <button
+                      type="button"
+                      onClick={confirmBankTransfer}
+                      disabled={confirmingTransfer}
+                      className="w-full rounded-lg bg-emerald-700 px-4 py-2 font-semibold text-white hover:bg-emerald-600 disabled:opacity-50"
+                    >
+                      {confirmingTransfer ? 'Confirming...' : 'Confirm received transfer'}
+                    </button>
+                  </div>
+                )}
 
               <div className="pt-4 border-t border-midnight-700">
                 <p className="text-xs uppercase tracking-wide text-midnight-400 mb-2">Items</p>

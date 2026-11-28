@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
-import { stripe } from '@/lib/stripe';
+import { getStripeClient, isStripeConfigured } from '@/lib/stripe';
 
 function verifyAdmin(request: NextRequest) {
   try {
@@ -71,8 +71,9 @@ export async function GET(request: NextRequest) {
     // failing the request, so the sales figures above always render.
     let payout: Record<string, unknown> = { configured: false };
 
-    if (stripe) {
+    if (isStripeConfigured()) {
       try {
+        const stripe = getStripeClient();
         const [balance, account, payouts] = await Promise.all([
           stripe.balance.retrieve(),
           stripe.accounts.retrieve(),

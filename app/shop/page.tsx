@@ -201,7 +201,7 @@ export default function ShopPage() {
             </button>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:gap-4">
             <select
               value={itemsPerPage}
               onChange={(e) => {
@@ -215,7 +215,7 @@ export default function ShopPage() {
               <option value="24">24 per page</option>
             </select>
 
-            <div className="text-sm text-midnight-300 px-4 py-2">
+            <div className="text-sm text-midnight-300 py-2 sm:px-4">
               Showing {paginatedProducts.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} -{' '}
               {Math.min(currentPage * itemsPerPage, filteredProducts.length)} of{' '}
               {filteredProducts.length}
@@ -256,24 +256,24 @@ export default function ShopPage() {
                   {paginatedProducts.map((product) => (
                     <div
                       key={product.id}
-                      className="card-glass backdrop-blur-md p-6 rounded-2xl flex gap-6 items-start"
+                      className="card-glass backdrop-blur-md p-4 sm:p-6 rounded-2xl flex flex-col sm:flex-row gap-4 sm:gap-6 items-start"
                     >
-                      <div className="w-32 h-32 rounded-lg bg-gradient-to-br from-sapphire-900/50 to-amethyst-900/50 flex items-center justify-center text-4xl flex-shrink-0">
+                      <div className="w-full h-48 sm:w-32 sm:h-32 rounded-lg bg-gradient-to-br from-sapphire-900/50 to-amethyst-900/50 flex items-center justify-center text-4xl flex-shrink-0">
                         💎
                       </div>
 
-                      <div className="flex-1">
-                        <div className="flex justify-between items-start mb-3">
+                      <div className="w-full min-w-0 flex-1">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-3">
                           <div>
-                            <h3 className="text-xl font-bold text-white mb-1">{product.title}</h3>
+                            <h3 className="break-words text-xl font-bold text-white mb-1">{product.title}</h3>
                             <p className="text-sm text-sapphire-300">{product.category}</p>
                           </div>
-                          <p className="text-3xl font-bold bg-gradient-to-r from-gold-300 to-rose-300 bg-clip-text text-transparent">
+                          <p className="break-words text-2xl font-bold bg-gradient-to-r from-gold-300 to-rose-300 bg-clip-text text-transparent sm:text-3xl">
                             ${product.price}
                           </p>
                         </div>
 
-                        <p className="text-midnight-200 mb-4">{product.description}</p>
+                        <p className="break-words text-midnight-200 mb-4">{product.description}</p>
 
                         <div className="flex gap-4 items-center">
                           <span className="text-sm text-midnight-400">

@@ -158,13 +158,13 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               )}
             </div>
 
-            <h1 className="text-4xl font-bold text-white mb-4">{product.title}</h1>
+            <h1 className="break-words text-3xl font-bold text-white mb-4 sm:text-4xl">{product.title}</h1>
 
-            <p className="text-4xl font-bold bg-gradient-to-r from-gold-300 to-rose-300 bg-clip-text text-transparent mb-6">
+            <p className="break-words text-3xl font-bold bg-gradient-to-r from-gold-300 to-rose-300 bg-clip-text text-transparent mb-6 sm:text-4xl">
               ${product.price.toFixed(2)}
             </p>
 
-            <p className="text-midnight-200 leading-relaxed mb-8 whitespace-pre-line">
+            <p className="break-words text-midnight-200 leading-relaxed mb-8 whitespace-pre-line">
               {product.description}
             </p>
 

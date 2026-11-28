@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { cartUtils, type Cart, type CartItem } from '@/lib/cart';
 
 interface CartContextType {
@@ -43,10 +43,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     setCart(updatedCart);
   };
 
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     const emptyCart = cartUtils.clearCart();
     setCart(emptyCart);
-  };
+  }, []);
 
   const getCartTotal = (): number => {
     return cartUtils.getCartTotals(cart).total;

@@ -1,160 +1,107 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
+import Stripe from 'stripe';
 import { prisma } from '@/lib/db';
-import { sendOrderConfirmation } from '@/lib/email';
-
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+import { completeOrderPayment } from '@/lib/order-payment';
+import { toCents } from '@/lib/pricing';
+import { getStripeClient, isStripeConfigured } from '@/lib/stripe';
 
 export async function POST(request: NextRequest) {
-  const body = await request.text();
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   const signature = request.headers.get('stripe-signature');
-
-  if (!signature || !webhookSecret) {
-    return NextResponse.json(
-      { error: 'Missing signature or webhook secret' },
-      { status: 400 }
-    );
+  if (!isStripeConfigured() || !webhookSecret) {
+    console.error('[stripe] Webhook is not configured.');
+    return NextResponse.json({ error: 'Payment webhook is not configured.' }, { status: 503 });
+  }
+  if (!signature) {
+    return NextResponse.json({ error: 'Missing Stripe signature.' }, { status: 400 });
   }
 
-  let event;
-
+  let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    const body = await request.text();
+    event = getStripeClient().webhooks.constructEvent(body, signature, webhookSecret);
   } catch (error) {
-    console.error('Webhook signature verification failed:', error);
-    return NextResponse.json(
-      { error: 'Invalid signature' },
-      { status: 400 }
-    );
+    console.error('[stripe] Webhook signature verification failed:', error);
+    return NextResponse.json({ error: 'Invalid Stripe signature.' }, { status: 400 });
   }
 
   try {
     switch (event.type) {
-      case 'checkout.session.completed': {
-        const session = event.data.object as any;
+      case 'checkout.session.completed':
+      case 'checkout.session.async_payment_succeeded': {
+        const session = event.data.object as Stripe.Checkout.Session;
         const orderId = session.metadata?.orderId;
-
-        if (orderId) {
-          const existing = await prisma.order.findUnique({
-            where: { id: orderId },
-            select: { paymentStatus: true },
-          });
-
-          // Stripe retries webhooks and may deliver the same event more than
-          // once. Without this guard a retry would decrement stock a second
-          // time for a single sale.
-          if (existing?.paymentStatus === 'succeeded') {
-            console.log('[stripe] Ignoring duplicate completion for', orderId);
-            break;
+        if (orderId && session.payment_status === 'paid') {
+          const order = await prisma.order.findUnique({ where: { id: orderId } });
+          if (
+            !order ||
+            (order.paymentMethod !== 'stripe' && order.paymentMethod !== null) ||
+            session.currency?.toLowerCase() !== 'usd' ||
+            session.amount_total !== toCents(order.totalAmount)
+          ) {
+            throw new Error(`Stripe session does not match order ${orderId}.`);
           }
 
-          const order = await prisma.order.update({
-            where: { id: orderId },
-            data: {
-              paymentStatus: 'succeeded',
-              status: 'confirmed',
-              // Captured here rather than at session creation: the payment
-              // intent does not exist until the customer actually pays.
-              stripePaymentId: (session.payment_intent as string) || undefined,
-            },
-            include: {
-              items: true,
-            },
-          });
-
-          // Money is in. Take the goods out of stock -- nothing else in the
-          // codebase did, so every item stayed permanently in stock and could
-          // be oversold without limit.
-          await Promise.all(
-            order.items.map((item) =>
-              prisma.product.update({
-                where: { id: item.productId },
-                data: { stock: { decrement: item.quantity } },
-              }).catch((stockError) => {
-                // A missing or deleted product must not roll back a paid order.
-                console.error('[stripe] Stock update failed for', item.productId, stockError);
-              })
-            )
-          );
-
-          // Record the receipt so admin earnings reconcile against Stripe.
-          await prisma.paymentRecord.create({
-            data: {
-              orderId: order.id,
-              amount: order.totalAmount,
-              currency: 'USD',
-              type: 'credit_card',
-              status: 'completed',
-              transactionId: (session.payment_intent as string) || session.id,
-              processedAt: new Date(),
-            },
-          }).catch((recordError) => {
-            console.error('[stripe] Payment record failed for', order.id, recordError);
-          });
-
-          if (order.discountCode) {
-            await prisma.discount.updateMany({
-              where: { code: order.discountCode },
-              data: { timesUsed: { increment: 1 } },
-            }).catch(() => undefined);
-          }
-
-          // Send confirmation email
-          await sendOrderConfirmation({
-            orderNumber: order.orderNumber,
-            customerEmail: order.customerEmail,
-            customerName: order.customerName,
-            items: order.items.map((item) => ({
-              name: item.title,
-              quantity: item.quantity,
-              price: item.price,
-            })),
-            subtotal: order.subtotal,
-            tax: order.tax,
-            shipping: order.shipping,
-            total: order.totalAmount,
-            address: order.address,
-            city: order.city,
-            postalCode: order.postalCode,
-            country: order.country,
+          const paymentIntentId =
+            typeof session.payment_intent === 'string'
+              ? session.payment_intent
+              : session.payment_intent?.id;
+          await completeOrderPayment({
+            orderId,
+            paymentMethod: 'stripe',
+            paymentRecordType: 'credit_card',
+            transactionId: paymentIntentId || session.id,
+            ...(paymentIntentId && { stripePaymentId: paymentIntentId }),
           });
         }
         break;
       }
 
-      case 'payment_intent.payment_failed': {
-        const paymentIntent = event.data.object as any;
-        const orderId = paymentIntent.metadata?.orderId;
-
+      case 'checkout.session.async_payment_failed': {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const orderId = session.metadata?.orderId;
         if (orderId) {
-          await prisma.order.update({
-            where: { id: orderId },
-            data: {
-              paymentStatus: 'failed',
-              status: 'cancelled',
-            },
+          await prisma.order.updateMany({
+            where: { id: orderId, paymentStatus: 'pending', paymentMethod: 'stripe' },
+            data: { paymentStatus: 'failed', status: 'cancelled' },
+          });
+        }
+        break;
+      }
+
+      case 'checkout.session.expired': {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const orderId = session.metadata?.orderId;
+        if (orderId) {
+          await prisma.order.updateMany({
+            where: { id: orderId, paymentStatus: 'pending', paymentMethod: 'stripe' },
+            data: { paymentStatus: 'failed', status: 'cancelled' },
           });
         }
         break;
       }
 
       case 'charge.refunded': {
-        const charge = event.data.object as any;
-        const paymentIntentId = charge.payment_intent;
-
+        const charge = event.data.object as Stripe.Charge;
+        const paymentIntentId =
+          typeof charge.payment_intent === 'string'
+            ? charge.payment_intent
+            : charge.payment_intent?.id;
         if (paymentIntentId) {
           const order = await prisma.order.findFirst({
             where: { stripePaymentId: paymentIntentId },
           });
-
           if (order) {
-            await prisma.order.update({
-              where: { id: order.id },
-              data: {
-                paymentStatus: 'refunded',
-                status: 'cancelled',
-              },
-            });
+            await prisma.$transaction([
+              prisma.order.update({
+                where: { id: order.id },
+                data: { paymentStatus: 'refunded', status: 'cancelled' },
+              }),
+              prisma.paymentRecord.updateMany({
+                where: { orderId: order.id, status: 'completed' },
+                data: { status: 'refunded', refundedAt: new Date() },
+              }),
+            ]);
           }
         }
         break;
@@ -163,10 +110,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error('Webhook processing error:', error);
-    return NextResponse.json(
-      { error: 'Webhook processing failed' },
-      { status: 500 }
-    );
+    console.error('[stripe] Webhook processing failed:', error);
+    return NextResponse.json({ error: 'Webhook processing failed.' }, { status: 500 });
   }
 }

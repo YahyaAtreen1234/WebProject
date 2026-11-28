@@ -52,7 +52,7 @@ function StockNote({ stock }: { stock: number }) {
 
 function ProductCard({ product }: { product: Product }) {
   return (
-    <Link href={`/shop/${product.id}`} className="group block">
+    <Link href={`/shop/${product.id}`} className="group block min-w-0">
       <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
         {product.image ? (
           <img
@@ -77,11 +77,11 @@ function ProductCard({ product }: { product: Product }) {
       </div>
 
       <div className="pt-4">
-        <p className="text-xs uppercase tracking-widest text-gray-400">{product.category}</p>
-        <h3 className="mt-1 text-[15px] leading-snug text-gray-900 group-hover:underline underline-offset-4">
+        <p className="break-words text-xs uppercase tracking-widest text-gray-400">{product.category}</p>
+        <h3 className="mt-1 break-words text-[15px] leading-snug text-gray-900 group-hover:underline underline-offset-4">
           {product.title}
         </h3>
-        <p className="mt-1 text-[15px] font-medium text-gray-900">{money(product.price)}</p>
+        <p className="mt-1 break-words text-[15px] font-medium text-gray-900">{money(product.price)}</p>
         <StockNote stock={product.stock} />
       </div>
     </Link>

@@ -261,7 +261,14 @@ JWT_SECRET="your-secret-key-32-chars-min"
 # Stripe (production keys)
 STRIPE_SECRET_KEY="sk_live_..."
 STRIPE_WEBHOOK_SECRET="whsec_..."
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_live_..."
+
+# PayPal (optional; test in sandbox first)
+PAYPAL_MODE="live"
+PAYPAL_CLIENT_ID="your-live-client-id"
+PAYPAL_CLIENT_SECRET="your-live-client-secret"
+
+# Optional manual bank transfer instructions (orders require admin confirmation)
+BANK_TRANSFER_INSTRUCTIONS="Your bank transfer details..."
 
 # Email Service
 SMTP_HOST="smtp.gmail.com"

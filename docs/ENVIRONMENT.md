@@ -69,7 +69,9 @@ ADMIN_PASSWORD="admin123"
 
 **Note:** Only used during initial database setup. Change in UI after first login.
 
-### PAYMENT PROCESSING (Stripe)
+### PAYMENT PROCESSING
+
+#### Stripe card and wallet checkout
 
 All Stripe keys must match the same environment (test or live).
 
@@ -86,7 +88,7 @@ Secret API key for server-side Stripe operations.
 STRIPE_SECRET_KEY="sk_test_4eC39HqLyjWDarhtT657BK"
 ```
 
-#### `STRIPE_WEBHOOK_SECRET` (Required)
+#### `STRIPE_WEBHOOK_SECRET` (Required in production)
 
 Secret for validating Stripe webhook events.
 
@@ -99,7 +101,7 @@ Secret for validating Stripe webhook events.
 STRIPE_WEBHOOK_SECRET="whsec_test_12345678901234567890"
 ```
 
-#### `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (Required)
+#### `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (Optional)
 
 Public API key for client-side Stripe operations.
 
@@ -117,6 +119,25 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_51234567890abcdef"
 - Test keys (pk_test_) for development
 - Live keys (pk_live_) only in production
 - Both secret and public keys must match environments
+- Hosted checkout redirects use the session URL and do not require a publishable key.
+- Manage available payment methods in Stripe Dashboard. Stripe Checkout hosts the payment page; wallet options are shown only when supported by the account, device, browser, currency, and customer.
+- Configure the Stripe webhook URL as `https://yourdomain.com/api/webhooks/stripe` and subscribe to `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`, `checkout.session.expired`, and `charge.refunded`.
+
+#### PayPal checkout (Optional)
+
+PayPal checkout uses PayPal's server-side Orders API. Configure a PayPal business app and add these server-only variables:
+
+```
+PAYPAL_MODE="sandbox"
+PAYPAL_CLIENT_ID="your-client-id"
+PAYPAL_CLIENT_SECRET="your-client-secret"
+```
+
+Use sandbox credentials and `PAYPAL_MODE="sandbox"` for testing. Switch the mode to `live` and use live credentials only after successful sandbox testing. Never expose the client secret to the browser or commit it to source control.
+
+#### Manual bank transfer (Optional)
+
+To offer bank transfer, set `BANK_TRANSFER_INSTRUCTIONS` to the transfer details customers should receive. Keep it server-side (do not use a `NEXT_PUBLIC_` prefix). Orders remain pending and are only marked paid after an administrator confirms the funds have arrived.
 
 ### EMAIL SERVICE (SMTP)
 
@@ -270,9 +291,12 @@ DATABASE_URL="file:./prisma/dev.db"
 JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
 ADMIN_EMAIL="admin@minerals.local"
 ADMIN_PASSWORD="admin123"
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_xxxxx"
 STRIPE_SECRET_KEY="sk_test_xxxxx"
 STRIPE_WEBHOOK_SECRET="whsec_test_xxxxx"
+PAYPAL_MODE="sandbox"
+PAYPAL_CLIENT_ID="your-sandbox-client-id"
+PAYPAL_CLIENT_SECRET="your-sandbox-client-secret"
+BANK_TRANSFER_INSTRUCTIONS=""
 SMTP_HOST="smtp.gmail.com"
 SMTP_PORT="587"
 SMTP_USER="your-email@gmail.com"
@@ -287,9 +311,12 @@ NODE_ENV="development"
 ```env
 DATABASE_URL="postgresql://user:pass@host:5432/db"
 JWT_SECRET="strong-random-secret-32-chars-minimum"
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_live_xxxxx"
 STRIPE_SECRET_KEY="sk_live_xxxxx"
 STRIPE_WEBHOOK_SECRET="whsec_live_xxxxx"
+PAYPAL_MODE="live"
+PAYPAL_CLIENT_ID="your-live-client-id"
+PAYPAL_CLIENT_SECRET="your-live-client-secret"
+BANK_TRANSFER_INSTRUCTIONS="Your bank transfer details..."
 SMTP_HOST="smtp.gmail.com"
 SMTP_PORT="587"
 SMTP_USER="production@email.com"
@@ -358,6 +385,14 @@ Check that:
 - STRIPE_SECRET_KEY matches environment (test or live)
 - Key is not truncated or modified
 - Key format starts with `sk_test_` or `sk_live_`
+- Ensure the secret key is set in the active Vercel environment and matches the Stripe mode
+- For wallets, check Dashboard payment method settings and domain registration
+
+### PayPal checkout errors
+
+- Confirm `PAYPAL_MODE` matches the credentials (`sandbox` or `live`)
+- Confirm both PayPal credentials are set in the active Vercel environment
+- Review PayPal Developer Dashboard API logs; never share the client secret
 
 ### Email not sending
 
